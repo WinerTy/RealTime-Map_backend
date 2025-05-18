@@ -17,4 +17,4 @@ class AppConfig(BaseSettings):
     )
 
 
-conf = AppConfig()  # type: ignore
+conf = AppConfig()
