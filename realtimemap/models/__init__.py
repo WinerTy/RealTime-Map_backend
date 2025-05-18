@@ -1,5 +1,7 @@
-__all__ = ["BaseSqlModel", "Task"]
+__all__ = ["BaseSqlModel", "AccessToken", "User"]
 
 
+from .access_token import AccessToken
 from .base import BaseSqlModel
-from .task import Task
+
+from .user import User
