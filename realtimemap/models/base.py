@@ -23,7 +23,7 @@ class BaseSqlModel(DeclarativeBase):
 
     @declared_attr.directive
     def __tablename__(cls) -> str:  # noqa
-        return camel_case_to_snake_case(cls.__name__)
+        return camel_case_to_snake_case(cls.__name__) + "s"
 
     @classmethod
     async def count(
