@@ -39,3 +39,6 @@ class Mark(BaseSqlModel, IntIdMixin, TimeMarkMixin):
     additional_info: Mapped[str] = mapped_column(String(256), nullable=True)
 
     __table_args__ = (Index("idx_locations_geom", geom, postgresql_using="gist"),)
+
+    def __str__(self):
+        return f"{self.mark_name}: {self.id}"

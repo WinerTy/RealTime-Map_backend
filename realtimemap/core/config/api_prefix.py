@@ -10,7 +10,7 @@ class AuthPrefix(BaseModel):
 
 
 class ApiPrefixV1(BaseModel):
-    prefix: str = "v1"
+    prefix: str = "/api/v1"
     auth: AuthPrefix = AuthPrefix()
 
 
