@@ -3,4 +3,4 @@ from dependencies.session import get_session
 
 
 async def get_mark_repository(session: get_session) -> MarkRepository:
-    yield MarkRepository(session)
+    yield MarkRepository(session=session)

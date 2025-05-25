@@ -4,15 +4,13 @@ from pydantic import BaseModel, field_validator
 
 class UserRead(schemas.BaseUser[int]):
     id: int
-    first_name: str
-    middle_name: str
-    last_name: str
+    phone: str
+    username: str
 
 
 class UserCreate(schemas.BaseUserCreate):
-    first_name: str
-    middle_name: str
-    last_name: str
+    phone: str
+    username: str
 
 
 class UserUpdate(schemas.BaseUserUpdate):

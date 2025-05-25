@@ -1,12 +1,13 @@
-from typing import Optional, Annotated
+from typing import Optional, Annotated, List
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Form
 from pydantic import BaseModel, Field
+from starlette.requests import Request
 
 from api.v1.auth.fastapi_users import current_active_user
 from crud.mark import MarkRepository
 from dependencies.crud import get_mark_repository
-from models import TypeMark, user
+from models import TypeMark, User
 from schemas.mark import CreateMarkRequest, ReadMark
 
 router = APIRouter(prefix="/marks", tags=["Marks"])
@@ -20,7 +21,7 @@ class MarkParams(BaseModel):
     type_mark: Optional[TypeMark] = None
 
 
-@router.get("/")
+@router.get("/", response_model=List[ReadMark])
 async def get_marks(
     repo: Annotated["MarkRepository", Depends(get_mark_repository)],
     params: MarkParams = Depends(),
@@ -31,8 +32,8 @@ async def get_marks(
 
 @router.post("/", response_model=ReadMark)
 async def create_mark_point(
-    mark: CreateMarkRequest,
-    user: Annotated["user", Depends(current_active_user)],
+    mark: Annotated[CreateMarkRequest, Form(media_type="multipart/form-data")],
+    user: Annotated["User", Depends(current_active_user)],
     repo: Annotated["MarkRepository", Depends(get_mark_repository)],
 ):
     """
@@ -42,3 +43,33 @@ async def create_mark_point(
     data = instance.__dict__
     data.pop("geom")  # FIX THIS
     return data
+
+
+@router.get("/list/", response_model=List[ReadMark])
+async def get_mark_list(
+    repo: Annotated["MarkRepository", Depends(get_mark_repository)],
+):
+    result = await repo.get_all_marks()
+    return result
+
+
+@router.get(
+    "/{mark_id}/",
+)
+async def get_mark(
+    mark_id: int,
+    repo: Annotated["MarkRepository", Depends(get_mark_repository)],
+    request: Request,
+):
+    result = await repo.get_mark_by_id(mark_id)
+    result = result.__dict__
+    result.pop("geom")
+    return ReadMark.model_validate(result, context={"request": request})
+
+
+@router.delete("/{mark_id}")
+async def delete_mark(
+    mark_id: int,
+    user: Annotated["User", Depends(current_active_user)],
+):
+    pass

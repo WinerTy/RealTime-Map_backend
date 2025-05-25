@@ -7,6 +7,7 @@ from starlette.staticfiles import StaticFiles
 
 from api.v1 import router as v1_router
 from .lifespan import lifespan
+from ..config import conf
 
 ROOT_DIR = Path(__file__).parent.parent
 
@@ -27,7 +28,7 @@ def add_routers(app: FastAPI):
 def create_app() -> FastAPI:
     app = FastAPI(lifespan=lifespan, default_response_class=ORJSONResponse)
     app.mount(
-        "/static", StaticFiles(directory=ROOT_DIR.parent / "static"), name="static"
+        "/static", StaticFiles(directory=ROOT_DIR.parent / conf.static), name="static"
     )
     add_routers(app)
     add_babel_middleware(app)

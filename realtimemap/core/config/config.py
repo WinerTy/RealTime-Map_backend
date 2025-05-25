@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from .api_prefix import ApiPrefix
@@ -9,6 +11,7 @@ class AppConfig(BaseSettings):
     server: ServerConfig = ServerConfig()
     db: DatabaseConfig
     api: ApiPrefix = ApiPrefix()
+    static: Path = Path("static")
     model_config = SettingsConfigDict(
         env_file=".env",
         case_sensitive=False,

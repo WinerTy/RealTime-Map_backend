@@ -13,17 +13,14 @@ if TYPE_CHECKING:
 
 class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
     __tablename__ = "users"
-    first_name: Mapped[str] = mapped_column(String(128), nullable=False)
-    middle_name: Mapped[str] = mapped_column(String(128), nullable=True)
-    last_name: Mapped[str] = mapped_column(String(128), nullable=False)
-
-    @property
-    def full_name(self):
-        return f"{self.first_name} {self.middle_name if self.middle_name else ''} {self.last_name}"
+    phone: Mapped[str] = mapped_column(
+        String(32), unique=True, nullable=False, index=True
+    )
+    username: Mapped[str] = mapped_column(String(32), unique=True, nullable=False)
 
     @classmethod
     def get_db(cls, session: "AsyncSession"):
         return SQLAlchemyUserDatabase(session, cls)
 
     def __str__(self):
-        return self.full_name
+        return self.username
