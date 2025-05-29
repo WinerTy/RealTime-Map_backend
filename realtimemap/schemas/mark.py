@@ -1,6 +1,6 @@
 from typing import Optional
 
-from fastapi import UploadFile, Request
+from fastapi import UploadFile, Request, WebSocket
 from geojson_pydantic import Point
 from pydantic import BaseModel, Field, model_validator
 from pydantic_core.core_schema import ValidationInfo
@@ -46,7 +46,7 @@ class ReadMark(BaseMark):
     @model_validator(mode="after")
     def generate_ful_image_path(self, info: ValidationInfo) -> "ReadMark":
         if info.context and "request" in info.context and self.photo:
-            request: Request = info.context["request"]
+            request: Request | WebSocket = info.context["request"]
             try:
                 self.photo = str(request.url_for(str(conf.static), path=self.photo))
             except Exception:

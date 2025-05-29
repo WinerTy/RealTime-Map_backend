@@ -2,6 +2,7 @@ import enum
 from typing import TYPE_CHECKING
 
 from geoalchemy2 import Geometry
+from geoalchemy2.functions import ST_Y, ST_X
 from sqlalchemy import ForeignKey, String, Index, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -39,6 +40,14 @@ class Mark(BaseSqlModel, IntIdMixin, TimeMarkMixin):
     additional_info: Mapped[str] = mapped_column(String(256), nullable=True)
 
     __table_args__ = (Index("idx_locations_geom", geom, postgresql_using="gist"),)
+
+    @property
+    def latitude(self) -> float:
+        return ST_Y(self.geom)
+
+    @property
+    def longitude(self) -> float:
+        return ST_X(self.geom)
 
     def __str__(self):
         return f"{self.mark_name}: {self.id}"

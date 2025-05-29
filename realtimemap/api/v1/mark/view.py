@@ -1,6 +1,6 @@
 from typing import Optional, Annotated, List
 
-from fastapi import APIRouter, Depends, Form
+from fastapi import APIRouter, Depends, Form, WebSocketDisconnect, WebSocket
 from pydantic import BaseModel, Field
 from starlette.requests import Request
 
@@ -9,6 +9,7 @@ from crud.mark import MarkRepository
 from dependencies.crud import get_mark_repository
 from models import TypeMark, User
 from schemas.mark import CreateMarkRequest, ReadMark
+from websocket.mark_socket import marks_websocket
 
 router = APIRouter(prefix="/marks", tags=["Marks"])
 
@@ -23,11 +24,14 @@ class MarkParams(BaseModel):
 
 @router.get("/", response_model=List[ReadMark])
 async def get_marks(
+    request: Request,
     repo: Annotated["MarkRepository", Depends(get_mark_repository)],
     params: MarkParams = Depends(),
 ):
     result = await repo.get_marks(**params.model_dump())
-    return result
+    return [
+        ReadMark.model_validate(mark, context={"request": request}) for mark in result
+    ]
 
 
 @router.post("/", response_model=ReadMark)
@@ -35,6 +39,7 @@ async def create_mark_point(
     mark: Annotated[CreateMarkRequest, Form(media_type="multipart/form-data")],
     user: Annotated["User", Depends(current_active_user)],
     repo: Annotated["MarkRepository", Depends(get_mark_repository)],
+    request: Request,
 ):
     """
     Protected endpoint for create mark.
@@ -42,15 +47,7 @@ async def create_mark_point(
     instance = await repo.create_mark(mark, user)
     data = instance.__dict__
     data.pop("geom")  # FIX THIS
-    return data
-
-
-@router.get("/list/", response_model=List[ReadMark])
-async def get_mark_list(
-    repo: Annotated["MarkRepository", Depends(get_mark_repository)],
-):
-    result = await repo.get_all_marks()
-    return result
+    return ReadMark.model_validate(data, context={"request": request})
 
 
 @router.get(
@@ -73,3 +70,24 @@ async def delete_mark(
     user: Annotated["User", Depends(current_active_user)],
 ):
     pass
+
+
+@router.websocket("/")
+async def websocket_endpoint(
+    websocket: WebSocket,
+    repo: Annotated["MarkRepository", Depends(get_mark_repository)],
+):
+    await marks_websocket.connect(websocket)
+
+    while True:
+        try:
+            cords = await websocket.receive_json()
+            await marks_websocket.update_coordinates(websocket, cords)
+            actual_coords = marks_websocket.get_user_cords(websocket)
+            result = await repo.get_marks(**actual_coords.model_dump())
+            result_json = [
+                mark.model_dump(context={"request": websocket}) for mark in result
+            ]
+            await marks_websocket.broadcast_json(websocket, result_json)
+        except WebSocketDisconnect:
+            await marks_websocket.disconnect(websocket)
