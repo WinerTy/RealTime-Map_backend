@@ -3,7 +3,7 @@ from typing import Dict, Optional, List
 from fastapi import WebSocket
 from pydantic import BaseModel, Field, ValidationError
 
-from schemas.mark import ReadMark
+from models.mark.schemas import ReadMark
 from .base import WebsocketManager
 
 

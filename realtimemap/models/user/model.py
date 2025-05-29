@@ -1,7 +1,11 @@
 from typing import TYPE_CHECKING
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable, SQLAlchemyUserDatabase
-from sqlalchemy import String
+from fastapi_users_db_sqlalchemy.access_token import (
+    SQLAlchemyAccessTokenDatabase,
+    SQLAlchemyBaseAccessTokenTable,
+)
+from sqlalchemy import String, Integer, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
 from models import BaseSqlModel
@@ -24,3 +28,15 @@ class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
 
     def __str__(self):
         return self.username
+
+
+class AccessToken(BaseSqlModel, SQLAlchemyBaseAccessTokenTable[int]):
+    user_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("users.id", ondelete="cascade"),
+        nullable=False,
+    )
+
+    @classmethod
+    def get_db(cls, session: "AsyncSession"):
+        return SQLAlchemyAccessTokenDatabase(session, cls)

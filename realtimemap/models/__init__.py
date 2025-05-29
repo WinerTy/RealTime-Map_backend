@@ -1,7 +1,7 @@
-__all__ = ["BaseSqlModel", "AccessToken", "User", "Mark", "TypeMark"]
+__all__ = ["BaseSqlModel", "AccessToken", "User", "Mark", "Category"]
 
 
-from .access_token import AccessToken
 from .base import BaseSqlModel
-from .mark import Mark, TypeMark
-from .user import User
+from .category.model import Category
+from .mark.model import Mark
+from .user.model import User, AccessToken

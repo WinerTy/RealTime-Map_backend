@@ -1,4 +1,4 @@
-from typing import Optional, Annotated, List
+from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, Form, WebSocketDisconnect, WebSocket
 from pydantic import BaseModel, Field
@@ -7,8 +7,8 @@ from starlette.requests import Request
 from api.v1.auth.fastapi_users import current_active_user
 from crud.mark import MarkRepository
 from dependencies.crud import get_mark_repository
-from models import TypeMark, User
-from schemas.mark import CreateMarkRequest, ReadMark
+from models import User
+from models.mark.schemas import CreateMarkRequest, ReadMark
 from websocket.mark_socket import marks_websocket
 
 router = APIRouter(prefix="/marks", tags=["Marks"])
@@ -19,7 +19,6 @@ class MarkParams(BaseModel):
     longitude: float = Field(..., ge=-90, le=90, examples=["63.201907"])
     radius: int = Field(500, description="Search radius in meters.")
     srid: int = Field(4326, description="SRID")
-    type_mark: Optional[TypeMark] = None
 
 
 @router.get("/", response_model=List[ReadMark])

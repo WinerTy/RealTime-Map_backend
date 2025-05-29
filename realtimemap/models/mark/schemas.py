@@ -6,14 +6,12 @@ from pydantic import BaseModel, Field, model_validator
 from pydantic_core.core_schema import ValidationInfo
 
 from core.config import conf
-from models import TypeMark
 
 
 class BaseMark(BaseModel):
     mark_name: str = Field(
         ..., min_length=1, max_length=128, description="Название метки"
     )
-    type_mark: TypeMark
 
 
 class CreateMarkRequest(BaseMark):

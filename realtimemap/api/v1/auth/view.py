@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from dependencies.auth.backend import authentication_backend
-from schemas.user import UserRead, UserCreate
+from models.user.schemas import UserRead, UserCreate
 from .fastapi_users import fastapi_users
 
 router = APIRouter(

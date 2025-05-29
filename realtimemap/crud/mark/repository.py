@@ -1,5 +1,5 @@
 import json
-from typing import Optional, List, TYPE_CHECKING
+from typing import List, TYPE_CHECKING
 
 from geoalchemy2.functions import (
     ST_SetSRID,
@@ -11,8 +11,8 @@ from geoalchemy2.functions import (
 from sqlalchemy import select
 
 from crud import BaseRepository
-from models import Mark, TypeMark, User
-from schemas.mark import CreateMark, ReadMark, UpdateMark, CreateMarkRequest
+from models import Mark, User
+from models.mark.schemas import CreateMark, ReadMark, UpdateMark, CreateMarkRequest
 from utils import upload_file
 
 if TYPE_CHECKING:
@@ -29,7 +29,6 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
         longitude: float,
         latitude: float,
         radius: int = 500,
-        type_mark: Optional[TypeMark] = None,
         srid: int = 4326,
     ) -> List[ReadMark]:
         current_point = ST_SetSRID(ST_MakePoint(longitude, latitude), srid)
@@ -40,9 +39,6 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
                 radius,
             )
         ]
-
-        if type_mark:
-            conditions.append(self.model.type_mark == type_mark)
 
         query = select(self.model, ST_AsGeoJSON(self.model.geom).label("geom")).where(
             *conditions
