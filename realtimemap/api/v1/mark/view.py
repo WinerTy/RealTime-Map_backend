@@ -3,12 +3,15 @@ from typing import Annotated, List
 from fastapi import APIRouter, Depends, Form, WebSocketDisconnect, WebSocket
 from pydantic import BaseModel, Field
 from starlette.requests import Request
+from starlette.responses import Response
 
 from api.v1.auth.fastapi_users import current_active_user
 from crud.mark import MarkRepository
 from dependencies.crud import get_mark_repository
+from dependencies.service import get_mark_service
 from models import User
 from models.mark.schemas import CreateMarkRequest, ReadMark
+from services.mark.service import MarkService
 from websocket.mark_socket import marks_websocket
 
 router = APIRouter(prefix="/marks", tags=["Marks"])
@@ -37,14 +40,16 @@ async def get_marks(
 async def create_mark_point(
     mark: Annotated[CreateMarkRequest, Form(media_type="multipart/form-data")],
     user: Annotated["User", Depends(current_active_user)],
-    repo: Annotated["MarkRepository", Depends(get_mark_repository)],
+    service: Annotated["MarkService", Depends(get_mark_service)],
     request: Request,
 ):
     """
     Protected endpoint for create mark.
     """
-    instance = await repo.create_mark(mark, user)
+    instance = await service.service_create_mark(mark, user)
+    end_at = instance.end_at
     data = instance.__dict__
+    data["end_at"] = end_at
     data.pop("geom")  # FIX THIS
     return ReadMark.model_validate(data, context={"request": request})
 
@@ -58,23 +63,28 @@ async def get_mark(
     request: Request,
 ):
     result = await repo.get_mark_by_id(mark_id)
+    end_at = result.end_at
     result = result.__dict__
+    result["end_at"] = end_at
     result.pop("geom")
     return ReadMark.model_validate(result, context={"request": request})
 
 
-@router.delete("/{mark_id}")
+@router.delete("/{mark_id}", status_code=204)
 async def delete_mark(
     mark_id: int,
     user: Annotated["User", Depends(current_active_user)],
+    service: Annotated["MarkService", Depends(get_mark_service)],
 ):
-    pass
+    await service.mark_repo.delete_mark(mark_id, user)
+
+    return Response(status_code=204)
 
 
+# FIX, Context, serialize datetime field
 @router.websocket("/")
 async def websocket_endpoint(
-    websocket: WebSocket,
-    repo: Annotated["MarkRepository", Depends(get_mark_repository)],
+    websocket: WebSocket, service: Annotated["MarkService", Depends(get_mark_service)]
 ):
     await marks_websocket.connect(websocket)
 
@@ -83,9 +93,12 @@ async def websocket_endpoint(
             cords = await websocket.receive_json()
             await marks_websocket.update_coordinates(websocket, cords)
             actual_coords = marks_websocket.get_user_cords(websocket)
-            result = await repo.get_marks(**actual_coords.model_dump())
+            result = await service.mark_repo.get_marks(**actual_coords.model_dump())
             result_json = [
-                mark.model_dump(context={"request": websocket}) for mark in result
+                mark.model_dump(
+                    context={"request": websocket}, exclude=["start_at", "end_at"]
+                )
+                for mark in result
             ]
             await marks_websocket.broadcast_json(websocket, result_json)
         except WebSocketDisconnect:

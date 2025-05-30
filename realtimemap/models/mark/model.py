@@ -1,8 +1,9 @@
+from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
 from geoalchemy2 import Geometry
 from geoalchemy2.functions import ST_Y, ST_X
-from sqlalchemy import ForeignKey, String, Index
+from sqlalchemy import ForeignKey, String, Index, DateTime, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from models.base import BaseSqlModel
@@ -35,7 +36,21 @@ class Mark(BaseSqlModel, IntIdMixin, TimeMarkMixin):
     )
     additional_info: Mapped[str] = mapped_column(String(256), nullable=True)
 
+    start_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    duration: Mapped[int] = mapped_column(Integer, nullable=False, default=12)
+
     __table_args__ = (Index("idx_locations_geom", geom, postgresql_using="gist"),)
+
+    @property
+    def end_at(self) -> datetime:
+        """
+        Calculates the end datetime by adding the duration to the start datetime.
+
+        Returns:
+            datetime: The calculated end datetime, which is the start_at datetime plus
+                     the duration in hours.
+        """
+        return self.start_at + timedelta(hours=self.duration)
 
     @property
     def latitude(self) -> float:

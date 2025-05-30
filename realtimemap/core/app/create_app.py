@@ -3,6 +3,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from fastapi_babel import BabelConfigs, BabelMiddleware
+from fastapi_pagination import add_pagination
 from starlette.staticfiles import StaticFiles
 
 from api.v1 import router as v1_router
@@ -12,11 +13,15 @@ from ..config import conf
 ROOT_DIR = Path(__file__).parent.parent
 
 
+def setup_pagination(app: FastAPI) -> None:
+    add_pagination(app)
+
+
 def add_babel_middleware(app: FastAPI) -> None:
     babel = BabelConfigs(
         ROOT_DIR=ROOT_DIR,
         BABEL_DEFAULT_LOCALE="en",
-        BABEL_TRANSLATION_DIRECTORY="lang",
+        BABEL_TRANSLATION_DIRECTORY="i18n",
     )
     app.add_middleware(BabelMiddleware, babel_configs=babel)
 
@@ -32,4 +37,5 @@ def create_app() -> FastAPI:
     )
     add_routers(app)
     add_babel_middleware(app)
+    setup_pagination(app)
     return app

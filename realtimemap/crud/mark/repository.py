@@ -1,6 +1,7 @@
 import json
 from typing import List, TYPE_CHECKING
 
+from fastapi import HTTPException
 from geoalchemy2.functions import (
     ST_SetSRID,
     ST_MakePoint,
@@ -45,15 +46,15 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
         )
 
         result = await self.session.execute(query)
-        return [
-            ReadMark(
-                id=mark.id,
-                mark_name=mark.mark_name,
-                type_mark=mark.type_mark,
-                geom=json.loads(coords),
-            )
-            for mark, coords in result
-        ]
+        result_list = []
+
+        for mark, coords in result:
+            mark_data = mark.__dict__
+            mark_data.pop("geom")
+            mark_data["end_at"] = mark.end_at
+            result_list.append(ReadMark(**mark_data, geom=json.loads(coords)))
+
+        return result_list
 
     async def create_mark(self, mark: CreateMarkRequest, user: "User") -> Mark:
         geom = f"SRID=4326;POINT({mark.longitude} {mark.latitude})"
@@ -86,3 +87,9 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
     async def get_mark_by_id(self, mark_id: int) -> Mark:
         mark = await self.get_by_id(mark_id)
         return mark
+
+    async def delete_mark(self, mark_id: int, user: "User") -> None:
+        mark = await self.get_mark_by_id(mark_id)
+        if not mark.owner == user:
+            raise HTTPException(status_code=403)
+        await super().delete(mark_id)

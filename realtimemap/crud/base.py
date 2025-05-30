@@ -6,6 +6,8 @@ from fastapi_babel import _  # noqa
 from sqlalchemy import select, delete
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.expression import exists as sql_exists
+from starlette.responses import Response
 
 from my_type import Model, CreateSchema, ReadSchema, UpdateSchema
 
@@ -76,15 +78,23 @@ class BaseRepository(Generic[Model, CreateSchema, ReadSchema, UpdateSchema]):
     async def delete(self, record_id: Any) -> None:
         try:
             record = await self.get_by_id(record_id)
-            stmt = delete(record)
+            stmt = delete(self.model).where(
+                getattr(self.model, self.id_field) == record.id
+            )
             logger.info(
                 f"Delete record {record_id} in Repository: {self.model.__name__}. Query: {stmt}"
             )
             await self.session.execute(stmt)
             await self.session.commit()
+            return Response(status_code=204)
         except Exception as e:
             logger.error(
                 f"Delete record {record_id} by id in Repository: {self.model.__name__}. ",
                 e,
             )
             await self.session.rollback()
+
+    async def exist(self, record_id: int) -> bool:
+        stmt = select(sql_exists().where(self.model.id == record_id))
+        result = await self.session.execute(stmt)
+        return result.scalar_one()
