@@ -1,7 +1,6 @@
 from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, Form, WebSocketDisconnect, WebSocket
-from pydantic import BaseModel, Field
 from starlette.requests import Request
 from starlette.responses import Response
 
@@ -10,27 +9,20 @@ from crud.mark import MarkRepository
 from dependencies.crud import get_mark_repository
 from dependencies.service import get_mark_service
 from models import User
-from models.mark.schemas import CreateMarkRequest, ReadMark
+from models.mark.schemas import CreateMarkRequest, ReadMark, MarkRequestParams
 from services.mark.service import MarkService
 from websocket.mark_socket import marks_websocket
 
 router = APIRouter(prefix="/marks", tags=["Marks"])
 
 
-class MarkParams(BaseModel):
-    latitude: float = Field(..., ge=-180, le=180, examples=["75.445675"])
-    longitude: float = Field(..., ge=-90, le=90, examples=["63.201907"])
-    radius: int = Field(500, description="Search radius in meters.")
-    srid: int = Field(4326, description="SRID")
-
-
 @router.get("/", response_model=List[ReadMark])
 async def get_marks(
     request: Request,
     repo: Annotated["MarkRepository", Depends(get_mark_repository)],
-    params: MarkParams = Depends(),
+    params: MarkRequestParams = Depends(),
 ):
-    result = await repo.get_marks(**params.model_dump())
+    result = await repo.get_marks(params)
     return [
         ReadMark.model_validate(mark, context={"request": request}) for mark in result
     ]

@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 from geoalchemy2 import Geometry
 from geoalchemy2.functions import ST_Y, ST_X
-from sqlalchemy import ForeignKey, String, Index, DateTime, Integer
+from sqlalchemy import ForeignKey, String, Index, DateTime, Integer, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from models.base import BaseSqlModel
@@ -39,7 +39,17 @@ class Mark(BaseSqlModel, IntIdMixin, TimeMarkMixin):
     start_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     duration: Mapped[int] = mapped_column(Integer, nullable=False, default=12)
 
+    is_ended: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default="false", nullable=False
+    )
+
     __table_args__ = (Index("idx_locations_geom", geom, postgresql_using="gist"),)
+
+    @property
+    def check_ended(self) -> bool:
+        if datetime.now() > self.end_at:
+            return True
+        return False
 
     @property
     def end_at(self) -> datetime:

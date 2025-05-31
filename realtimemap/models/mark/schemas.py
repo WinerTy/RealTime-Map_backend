@@ -52,6 +52,7 @@ class ReadMark(BaseMark):
     geom: Optional[Point] = None
     photo: Optional[str] = None
     end_at: datetime = Field(datetime.now(), description="Datetime for end")
+    is_ended: bool
 
     @model_validator(mode="after")
     def generate_ful_image_path(self, info: ValidationInfo) -> "ReadMark":
@@ -68,3 +69,13 @@ class ReadMark(BaseMark):
         json_encoders = {
             datetime: lambda dt: dt.isoformat(),
         }
+
+
+class MarkRequestParams(BaseModel):
+    latitude: float = Field(..., ge=-90, le=90, examples=["75.445675"])
+    longitude: float = Field(..., ge=-180, le=180, examples=["63.201907"])
+    radius: int = Field(500, description="Search radius in meters.")
+    srid: int = Field(4326, description="SRID")
+    date: datetime = Field(datetime.now(), description="Date")
+    duration: Optional[int] = Field(24, description="Search duration in hours.")
+    show_ended: Optional[bool] = Field(False, description="Show ended.")

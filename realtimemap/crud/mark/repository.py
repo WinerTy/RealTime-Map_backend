@@ -1,4 +1,5 @@
 import json
+from datetime import timedelta
 from typing import List, TYPE_CHECKING
 
 from fastapi import HTTPException
@@ -9,11 +10,17 @@ from geoalchemy2.functions import (
     ST_Transform,
     ST_AsGeoJSON,
 )
-from sqlalchemy import select
+from sqlalchemy import select, or_
 
 from crud import BaseRepository
 from models import Mark, User
-from models.mark.schemas import CreateMark, ReadMark, UpdateMark, CreateMarkRequest
+from models.mark.schemas import (
+    CreateMark,
+    ReadMark,
+    UpdateMark,
+    CreateMarkRequest,
+    MarkRequestParams,
+)
 from utils import upload_file
 
 if TYPE_CHECKING:
@@ -25,21 +32,32 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
         super().__init__(Mark, session, "id")
         self.upload_dir = "upload_marks"
 
-    async def get_marks(
-        self,
-        longitude: float,
-        latitude: float,
-        radius: int = 500,
-        srid: int = 4326,
-    ) -> List[ReadMark]:
-        current_point = ST_SetSRID(ST_MakePoint(longitude, latitude), srid)
+    async def get_marks(self, params: MarkRequestParams) -> List[ReadMark]:
+        current_point = ST_SetSRID(
+            ST_MakePoint(params.longitude, params.latitude), params.srid
+        )
+
+        # Вычисляем границы временного окна (используем Python timedelta для параметров)
+        min_start = params.date - timedelta(hours=params.duration)
+        max_end = params.date + timedelta(hours=params.duration)
+
         conditions = [
             ST_DWithin(
                 ST_Transform(self.model.geom, 3857),
                 ST_Transform(current_point, 3857),
-                radius,
-            )
+                params.radius,
+            ),
+            # Метка должна начаться не позже max_end
+            self.model.start_at <= max_end,
+            # И закончиться не раньше min_start (используем SQL-функции для вычисления)
+            self.model.start_at + timedelta(hours=params.duration) >= min_start,
         ]
+        if params.show_ended:
+            conditions.append(
+                or_(self.model.is_ended, not self.model.is_ended),
+            )
+        else:
+            conditions.append(not self.model.is_ended)
 
         query = select(self.model, ST_AsGeoJSON(self.model.geom).label("geom")).where(
             *conditions
@@ -66,23 +84,6 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
         result: Mark = await super().create(formated_data)
 
         return result
-
-    async def get_all_marks(self):
-        stmt = select(self.model, ST_AsGeoJSON(self.model.geom).label("geom"))
-
-        result = await self.session.execute(stmt)
-        # marks_list = []
-        deb_res = [
-            {
-                "id": mark.id,
-                "mark_name": mark.mark_name,
-                "type_mark": mark.type_mark,
-                "geom": json.loads(coords),
-            }
-            for mark, coords in result
-        ]
-
-        return deb_res
 
     async def get_mark_by_id(self, mark_id: int) -> Mark:
         mark = await self.get_by_id(mark_id)
