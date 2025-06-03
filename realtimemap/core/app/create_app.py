@@ -7,8 +7,8 @@ from fastapi_pagination import add_pagination
 from starlette.staticfiles import StaticFiles
 
 from api.v1 import router as v1_router
+from core.config import conf
 from .lifespan import lifespan
-from ..config import conf
 
 ROOT_DIR = Path(__file__).parent.parent
 
