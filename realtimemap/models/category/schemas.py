@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, computed_field
+from pydantic import BaseModel, Field
 
 
 class BaseCategory(BaseModel):
@@ -16,8 +16,3 @@ class UpdateCategory(CreateCategory):
 class ReadCategory(BaseCategory):
     id: int
     icon: str
-
-    @computed_field
-    @property
-    def len_name(self) -> int:
-        return len(self.category_name)
