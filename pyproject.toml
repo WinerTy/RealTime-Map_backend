@@ -8,6 +8,7 @@ dependencies = [
     "asyncpg>=0.30.0",
     "fastapi>=0.115.12",
     "fastapi-babel>=1.0.0",
+    "fastapi-cache2[redis]>=0.2.2",
     "fastapi-pagination>=0.13.1",
     "fastapi-users[sqlalchemy]>=14.0.1",
     "geoalchemy2>=0.17.1",
