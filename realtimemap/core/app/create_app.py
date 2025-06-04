@@ -4,10 +4,12 @@ from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from fastapi_babel import BabelConfigs, BabelMiddleware
 from fastapi_pagination import add_pagination
+from starlette.middleware.cors import CORSMiddleware
 from starlette.staticfiles import StaticFiles
 
 from api.v1 import router as v1_router
 from core.config import conf
+from .admin import setup_admin
 from .lifespan import lifespan
 
 ROOT_DIR = Path(__file__).parent.parent
@@ -17,6 +19,8 @@ def setup_pagination(app: FastAPI) -> None:
     add_pagination(app)
 
 
+# pybabel init -i messages.pot -d i18n -l en -D messages
+# pybabel compile -d translations -D messages
 def add_babel_middleware(app: FastAPI) -> None:
     babel = BabelConfigs(
         ROOT_DIR=ROOT_DIR,
@@ -38,4 +42,12 @@ def create_app() -> FastAPI:
     add_routers(app)
     add_babel_middleware(app)
     setup_pagination(app)
+    setup_admin(app)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
     return app

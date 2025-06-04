@@ -3,6 +3,15 @@ revision = 2
 requires-python = ">=3.13"
 
 [[package]]
+name = "aiofiles"
+version = "24.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/0b/03/a88171e277e8caa88a4c77808c20ebb04ba74cc4681bf1e9416c862de237/aiofiles-24.1.0.tar.gz", hash = "sha256:22a075c9e5a3810f0c2e48f3008c94d68c65d763b9b03857924c99e57355166c", size = 30247, upload-time = "2024-06-24T11:02:03.584Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a5/45/30bb92d442636f570cb5651bc661f52b610e2eec3f891a5dc3a4c3667db0/aiofiles-24.1.0-py3-none-any.whl", hash = "sha256:b4ec55f4195e3eb5d7abd1bf7e061763e864dd4954231fb8539a0ef8bb8260e5", size = 15896, upload-time = "2024-06-24T11:02:01.529Z" },
+]
+
+[[package]]
 name = "alembic"
 version = "1.15.2"
 source = { registry = "https://pypi.org/simple" }
@@ -296,6 +305,22 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/f4/55/ae499352d82338331ca1e28c7f4a63bfd09479b16395dce38cf50a39e2c2/fastapi-0.115.12.tar.gz", hash = "sha256:1e2c2a2646905f9e83d32f04a3f86aff4a286669c6c950ca95b5fd68c2602681", size = 295236, upload-time = "2025-03-23T22:55:43.822Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/50/b3/b51f09c2ba432a576fe63758bddc81f78f0c6309d9e5c10d194313bf021e/fastapi-0.115.12-py3-none-any.whl", hash = "sha256:e94613d6c05e27be7ffebdd6ea5f388112e5e430c8f7d6494a9d1d88d43e814d", size = 95164, upload-time = "2025-03-23T22:55:42.101Z" },
+]
+
+[[package]]
+name = "fastapi-amis-admin"
+version = "0.7.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "aiofiles" },
+    { name = "fastapi" },
+    { name = "python-multipart" },
+    { name = "sqlalchemy-database" },
+    { name = "sqlmodel" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ed/93/a02e3d63afbb8530a4783306501b1b5641cab7de444705d3afe1d35921ea/fastapi_amis_admin-0.7.3.tar.gz", hash = "sha256:eb09c4db043e91e777eeca5c3fb3569b8cfa2b2836ed9ffe0655abf144210e35", size = 476094, upload-time = "2025-03-19T12:50:02.083Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/80/74/86cb9a1f0ae6d0335a036f188755df597bed2f89444758668af468bdf63a/fastapi_amis_admin-0.7.3-py3-none-any.whl", hash = "sha256:12768d95d73e759d6b275d7b8c3669bdf5a02e65d29ae0f100c56541e93e2f53", size = 115059, upload-time = "2025-03-19T12:50:00.84Z" },
 ]
 
 [[package]]
@@ -721,6 +746,19 @@ wheels = [
 ]
 
 [[package]]
+name = "pydantic-extra-types"
+version = "2.10.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pydantic" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/7e/ba/4178111ec4116c54e1dc7ecd2a1ff8f54256cdbd250e576882911e8f710a/pydantic_extra_types-2.10.5.tar.gz", hash = "sha256:1dcfa2c0cf741a422f088e0dbb4690e7bfadaaf050da3d6f80d6c3cf58a2bad8", size = 138429, upload-time = "2025-06-02T09:31:52.713Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/70/1a/5f4fd9e7285f10c44095a4f9fe17d0f358d1702a7c74a9278c794e8a7537/pydantic_extra_types-2.10.5-py3-none-any.whl", hash = "sha256:b60c4e23d573a69a4f1a16dd92888ecc0ef34fb0e655b4f305530377fa70e7a8", size = 38315, upload-time = "2025-06-02T09:31:51.229Z" },
+]
+
+[[package]]
 name = "pydantic-settings"
 version = "2.9.1"
 source = { registry = "https://pypi.org/simple" }
@@ -803,6 +841,7 @@ dependencies = [
     { name = "alembic" },
     { name = "asyncpg" },
     { name = "fastapi" },
+    { name = "fastapi-amis-admin" },
     { name = "fastapi-babel" },
     { name = "fastapi-cache2", extra = ["redis"] },
     { name = "fastapi-pagination" },
@@ -810,6 +849,7 @@ dependencies = [
     { name = "geoalchemy2" },
     { name = "geojson-pydantic" },
     { name = "orjson" },
+    { name = "pydantic-extra-types" },
     { name = "pydantic-settings" },
     { name = "shapely" },
     { name = "sqlalchemy" },
@@ -829,6 +869,7 @@ requires-dist = [
     { name = "alembic", specifier = ">=1.15.2" },
     { name = "asyncpg", specifier = ">=0.30.0" },
     { name = "fastapi", specifier = ">=0.115.12" },
+    { name = "fastapi-amis-admin", specifier = ">=0.7.3" },
     { name = "fastapi-babel", specifier = ">=1.0.0" },
     { name = "fastapi-cache2", extras = ["redis"], specifier = ">=0.2.2" },
     { name = "fastapi-pagination", specifier = ">=0.13.1" },
@@ -836,6 +877,7 @@ requires-dist = [
     { name = "geoalchemy2", specifier = ">=0.17.1" },
     { name = "geojson-pydantic", specifier = ">=2.0.0" },
     { name = "orjson", specifier = ">=3.10.18" },
+    { name = "pydantic-extra-types", specifier = ">=2.10.5" },
     { name = "pydantic-settings", specifier = ">=2.9.1" },
     { name = "shapely", specifier = ">=2.1.1" },
     { name = "sqlalchemy", specifier = ">=2.0.41" },
@@ -953,6 +995,31 @@ wheels = [
 [package.optional-dependencies]
 asyncio = [
     { name = "greenlet" },
+]
+
+[[package]]
+name = "sqlalchemy-database"
+version = "0.1.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "sqlalchemy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/1e/62/aefbe690d926f32563d87c7a88fbd0e11ac2840d5d6c152f1e86827ccf7f/sqlalchemy_database-0.1.2.tar.gz", hash = "sha256:85720ed45b10e2c02fd02b82b770c735b2644cda38ddab9c0cb94348b6e8e839", size = 63512, upload-time = "2024-03-31T07:19:44.994Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/36/d2/a100111c6e0b36a2fb121dbd920a3312ae0559434eec8c9a796f10f89fa6/sqlalchemy_database-0.1.2-py3-none-any.whl", hash = "sha256:f9e5ff8cc607883673aedd9179c743e6550240bcca2084ff63771586cab8b3b4", size = 11156, upload-time = "2024-03-31T07:19:43.092Z" },
+]
+
+[[package]]
+name = "sqlmodel"
+version = "0.0.24"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pydantic" },
+    { name = "sqlalchemy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/86/4b/c2ad0496f5bdc6073d9b4cef52be9c04f2b37a5773441cc6600b1857648b/sqlmodel-0.0.24.tar.gz", hash = "sha256:cc5c7613c1a5533c9c7867e1aab2fd489a76c9e8a061984da11b4e613c182423", size = 116780, upload-time = "2025-03-07T05:43:32.887Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/16/91/484cd2d05569892b7fef7f5ceab3bc89fb0f8a8c0cde1030d383dbc5449c/sqlmodel-0.0.24-py3-none-any.whl", hash = "sha256:6778852f09370908985b667d6a3ab92910d0d5ec88adcaf23dbc242715ff7193", size = 28622, upload-time = "2025-03-07T05:43:30.37Z" },
 ]
 
 [[package]]

@@ -7,7 +7,7 @@ from fastapi_pagination.ext.sqlalchemy import apaginate
 
 from crud.category.repository import CategoryRepository
 from dependencies.crud import get_category_repository
-from models.category.schemas import ReadCategory
+from models.category.schemas import ReadCategory, CreateCategory
 
 router = APIRouter(prefix="/category", tags=["category"])
 
@@ -28,3 +28,13 @@ async def get_all_sql(
     params: Params = Depends(),  # Need for cache in Redis mb FIX
 ):
     return await apaginate(repo.session, repo.get_select_all())
+
+
+@router.post(
+    "/",
+)
+async def create_category(
+    category_data: CreateCategory,
+):
+    print("Color: ", type(category_data.color))
+    return category_data
