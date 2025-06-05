@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi_amis_admin.admin import AdminSite, Settings
 
 from core.config import conf
-from .admin_model import AdminCategory
+from .admin_model import AdminCategory, UserLoginFormAdmin
 
 
 def setup_admin(app: FastAPI) -> None:
@@ -14,4 +14,5 @@ def setup_admin(app: FastAPI) -> None:
         )
     )
     adm.register_admin(AdminCategory)
+    adm.register_admin(UserLoginFormAdmin)
     adm.mount_app(app)
