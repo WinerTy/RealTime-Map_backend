@@ -23,9 +23,7 @@ async def get_marks(
     params: MarkRequestParams = Depends(),
 ):
     result = await repo.get_marks(params)
-    return [
-        ReadMark.model_validate(mark, context={"request": request}) for mark in result
-    ]
+    return [ReadMark.model_validate(mark) for mark in result]
 
 
 @router.post("/", response_model=ReadMark)
@@ -43,7 +41,7 @@ async def create_mark_point(
     data = instance.__dict__
     data["end_at"] = end_at
     data.pop("geom")  # FIX THIS
-    return ReadMark.model_validate(data, context={"request": request})
+    return data
 
 
 @router.get(

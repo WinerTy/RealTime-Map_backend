@@ -1,12 +1,10 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
-from fastapi import UploadFile, Request, WebSocket
+from fastapi import UploadFile
 from geojson_pydantic import Point
-from pydantic import BaseModel, Field, model_validator, field_validator
-from pydantic_core.core_schema import ValidationInfo
-
-from core.config import conf
+from pydantic import BaseModel, Field, field_validator
+from sqlalchemy_file.mutable_list import MutableList
 
 
 class BaseMark(BaseModel):
@@ -31,7 +29,7 @@ class CreateMarkRequest(BaseMark):
     additional_info: Optional[str] = Field(
         default=None, description="Дополнительная информация"
     )
-    photo: Optional[UploadFile] = None
+    photo: Optional[List[UploadFile]] = None
     category_id: int
 
 
@@ -39,7 +37,7 @@ class CreateMark(BaseMark):
     geom: str
     owner_id: int
     additional_info: Optional[str] = None
-    photo: Optional[str] = None
+    photo: Optional[List[UploadFile]] = None
     category_id: int
 
 
@@ -50,25 +48,26 @@ class UpdateMark(CreateMark):
 class ReadMark(BaseMark):
     id: int
     geom: Optional[Point] = None
-    photo: Optional[str] = None
-    end_at: datetime = Field(datetime.now(), description="Datetime for end")
+    photo: List[str] = []
+    end_at: datetime
     is_ended: bool
-
-    @model_validator(mode="after")
-    def generate_ful_image_path(self, info: ValidationInfo) -> "ReadMark":
-        if info.context and "request" in info.context and self.photo:
-            request: Request | WebSocket = info.context["request"]
-            try:
-                self.photo = str(request.url_for(str(conf.static), path=self.photo))
-            except Exception:
-                self.photo = None
-                raise
-        return self
 
     class Config:
         json_encoders = {
             datetime: lambda dt: dt.isoformat(),
         }
+
+    @field_validator("photo", mode="before")
+    @classmethod
+    def convert_photos_url(cls, v: MutableList):
+        if v is None:
+            return []
+        result: List[str] = []
+
+        for photo in v:
+            result.append(photo.path)
+
+        return result
 
 
 class MarkRequestParams(BaseModel):

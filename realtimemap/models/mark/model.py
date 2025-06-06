@@ -5,6 +5,7 @@ from geoalchemy2 import Geometry
 from geoalchemy2.functions import ST_Y, ST_X
 from sqlalchemy import ForeignKey, String, Index, DateTime, Integer, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy_file import ImageField
 
 from models.base import BaseSqlModel
 from models.mixins import IntIdMixin, TimeMarkMixin
@@ -19,7 +20,9 @@ class Mark(BaseSqlModel, IntIdMixin, TimeMarkMixin):
     geom: Mapped[Geometry] = mapped_column(
         Geometry(geometry_type="POINT", srid=4326), nullable=False
     )
-    photo: Mapped[str] = mapped_column(String(256), nullable=True)
+    photo: Mapped[ImageField] = mapped_column(
+        ImageField(upload_storage="mark", multiple=True), nullable=True
+    )
     owner_id: Mapped[int] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )

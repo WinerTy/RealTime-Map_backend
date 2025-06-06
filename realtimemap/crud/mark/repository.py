@@ -10,7 +10,7 @@ from geoalchemy2.functions import (
     ST_Transform,
     ST_AsGeoJSON,
 )
-from sqlalchemy import select, or_
+from sqlalchemy import select
 
 from crud import BaseRepository
 from models import Mark, User
@@ -21,7 +21,6 @@ from models.mark.schemas import (
     CreateMarkRequest,
     MarkRequestParams,
 )
-from utils import upload_file
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -52,12 +51,9 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
             # И закончиться не раньше min_start (используем SQL-функции для вычисления)
             self.model.start_at + timedelta(hours=params.duration) >= min_start,
         ]
-        if params.show_ended:
-            conditions.append(
-                or_(self.model.is_ended, not self.model.is_ended),
-            )
-        else:
-            conditions.append(not self.model.is_ended)
+        if not params.show_ended:
+            print(params.show_ended)
+            conditions.append(self.model.is_ended == params.show_ended)
 
         query = select(self.model, ST_AsGeoJSON(self.model.geom).label("geom")).where(
             *conditions
@@ -76,10 +72,10 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
 
     async def create_mark(self, mark: CreateMarkRequest, user: "User") -> Mark:
         geom = f"SRID=4326;POINT({mark.longitude} {mark.latitude})"
-        mark_data = mark.model_dump(exclude={"longitude", "latitude", "photo"})
-        if mark.photo:
-            file_path = await upload_file(mark.photo, self.upload_dir)
-            mark_data["photo"] = file_path
+        mark_data = mark.model_dump(exclude={"longitude", "latitude"})
+        # if mark.photo:
+        #     file_path = await upload_file(mark.photo, self.upload_dir)
+        #     mark_data["photo"] = file_path
         formated_data = CreateMark(**mark_data, geom=geom, owner_id=user.id)
         result: Mark = await super().create(formated_data)
 
