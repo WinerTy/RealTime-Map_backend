@@ -1,11 +1,24 @@
+import os
 import time
 
 from fastapi import Request
+from fastapi.responses import RedirectResponse
+from libcloud.storage.drivers.local import LocalStorageDriver
+from sqlalchemy_file.storage import StorageManager
 
 from core.app import create_app
 from core.config import conf
 
 app = create_app()
+
+os.makedirs("./uploads/category", exist_ok=True)
+container = LocalStorageDriver("./uploads").get_container("category")
+StorageManager.add_storage("default", container)
+
+
+@app.get("/")
+async def redirect_root():
+    return RedirectResponse(url="/docs")
 
 
 @app.middleware("http")

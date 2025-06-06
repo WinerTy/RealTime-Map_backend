@@ -1,5 +1,6 @@
 from typing import Any
 
+from fastapi import UploadFile
 from pydantic import BaseModel, Field, field_validator
 from pydantic_extra_types.color import Color
 
@@ -10,7 +11,7 @@ class BaseCategory(BaseModel):
 
 class CreateCategory(BaseCategory):
     color: str
-    icon: str
+    icon: UploadFile
 
     @field_validator("color", mode="before")
     @classmethod

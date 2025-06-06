@@ -29,7 +29,7 @@ async def upload_file(file: File(...), upload_sub_dir: str) -> str:
     This relative path is suitable for storing in a database and later
     being used with `request.url_for(conf.STATIC_ROUTE_NAME, path=relative_path)`.
 
-    :param file: File to upload (FastAPI File object)
+    :param file: File to uploads (FastAPI File object)
     :param upload_sub_dir: Subdirectory within conf.STATIC_FILES_ROOT_DIR (e.g., "mark_photos")
                            This will be part of the returned relative path.
     :return: str: Relative path of the uploaded file (e.g., "mark_photos/unique_name.jpg")

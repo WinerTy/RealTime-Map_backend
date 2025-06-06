@@ -12,6 +12,7 @@ dependencies = [
     "fastapi-cache2[redis]>=0.2.2",
     "fastapi-pagination>=0.13.1",
     "fastapi-users[sqlalchemy]>=14.0.1",
+    "fasteners>=0.19",
     "geoalchemy2>=0.17.1",
     "geojson-pydantic>=2.0.0",
     "orjson>=3.10.18",
@@ -19,6 +20,7 @@ dependencies = [
     "pydantic-settings>=2.9.1",
     "shapely>=2.1.1",
     "sqlalchemy>=2.0.41",
+    "sqlalchemy-file>=0.6.0",
     "uvicorn>=0.34.2",
     "websockets>=15.0.1",
 ]

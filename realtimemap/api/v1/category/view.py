@@ -1,9 +1,11 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Form
 from fastapi_cache.decorator import cache
 from fastapi_pagination import Page, Params, paginate
 from fastapi_pagination.ext.sqlalchemy import apaginate
+from pydantic import BaseModel
+from starlette.requests import Request
 
 from crud.category.repository import CategoryRepository
 from dependencies.crud import get_category_repository
@@ -21,6 +23,23 @@ async def get_category(
     return paginate(result)
 
 
+class DebugCategoryRead(BaseModel):
+    id: int
+    icon: str
+
+
+@router.get("/{category_id}", response_model=DebugCategoryRead)
+async def get_by_id_category(
+    category_id: int,
+    repo: Annotated["CategoryRepository", Depends(get_category_repository)],
+    request: Request,
+):
+    result = await repo.get_by_id(category_id)
+    print(request)
+    icon = str(request.base_url) + result.icon["url"]
+    return DebugCategoryRead(id=result.id, icon=icon)
+
+
 @router.get("/", response_model=Page[ReadCategory])
 @cache(expire=3600, namespace="category-list")
 async def get_all_sql(
@@ -34,7 +53,8 @@ async def get_all_sql(
     "/",
 )
 async def create_category(
-    category_data: CreateCategory,
+    category_data: Annotated[CreateCategory, Form(media_type="multipart/form-data")],
+    repo: Annotated["CategoryRepository", Depends(get_category_repository)],
 ):
-    print("Color: ", type(category_data.color))
-    return category_data
+    result = await repo.create(category_data)
+    return result
