@@ -70,9 +70,12 @@ class ReadMark(BaseMark):
         return result
 
 
-class MarkRequestParams(BaseModel):
-    latitude: float = Field(..., ge=-90, le=90, examples=["75.445675"])
+class MarkCoordinates(BaseModel):
     longitude: float = Field(..., ge=-180, le=180, examples=["63.201907"])
+    latitude: float = Field(..., ge=-90, le=90, examples=["75.445675"])
+
+
+class MarkRequestParams(MarkCoordinates):
     radius: int = Field(500, description="Search radius in meters.")
     srid: int = Field(4326, description="SRID")
     date: datetime = Field(datetime.now(), description="Date")

@@ -1,6 +1,6 @@
 from typing import Annotated, List
 
-from fastapi import APIRouter, Depends, Form, WebSocketDisconnect, WebSocket
+from fastapi import APIRouter, Depends, Form, WebSocket
 from starlette.requests import Request
 from starlette.responses import Response
 
@@ -12,6 +12,13 @@ from models import User
 from models.mark.schemas import CreateMarkRequest, ReadMark, MarkRequestParams
 from services.mark.service import MarkService
 from websocket.mark_socket import marks_websocket
+
+
+from websocket.base import manager as ws_manager
+
+from dependencies.auth.web_socket import websocket_auth
+
+from datetime import datetime
 
 router = APIRouter(prefix="/marks", tags=["Marks"])
 
@@ -83,13 +90,27 @@ async def websocket_endpoint(
             cords = await websocket.receive_json()
             await marks_websocket.update_coordinates(websocket, cords)
             actual_coords = marks_websocket.get_user_cords(websocket)
-            result = await service.mark_repo.get_marks(**actual_coords.model_dump())
-            result_json = [
-                mark.model_dump(
-                    context={"request": websocket}, exclude=["start_at", "end_at"]
-                )
-                for mark in result
-            ]
+            result = await service.mark_repo.get_marks(
+                MarkRequestParams(**actual_coords.model_dump())
+            )
+            result_json = [mark.model_dump(mode="json") for mark in result]
             await marks_websocket.broadcast_json(websocket, result_json)
-        except WebSocketDisconnect:
+        except Exception as e:
+            await websocket.send_json({"message": "Disconnected", "error": str(e)})
             await marks_websocket.disconnect(websocket)
+
+
+@router.websocket("/chat")
+async def websocket_chat_endpoint(
+    websocket: WebSocket, user: Annotated["User", Depends(websocket_auth)]
+):
+    await ws_manager.connect(websocket)
+    await ws_manager.broadcast(f"Welcome {user.email}!")
+    while True:
+        message = await websocket.receive_text()
+        data = {
+            "user": user.model_dump(mode="json"),
+            "message": message,
+            "date": datetime.now().isoformat(),
+        }
+        await ws_manager.broadcast_json(data)

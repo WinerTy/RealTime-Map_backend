@@ -17,3 +17,10 @@ class WebsocketManager:
     async def broadcast(self, message: str):
         for connection in self.active_connections:
             await connection.send_text(message)
+
+    async def broadcast_json(self, data: dict):
+        for connection in self.active_connections:
+            await connection.send_json(data)
+
+
+manager = WebsocketManager()
