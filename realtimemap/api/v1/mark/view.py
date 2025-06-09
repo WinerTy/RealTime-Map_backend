@@ -1,6 +1,6 @@
 from typing import Annotated, List
 
-from fastapi import APIRouter, Depends, Form, WebSocket
+from fastapi import APIRouter, Depends, Form, WebSocket, BackgroundTasks
 from starlette.requests import Request
 from starlette.responses import Response
 
@@ -33,8 +33,9 @@ async def get_marks(
     return [ReadMark.model_validate(mark) for mark in result]
 
 
-@router.post("/", response_model=ReadMark)
+@router.post("/", response_model=ReadMark, status_code=201)
 async def create_mark_point(
+    background: BackgroundTasks,
     mark: Annotated[CreateMarkRequest, Form(media_type="multipart/form-data")],
     user: Annotated["User", Depends(current_active_user)],
     service: Annotated["MarkService", Depends(get_mark_service)],
@@ -48,6 +49,9 @@ async def create_mark_point(
     data = instance.__dict__
     data["end_at"] = end_at
     data.pop("geom")  # FIX THIS
+    background.add_task(
+        ws_manager.broadcast_json, ReadMark(**data).model_dump(mode="json")
+    )
     return data
 
 
