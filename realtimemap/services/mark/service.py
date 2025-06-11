@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
     from crud.mark import MarkRepository
     from crud.category import CategoryRepository
+    from crud.mark_comment.repository import MarkCommentRepository
 
 
 class MarkService(BaseService):
@@ -19,6 +20,7 @@ class MarkService(BaseService):
         session: "AsyncSession",
         mark_repo: "MarkRepository",
         category_repo: "CategoryRepository",
+        mark_comment_repo: "MarkCommentRepository",
     ):
         super().__init__(session)
         self.mark_repo = mark_repo

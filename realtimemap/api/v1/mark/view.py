@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, Form, WebSocket, BackgroundTasks
@@ -6,19 +7,15 @@ from starlette.responses import Response
 
 from api.v1.auth.fastapi_users import current_active_user
 from crud.mark import MarkRepository
+from dependencies.auth.web_socket import websocket_auth
 from dependencies.crud import get_mark_repository
 from dependencies.service import get_mark_service
 from models import User
 from models.mark.schemas import CreateMarkRequest, ReadMark, MarkRequestParams
+from models.user.schemas import UserRead
 from services.mark.service import MarkService
-from websocket.mark_socket import marks_websocket
-
-
 from websocket.base import manager as ws_manager
-
-from dependencies.auth.web_socket import websocket_auth
-
-from datetime import datetime
+from websocket.mark_socket import marks_websocket
 
 router = APIRouter(prefix="/marks", tags=["Marks"])
 
@@ -106,7 +103,7 @@ async def websocket_endpoint(
 
 @router.websocket("/chat")
 async def websocket_chat_endpoint(
-    websocket: WebSocket, user: Annotated["User", Depends(websocket_auth)]
+    websocket: WebSocket, user: Annotated["UserRead", Depends(websocket_auth)]
 ):
     await ws_manager.connect(websocket)
     await ws_manager.broadcast(f"Welcome {user.email}!")

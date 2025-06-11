@@ -1,3 +1,4 @@
+from abc import ABC
 from typing import List
 
 from fastapi import WebSocket
@@ -21,6 +22,11 @@ class WebsocketManager:
     async def broadcast_json(self, data: dict):
         for connection in self.active_connections:
             await connection.send_json(data)
+
+
+class AbstractWebSocket(ABC):
+    async def connect(self, websocket: WebSocket):
+        raise NotImplementedError()
 
 
 manager = WebsocketManager()
