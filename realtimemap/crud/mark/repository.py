@@ -13,7 +13,7 @@ from geoalchemy2.functions import (
 from sqlalchemy import select
 
 from crud import BaseRepository
-from models import Mark, User
+from models import Mark
 from models.mark.schemas import (
     CreateMark,
     ReadMark,
@@ -23,6 +23,7 @@ from models.mark.schemas import (
 )
 
 if TYPE_CHECKING:
+    from models import User
     from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -52,7 +53,6 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
             self.model.start_at + timedelta(hours=params.duration) >= min_start,
         ]
         if not params.show_ended:
-            print(params.show_ended)
             conditions.append(self.model.is_ended == params.show_ended)
 
         query = select(self.model, ST_AsGeoJSON(self.model.geom).label("geom")).where(
@@ -81,9 +81,22 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
 
         return result
 
-    async def get_mark_by_id(self, mark_id: int) -> Mark:
-        mark = await self.get_by_id(mark_id)
-        return mark
+    async def get_mark_by_id(self, mark_id: int) -> ReadMark:
+        stmt = select(self.model, ST_AsGeoJSON(self.model.geom).label("geom")).where(
+            self.model.id == mark_id
+        )
+        result = await self.session.execute(stmt)
+        result = result.first()
+        if not result:
+            raise HTTPException(status_code=404, detail="mark not found")
+
+        print(result)
+        mark = result[0]
+        coords = result[1]
+        mark_data = mark.__dict__
+        mark_data["end_at"] = mark.end_at
+        mark_data.pop("geom")
+        return ReadMark(**mark_data, geom=json.loads(coords))
 
     async def delete_mark(self, mark_id: int, user: "User") -> None:
         mark = await self.get_mark_by_id(mark_id)

@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, Form, WebSocket, BackgroundTasks
+from fastapi_cache.decorator import cache
 from starlette.requests import Request
 from starlette.responses import Response
 
@@ -55,17 +56,13 @@ async def create_mark_point(
 @router.get(
     "/{mark_id}/",
 )
+@cache(expire=3600, namespace="marks:id")
 async def get_mark(
     mark_id: int,
     repo: Annotated["MarkRepository", Depends(get_mark_repository)],
-    request: Request,
 ):
     result = await repo.get_mark_by_id(mark_id)
-    end_at = result.end_at
-    result = result.__dict__
-    result["end_at"] = end_at
-    result.pop("geom")
-    return ReadMark.model_validate(result, context={"request": request})
+    return result
 
 
 @router.delete("/{mark_id}", status_code=204)

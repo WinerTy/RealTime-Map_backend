@@ -47,6 +47,7 @@ class UpdateMark(CreateMark):
 
 class ReadMark(BaseMark):
     id: int
+    owner_id: int
     geom: Optional[Point] = None
     photo: List[str] = []
     end_at: datetime
@@ -81,3 +82,8 @@ class MarkRequestParams(MarkCoordinates):
     date: datetime = Field(datetime.now(), description="Date")
     duration: Optional[int] = Field(24, description="Search duration in hours.")
     show_ended: Optional[bool] = Field(False, description="Show ended.")
+
+
+class MarkRequestWebSocket(BaseModel):
+    action_type: str
+    items: List[ReadMark] = []

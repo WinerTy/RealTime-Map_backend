@@ -60,7 +60,6 @@ def serve_files(storage: str = Path(...), file_id: str = Path(...)):
             return RedirectResponse(file.get_cdn_url())
 
         # Для других хранилищ (без CDN) отдаем поток, но с правильным заголовком
-        print("StreamResponse")
         return StreamingResponse(
             file.object.as_stream(),
             media_type=file.content_type,
