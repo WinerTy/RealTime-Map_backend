@@ -21,7 +21,7 @@ from websocket.mark_socket import marks_websocket
 router = APIRouter(prefix="/marks", tags=["Marks"])
 
 
-@router.get("/", response_model=List[ReadMark])
+@router.get("/", response_model=List[ReadMark], status_code=200)
 async def get_marks(
     request: Request,
     repo: Annotated["MarkRepository", Depends(get_mark_repository)],
@@ -49,9 +49,7 @@ async def create_mark_point(
     return instance
 
 
-@router.get(
-    "/{mark_id}/",
-)
+@router.get("/{mark_id}/")
 @cache(expire=3600, namespace="marks:id")
 async def get_mark(
     mark_id: int,

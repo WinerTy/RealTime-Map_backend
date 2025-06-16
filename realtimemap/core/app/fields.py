@@ -25,7 +25,8 @@ class GeomField(BaseField):
             return {"lat": None, "lng": None}
         print(type(to_shape(value)))
         point: Point = to_shape(value)
-        return {"lat": point.y, "lng": point.x}
+        result = point.__geo_interface__
+        return str(result["coordinates"])
 
     def process_form_data(self, value: str) -> Optional[WKTElement]:
         """
@@ -36,10 +37,10 @@ class GeomField(BaseField):
             return None
         try:
             coords = json.loads(value)
-            if coords.get("lat") is None or coords.get("lng") is None:
+            if coords.get("lat") is None or coords.get("lon") is None:
                 return None
 
-            point_wkt = f"POINT({coords['lng']} {coords['lat']})"
+            point_wkt = f"POINT({coords['lon']} {coords['lat']})"
             return WKTElement(point_wkt, srid=self.srid)
         except (json.JSONDecodeError, TypeError):
             return None
