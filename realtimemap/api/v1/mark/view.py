@@ -28,7 +28,7 @@ async def get_marks(
     params: MarkRequestParams = Depends(),
 ):
     result = await repo.get_marks(params)
-    return [ReadMark.model_validate(mark) for mark in result]
+    return result
 
 
 @router.post("/", response_model=ReadMark, status_code=201)
@@ -43,14 +43,10 @@ async def create_mark_point(
     Protected endpoint for create mark.
     """
     instance = await service.service_create_mark(mark, user)
-    end_at = instance.end_at
-    data = instance.__dict__
-    data["end_at"] = end_at
-    data.pop("geom")  # FIX THIS
-    background.add_task(
-        ws_manager.broadcast_json, ReadMark(**data).model_dump(mode="json")
-    )
-    return data
+    # background.add_task(
+    #     ws_manager.broadcast_json, ReadMark(**data).model_dump(mode="json")
+    # )
+    return instance
 
 
 @router.get(

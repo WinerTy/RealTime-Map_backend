@@ -5,6 +5,8 @@ from fastapi import UploadFile
 from geojson_pydantic import Point
 from pydantic import BaseModel, Field, field_validator
 from sqlalchemy_file.mutable_list import MutableList
+from geoalchemy2.shape import to_shape
+from geoalchemy2 import WKBElement
 
 
 class BaseMark(BaseModel):
@@ -57,6 +59,13 @@ class ReadMark(BaseMark):
         json_encoders = {
             datetime: lambda dt: dt.isoformat(),
         }
+
+    @field_validator("geom", mode="before")
+    @classmethod
+    def convert_geom(cls, v: WKBElement):
+        print(type(v))
+        result = to_shape(v)
+        return Point(**result.__geo_interface__)
 
     @field_validator("photo", mode="before")
     @classmethod
