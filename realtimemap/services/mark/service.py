@@ -6,6 +6,7 @@ from fastapi_babel import _
 from models import User
 from models.mark.schemas import ReadMark, CreateMarkRequest
 from services.base import BaseService
+from models.mark_comment.schemas import CreateMarkCommentRequest
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -25,6 +26,7 @@ class MarkService(BaseService):
         super().__init__(session)
         self.mark_repo = mark_repo
         self.category_repo = category_repo
+        self.mark_comment_repo = mark_comment_repo
 
     async def service_create_mark(
         self, mark_data: CreateMarkRequest, user: User
@@ -37,3 +39,8 @@ class MarkService(BaseService):
             )
         mark = await self.mark_repo.create_mark(mark_data, user)
         return mark
+
+    async def create_comment(
+        self, user: User, data: CreateMarkCommentRequest, mark_id: int
+    ):
+        return await self.mark_comment_repo.create_comment(user, data, mark_id)

@@ -1,13 +1,13 @@
 from typing import TYPE_CHECKING
-
 from sqlalchemy import select
 
 from crud import BaseRepository
-from models import MarkComment
+from models import MarkComment, User
 from models.mark_comment.schemas import (
     CreateMarkComment,
     ReadMarkComment,
     UpdateMarkComment,
+    CreateMarkCommentRequest,
 )
 
 if TYPE_CHECKING:
@@ -20,8 +20,13 @@ class MarkCommentRepository(
     def __init__(self, session: "AsyncSession"):
         super().__init__(session=session, model=MarkComment)
 
-    async def create_comment(self, data: CreateMarkComment):
-        result = await self.create(data=data)
+    async def create_comment(
+        self, user: User, data: CreateMarkCommentRequest, mark_id: int
+    ):
+        create_data = CreateMarkComment(
+            **data.model_dump(), user_id=user.id, mark_id=mark_id
+        )
+        result = await self.create(data=create_data)
         return result
 
     async def get_comment_for_mark(self, mark_id: int):
