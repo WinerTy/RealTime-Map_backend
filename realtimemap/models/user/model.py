@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
-
+from jinja2 import Template
+from fastapi import Request
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable, SQLAlchemyUserDatabase
 from fastapi_users_db_sqlalchemy.access_token import (
     SQLAlchemyAccessTokenDatabase,
@@ -28,6 +29,13 @@ class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
 
     def __str__(self):
         return self.username
+
+    async def __admin_repr__(self, request: Request):
+        return self.username
+
+    async def __admin_select2_repr__(self, request: Request) -> str:
+        temp = Template("""<span>{{email}}</span>""", autoescape=True)
+        return temp.render(email=self.email)
 
 
 class AccessToken(BaseSqlModel, SQLAlchemyBaseAccessTokenTable[int]):
