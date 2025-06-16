@@ -1,4 +1,7 @@
 from pydantic import BaseModel, Field, field_validator
+from models.user.schemas import UserRead
+from typing import Optional
+from datetime import datetime
 
 
 class BaseMarkComment(BaseModel):
@@ -27,6 +30,8 @@ class ReadMarkComment(BaseMarkComment):
     mark_id: int = Field(..., description="Mark id", ge=0)
     likes: int = Field(..., description="Likes", ge=0)
     dislikes: int = Field(..., description="Dislikes", ge=0)
+    created_at: datetime = Field(..., description="Creation date in ISO format")
+    user: Optional[UserRead] = None
 
 
 class CreateMarkCommentRequest(BaseMarkComment):

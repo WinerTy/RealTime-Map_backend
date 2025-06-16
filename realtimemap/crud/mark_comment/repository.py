@@ -34,5 +34,5 @@ class MarkCommentRepository(
             select(self.model)
             .where(self.model.mark_id == mark_id)
             .order_by(self.model.created_at.desc())
-        )
+        ).join(self.model.user)
         return stmt

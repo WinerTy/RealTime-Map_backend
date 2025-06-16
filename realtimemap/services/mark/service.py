@@ -44,3 +44,6 @@ class MarkService(BaseService):
         self, user: User, data: CreateMarkCommentRequest, mark_id: int
     ):
         return await self.mark_comment_repo.create_comment(user, data, mark_id)
+
+    async def get_comments(self, mark_id: int):
+        return await self.mark_comment_repo.get_comment_for_mark(mark_id)

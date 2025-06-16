@@ -17,6 +17,9 @@ def custom_key_builder(
     if "repo" in kwargs_for_key:
         del kwargs_for_key["repo"]
 
+    if "service" in kwargs_for_key:
+        del kwargs_for_key["service"]
+
     print(args)
     print(kwargs_for_key)
     cache_key = (
