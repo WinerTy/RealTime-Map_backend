@@ -60,22 +60,12 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
         )
 
         result = await self.session.execute(query)
-        result_list = []
 
-        for mark, coords in result:
-            mark_data = mark.__dict__
-            mark_data.pop("geom")
-            mark_data["end_at"] = mark.end_at
-            result_list.append(ReadMark(**mark_data, geom=json.loads(coords)))
-
-        return result_list
+        return result.scalars().all()
 
     async def create_mark(self, mark: CreateMarkRequest, user: "User") -> Mark:
         geom = f"SRID=4326;POINT({mark.longitude} {mark.latitude})"
         mark_data = mark.model_dump(exclude={"longitude", "latitude"})
-        # if mark.photo:
-        #     file_path = await upload_file(mark.photo, self.upload_dir)
-        #     mark_data["photo"] = file_path
         formated_data = CreateMark(**mark_data, geom=geom, owner_id=user.id)
         result: Mark = await super().create(formated_data)
 
