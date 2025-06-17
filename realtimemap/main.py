@@ -26,7 +26,7 @@ StorageManager.add_storage("category", category_container)
 StorageManager.add_storage("mark", mark_container)
 
 
-@app.get("/")
+@app.get("/", tags=["Root"], status_code=307)
 async def redirect_root():
     return RedirectResponse(url="/docs")
 
@@ -40,7 +40,7 @@ async def add_process_time_header(request: Request, call_next):
     return response
 
 
-@app.get("/{storage}/{file_id}")
+@app.get("/{storage}/{file_id}", tags=["Root"])
 def serve_files(storage: str = Path(...), file_id: str = Path(...)):
     try:
         file = StorageManager.get_file(f"{storage}/{file_id}")
