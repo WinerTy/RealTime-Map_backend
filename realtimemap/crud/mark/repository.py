@@ -1,4 +1,3 @@
-import json
 from datetime import timedelta
 from typing import List, TYPE_CHECKING
 
@@ -9,6 +8,7 @@ from geoalchemy2.functions import (
     ST_DWithin,
     ST_Transform,
     ST_AsGeoJSON,
+    ST_Distance,
 )
 from sqlalchemy import select
 
@@ -20,6 +20,7 @@ from models.mark.schemas import (
     UpdateMark,
     CreateMarkRequest,
     MarkRequestParams,
+    MarkCoordinates,
 )
 
 if TYPE_CHECKING:
@@ -47,9 +48,7 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
                 ST_Transform(current_point, 3857),
                 params.radius,
             ),
-            # Метка должна начаться не позже max_end
             self.model.start_at <= max_end,
-            # И закончиться не раньше min_start (используем SQL-функции для вычисления)
             self.model.start_at + timedelta(hours=params.duration) >= min_start,
         ]
         if not params.show_ended:
@@ -71,25 +70,33 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
 
         return result
 
-    async def get_mark_by_id(self, mark_id: int) -> ReadMark:
-        stmt = select(self.model, ST_AsGeoJSON(self.model.geom).label("geom")).where(
-            self.model.id == mark_id
-        )
+    async def get_mark_by_id(self, mark_id: int) -> Mark:
+        stmt = select(self.model).where(self.model.id == mark_id)
         result = await self.session.execute(stmt)
-        result = result.first()
+        result = result.scalar_one_or_none()
         if not result:
             raise HTTPException(status_code=404, detail="mark not found")
 
-        print(result)
-        mark = result[0]
-        coords = result[1]
-        mark_data = mark.__dict__
-        mark_data["end_at"] = mark.end_at
-        mark_data.pop("geom")
-        return ReadMark(**mark_data, geom=json.loads(coords))
+        return result
 
     async def delete_mark(self, mark_id: int, user: "User") -> None:
         mark = await self.get_mark_by_id(mark_id)
         if not mark.owner == user:
             raise HTTPException(status_code=403)
         await super().delete(mark_id)
+
+    async def check_distance(
+        self, current_location: MarkCoordinates, mark: Mark, radius: int = 500
+    ) -> bool:
+        user_point = ST_SetSRID(
+            ST_MakePoint(current_location.longitude, current_location.latitude), 4326
+        )
+
+        # Преобразуем обе точки в метрическую проекцию (3857)
+        stmt = select(
+            ST_Distance(ST_Transform(mark.geom, 3857), ST_Transform(user_point, 3857))
+            <= radius
+        )
+
+        result = await self.session.execute(stmt)
+        return result.scalar()
