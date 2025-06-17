@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING
 from fastapi import HTTPException
 from fastapi_babel import _
 
-from models import User
-from models.mark.schemas import ReadMark, CreateMarkRequest
-from services.base import BaseService
+from models import User, Mark
+from models.mark.schemas import CreateMarkRequest
 from models.mark_comment.schemas import CreateMarkCommentRequest
+from services.base import BaseService
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -30,7 +30,7 @@ class MarkService(BaseService):
 
     async def service_create_mark(
         self, mark_data: CreateMarkRequest, user: User
-    ) -> ReadMark:
+    ) -> Mark:
         category_exist = await self.category_repo.exist(mark_data.category_id)
         if not category_exist:
             raise HTTPException(

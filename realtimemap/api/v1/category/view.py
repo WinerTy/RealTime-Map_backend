@@ -9,7 +9,7 @@ from crud.category.repository import CategoryRepository
 from dependencies.crud import get_category_repository
 from models.category.schemas import ReadCategory, CreateCategory
 
-router = APIRouter(prefix="/category", tags=["category"])
+router = APIRouter(prefix="/category", tags=["Category"])
 
 
 @router.get("/pg", response_model=Page[ReadCategory])

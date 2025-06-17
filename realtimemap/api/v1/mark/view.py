@@ -1,24 +1,26 @@
-from datetime import datetime
+import logging
 from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, Form, WebSocket, BackgroundTasks
-from fastapi_cache.decorator import cache
 from starlette.requests import Request
 from starlette.responses import Response
 
 from api.v1.auth.fastapi_users import current_active_user
 from crud.mark import MarkRepository
-from dependencies.auth.web_socket import websocket_auth
 from dependencies.crud import get_mark_repository
 from dependencies.service import get_mark_service
 from models import User
-from models.mark.schemas import CreateMarkRequest, ReadMark, MarkRequestParams
-from models.user.schemas import UserRead
+from models.mark.schemas import (
+    CreateMarkRequest,
+    ReadMark,
+    MarkRequestParams,
+)
 from services.mark.service import MarkService
-from websocket.base import manager as ws_manager
 from websocket.mark_socket import marks_websocket
 
 router = APIRouter(prefix="/marks", tags=["Marks"])
+
+logger = logging.getLogger(__name__)
 
 
 @router.get("/", response_model=List[ReadMark], status_code=200)
@@ -49,13 +51,13 @@ async def create_mark_point(
     return instance
 
 
-@router.get("/{mark_id}/")
-@cache(expire=3600, namespace="marks:id")
+@router.get("/{mark_id}/", response_model=ReadMark, status_code=200)
+# @cache(expire=3600) # TODO FIX
 async def get_mark(
     mark_id: int,
     repo: Annotated["MarkRepository", Depends(get_mark_repository)],
 ):
-    result = await repo.get_mark_by_id(mark_id)
+    result = await repo.get_by_id(mark_id)
     return result
 
 
@@ -90,19 +92,3 @@ async def websocket_endpoint(
         except Exception as e:
             await websocket.send_json({"message": "Disconnected", "error": str(e)})
             await marks_websocket.disconnect(websocket)
-
-
-@router.websocket("/chat")
-async def websocket_chat_endpoint(
-    websocket: WebSocket, user: Annotated["UserRead", Depends(websocket_auth)]
-):
-    await ws_manager.connect(websocket)
-    await ws_manager.broadcast(f"Welcome {user.email}!")
-    while True:
-        message = await websocket.receive_text()
-        data = {
-            "user": user.model_dump(mode="json"),
-            "message": message,
-            "date": datetime.now().isoformat(),
-        }
-        await ws_manager.broadcast_json(data)
