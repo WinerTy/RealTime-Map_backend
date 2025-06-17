@@ -1,11 +1,12 @@
 from typing import TYPE_CHECKING
-from jinja2 import Template
+
 from fastapi import Request
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable, SQLAlchemyUserDatabase
 from fastapi_users_db_sqlalchemy.access_token import (
     SQLAlchemyAccessTokenDatabase,
     SQLAlchemyBaseAccessTokenTable,
 )
+from jinja2 import Template
 from sqlalchemy import String, Integer, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -25,7 +26,9 @@ class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
 
     @classmethod
     def get_db(cls, session: "AsyncSession"):
-        return SQLAlchemyUserDatabase(session, cls)
+        return SQLAlchemyUserDatabase(
+            session, cls
+        )  # TODO Переписать метод на получения пользователя с email на (email, phone, username)
 
     def __str__(self):
         return self.username

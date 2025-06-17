@@ -1,10 +1,10 @@
-from typing import Dict, Optional, List
+from typing import Dict, Optional
 
 from fastapi import WebSocket
 from pydantic import ValidationError
 
-from models.mark.schemas import ReadMark, MarkCoordinates
-from .base import WebsocketManager
+from models.mark.schemas import MarkCoordinates, MarkRequestParams
+from .base import WebsocketManager, AbstractWebSocket
 
 
 class MarkWebSocket(WebsocketManager):
@@ -40,9 +40,25 @@ class MarkWebSocket(WebsocketManager):
     def get_user_cords(self, websocket: WebSocket) -> MarkCoordinates:
         return self.connection_data.get(websocket)
 
-    @staticmethod
-    async def broadcast_json(websocket: WebSocket, data: List[ReadMark]):
-        await websocket.send_json(data)
+    async def check_include_mark(self):
+        pass
 
 
 marks_websocket = MarkWebSocket()
+
+
+class MarksWebSocket(AbstractWebSocket):
+    def __init__(self):
+        self.connections: Dict[WebSocket, Optional[MarkRequestParams]] = dict()
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.connections[websocket] = None
+
+    async def disconnect(self, websocket: WebSocket):
+        if websocket in self.connections:
+            self.connections.pop(websocket)
+
+    async def set_params(self, websocket: WebSocket, params: MarkRequestParams):
+        if websocket in self.connections:
+            self.connections[websocket] = params

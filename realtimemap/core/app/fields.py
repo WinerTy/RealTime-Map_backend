@@ -1,15 +1,17 @@
-from starlette_admin.fields import BaseField
+from typing import Any
+
 from fastapi import Request
-from typing import Optional, Any
-from geoalchemy2 import WKTElement
 from geoalchemy2.shape import to_shape
 from shapely.geometry import Point
-import json
+from starlette.datastructures import FormData
+from starlette_admin import RequestAction
+from starlette_admin.fields import BaseField
 
 
 class GeomField(BaseField):
     render_input_template = "starlette_admin/fields/geom_input.html"
     render_view_template = "starlette_admin/fields/geom_view.html"
+    input_type = "text"
 
     def __init__(self, *args, srid=4326, **kwargs):
         super().__init__(*args, **kwargs)
@@ -22,25 +24,34 @@ class GeomField(BaseField):
         value = getattr(obj, self.name, None)
 
         if value is None:
-            return {"lat": None, "lng": None}
-        print(type(to_shape(value)))
+            return "Coords not found"
         point: Point = to_shape(value)
         result = point.__geo_interface__
         return str(result["coordinates"])
 
-    def process_form_data(self, value: str) -> Optional[WKTElement]:
+    async def parse_form_data(
+        self, request: Request, form_data: FormData, action: RequestAction
+    ) -> Any:
         """
-        Processes the form data (a JSON string `{"lat": ..., "lng": ...}`)
-        back into a WKTElement for the database.
+        Extracts the value of this field from submitted form data.
         """
-        if not value:
-            return None
-        try:
-            coords = json.loads(value)
-            if coords.get("lat") is None or coords.get("lon") is None:
-                return None
+        print(form_data.values())
+        return form_data.get(self.id)
 
-            point_wkt = f"POINT({coords['lon']} {coords['lat']})"
-            return WKTElement(point_wkt, srid=self.srid)
-        except (json.JSONDecodeError, TypeError):
-            return None
+    # async def parse_form_data(self, request: Request, value: Any) -> Optional[str]:
+    #     """
+    #     Processes the form data (a JSON string `{"lat": ..., "lng": ...}`)
+    #     back into a WKTElement for the database.
+    #     """
+    #     if not value:
+    #         return None
+    #     try:
+    #         coords = json.loads(value)
+    #         if coords.get("lat") is None or coords.get("lon") is None:
+    #             return None
+    #
+    #         point_wkt = f"POINT({coords['lon']} {coords['lat']})"
+    #         print(point_wkt)
+    #         return point_wkt
+    #     except (json.JSONDecodeError, TypeError):
+    #         return None
