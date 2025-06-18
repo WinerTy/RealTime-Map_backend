@@ -6,8 +6,8 @@ services:
       - "8000:8000"
     
     command: ../.venv/bin/python main.py
-    depends_on:
-      - redis
+    # depends_on:
+    #   - redis
   # redis:
   #   image: redis:latest
   #   container_name: redis-serivce
