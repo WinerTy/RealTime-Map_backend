@@ -44,7 +44,7 @@ jobs:
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          key: ${{ secrets.SSH_KEY }}
           script: |
             cd ${{ env.PROJECT_DIR }}
             docker-compose -f ${{ env.DOCKER_COMPOSE_FILE }} down
