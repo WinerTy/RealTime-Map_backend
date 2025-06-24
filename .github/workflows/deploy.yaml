@@ -10,7 +10,8 @@ on:
 
 
 jobs:
-  test:
-    runs-on: self-hosted
+  build:
+    runs-on: ubuntu-latest
     steps:
-      - run: echo "Testing"
+      - uses: actions/checkout@v4
+      - run: docker-compose up --build
