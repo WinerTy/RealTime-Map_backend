@@ -15,6 +15,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check dir
+        run: pwd
+
       - name: Verify Docker access
         run: |
           docker --version
