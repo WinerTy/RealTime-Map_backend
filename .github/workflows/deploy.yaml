@@ -1,27 +1,19 @@
-
-name: Deploy
-
-
+name: Build and Deploy with Docker Compose
 
 on:
   push:
-    branches: [main]
-
-
+    branches: [ "main" ]  # Укажи свою ветку (например, master, dev и т. д.)
 
 jobs:
-  build:
-    runs-on: self-hosted
+  build-and-deploy:
+    runs-on: self-hosted  # Использует ваш собственный runner
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Check dir
-        run: pwd
 
-      - name: Verify Docker access
+      - name: Set up Docker Compose
         run: |
-          docker --version
-          docker-compose --version
-          docker ps
-
-      - run: docker-compose up --build
+          docker-compose down  realtime-map-backend
+          docker-compose build --pull  # Собирает образы с обновлением базовых
+          docker-compose up -d  # Запускает в фоновом режиме
