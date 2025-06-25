@@ -15,5 +15,4 @@ jobs:
       - name: Set up Docker Compose
         run: |
           docker-compose down  realtime-map-backend
-          docker-compose build --pull  # Собирает образы с обновлением базовых
-          docker-compose up -d  # Запускает в фоновом режиме
+          docker-compose up --build -d
