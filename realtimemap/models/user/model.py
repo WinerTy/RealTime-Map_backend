@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 
 from fastapi import Request
-from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable, SQLAlchemyUserDatabase
+from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
 from fastapi_users_db_sqlalchemy.access_token import (
     SQLAlchemyAccessTokenDatabase,
     SQLAlchemyBaseAccessTokenTable,
@@ -11,6 +11,7 @@ from sqlalchemy import String, Integer, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy_file import ImageField
 
+from auth.user_database import MySQLAlchemyUserDatabase
 from models import BaseSqlModel
 from models.mixins import IntIdMixin
 
@@ -25,11 +26,13 @@ class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
     )
     username: Mapped[str] = mapped_column(String(32), unique=True, nullable=False)
 
-    avatar: Mapped[ImageField] = mapped_column(ImageField(upload_storage="users"), nullable=True)
+    avatar: Mapped[ImageField] = mapped_column(
+        ImageField(upload_storage="users"), nullable=True
+    )
 
     @classmethod
     def get_db(cls, session: "AsyncSession"):
-        return SQLAlchemyUserDatabase(
+        return MySQLAlchemyUserDatabase(
             session, cls
         )  # TODO Переписать метод на получения пользователя с email на (email, phone, username)
 

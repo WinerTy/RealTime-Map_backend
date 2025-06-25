@@ -3,7 +3,6 @@ from typing import Optional
 from fastapi_users import schemas
 from pydantic import BaseModel, field_validator
 from pydantic_extra_types.phone_numbers import PhoneNumber
-from sqlalchemy_file.mutable_list import MutableList
 
 
 class UserRead(schemas.BaseUser[int]):
@@ -13,9 +12,9 @@ class UserRead(schemas.BaseUser[int]):
     avatar: Optional[str] = None
 
     @field_validator("avatar", mode="before")
-    def convert_photos_url(cls, v) -> str:
-        print(v)
-        print(type(v))
+    def convert_photos_url(cls, v) -> Optional[str]:
+        if v is None:
+            return None
         return v.path
 
 

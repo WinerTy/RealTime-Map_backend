@@ -9,7 +9,9 @@ from fastapi_users import (
     models,
     exceptions,
 )
+from fastapi_users.models import ID, UP
 
+from auth.base import MyBaseUserDatabase
 from core.config import conf
 from models import User
 
@@ -19,6 +21,7 @@ log = logging.getLogger(__name__)
 class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     reset_password_token_secret = conf.api.v1.auth.reset_password_token_secret
     verification_token_secret = conf.api.v1.auth.verification_token_secret
+    user_db = MyBaseUserDatabase[UP, ID]
 
     async def on_after_register(
         self,
@@ -75,7 +78,20 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         """
         await self.validate_password(user_create.password, user_create)
 
-        existing_user = await self.user_db.get_by_email(user_create.email)
+        existing_user = await self.user_db.get_by_email(email=user_create.email)
+
+        if existing_user is not None:
+            raise exceptions.UserAlreadyExists()
+
+        existing_user = await self.user_db.get_by_phone(phone=user_create.phone)
+
+        if existing_user is not None:
+            raise exceptions.UserAlreadyExists()
+
+        existing_user = await self.user_db.get_by_username(
+            username=user_create.username
+        )
+
         if existing_user is not None:
             raise exceptions.UserAlreadyExists()
 
