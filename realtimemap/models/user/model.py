@@ -9,6 +9,7 @@ from fastapi_users_db_sqlalchemy.access_token import (
 from jinja2 import Template
 from sqlalchemy import String, Integer, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy_file import ImageField
 
 from models import BaseSqlModel
 from models.mixins import IntIdMixin
@@ -23,6 +24,8 @@ class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
         String(32), unique=True, nullable=False, index=True
     )
     username: Mapped[str] = mapped_column(String(32), unique=True, nullable=False)
+
+    avatar: Mapped[ImageField] = mapped_column(ImageField(upload_storage="users"), nullable=True)
 
     @classmethod
     def get_db(cls, session: "AsyncSession"):

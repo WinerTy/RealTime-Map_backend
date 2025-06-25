@@ -54,6 +54,7 @@ class AdminUser(ModelView):
         User.is_active,
         User.is_superuser,
         User.is_verified,
+        User.avatar
     ]
 
     exclude_fields_from_detail = [User.hashed_password]

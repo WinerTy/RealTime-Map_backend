@@ -16,15 +16,17 @@ app = create_app()
 os.makedirs("uploads/category", exist_ok=True)
 os.makedirs("uploads/default", exist_ok=True)
 os.makedirs("uploads/mark", exist_ok=True)
+os.makedirs("uploads/users", exist_ok=True)
 
 default_container = LocalStorageDriver("uploads").get_container("default")
 category_container = LocalStorageDriver("uploads").get_container("category")
 mark_container = LocalStorageDriver("uploads").get_container("mark")
+users_container = LocalStorageDriver("uploads").get_container("users")
 
 StorageManager.add_storage("default", default_container)
 StorageManager.add_storage("category", category_container)
 StorageManager.add_storage("mark", mark_container)
-
+StorageManager.add_storage("users", users_container)
 
 @app.get("/", tags=["Root"], status_code=307)
 async def redirect_root():
@@ -40,7 +42,7 @@ async def add_process_time_header(request: Request, call_next):
     return response
 
 
-@app.get("/{storage}/{file_id}", tags=["Root"])
+@app.get("/api/v1/media/{storage}/{file_id}", tags=["Root"])
 def serve_files(storage: str = Path(...), file_id: str = Path(...)):
     try:
         file = StorageManager.get_file(f"{storage}/{file_id}")
