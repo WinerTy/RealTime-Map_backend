@@ -2,11 +2,11 @@ name: Build and Deploy with Docker Compose
 
 on:
   push:
-    branches: [ "main" ]  # Укажи свою ветку (например, master, dev и т. д.)
+    branches: [ "main" ]
 
 jobs:
   build-and-deploy:
-    runs-on: self-hosted  # Использует ваш собственный runner
+    runs-on: self-hosted
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
