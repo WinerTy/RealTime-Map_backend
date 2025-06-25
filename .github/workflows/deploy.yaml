@@ -14,5 +14,4 @@ jobs:
 
       - name: Set up Docker Compose
         run: |
-          docker compose down  realtime-map-backend
           docker compose up --build -d
