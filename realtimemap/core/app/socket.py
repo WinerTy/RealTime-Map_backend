@@ -14,7 +14,7 @@ sio = socketio.AsyncServer(
     cors_allowed_origins=[],
     client_manager=redis_manager,
 )
-sio_app = socketio.ASGIApp(socketio_server=sio, socketio_path="ws")
+sio_app = socketio.ASGIApp(socketio_server=sio)
 
 
 class MarksNamespace(AsyncNamespace):

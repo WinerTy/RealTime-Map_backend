@@ -39,7 +39,7 @@ def add_routers(app: FastAPI):
 
 
 def mount_socket_io(app: FastAPI) -> None:
-    app.mount("/ws", app=sio_app)
+    app.mount("/socket.io", app=sio_app)
 
 
 def setup_file_storage():
