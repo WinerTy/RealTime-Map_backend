@@ -1,18 +1,16 @@
 from typing import Any, Optional
 
 import socketio
-from socketio import AsyncNamespace, AsyncRedisManager
+from socketio import AsyncNamespace
 
-from core.config import conf
 from crud.mark import MarkRepository
 from database.helper import db_helper
 from models.mark.schemas import MarkRequestParams, ReadMark
 
-redis_manager = AsyncRedisManager(url=str(conf.redis.url))
 sio = socketio.AsyncServer(
     async_mode="asgi",
     cors_allowed_origins=[],
-    client_manager=redis_manager,
+    client_manager=socketio.AsyncManager(),
 )
 sio_app = socketio.ASGIApp(socketio_server=sio)
 
