@@ -1,35 +1,71 @@
 import logging
-from typing import Annotated, List
+from typing import Annotated, List, Optional
 
-from fastapi import APIRouter, Depends, Form, WebSocket, BackgroundTasks
-from starlette.requests import Request
-from starlette.responses import Response
+from fastapi import (
+    APIRouter,
+    Depends,
+    Form,
+    BackgroundTasks,
+    Request,
+    Response,
+    WebSocket,
+)
 
 from api.v1.auth.fastapi_users import current_active_user
+from core.app.socket import sio
 from crud.mark import MarkRepository
-from dependencies.crud import get_mark_repository
+from database.helper import db_helper
 from dependencies.service import get_mark_service
-from models import User
+from models import User, Mark
 from models.mark.schemas import (
     CreateMarkRequest,
     ReadMark,
     MarkRequestParams,
+    action_type,
 )
 from services.mark.service import MarkService
-from websocket.mark_socket import marks_websocket
 
 router = APIRouter(prefix="/marks", tags=["Marks"])
 
 logger = logging.getLogger(__name__)
 
 
+async def notify_mark_action(mark: Mark, action: action_type):
+    try:
+        async with db_helper.session_factory() as session:
+            repo = MarkRepository(session)
+            connections = sio.manager.rooms.get("/marks", {})
+            if not connections:
+                return
+            for room_name in connections:
+                if room_name:
+                    params: Optional[MarkRequestParams] = await sio.get_session(
+                        room_name, "/marks"
+                    )
+                    if not params:
+                        continue
+                    in_range = await repo.check_distance(params, mark)
+                    if in_range:
+                        await sio.emit(
+                            action,
+                            to=room_name,
+                            data=mark.id,
+                            namespace="/marks",
+                        )
+    except Exception as e:
+        print(e)
+
+
 @router.get("/", response_model=List[ReadMark], status_code=200)
 async def get_marks(
-    request: Request,
-    repo: Annotated["MarkRepository", Depends(get_mark_repository)],
+    # request: Request, mb for generate full url
+    service: Annotated["MarkService", Depends(get_mark_service)],
     params: MarkRequestParams = Depends(),
 ):
-    result = await repo.get_marks(params)
+    """
+    Endpoint for getting all marks in radius, filtered by params.
+    """
+    result = await service.get_marks(params)
     return result
 
 
@@ -44,51 +80,45 @@ async def create_mark_point(
     """
     Protected endpoint for create mark.
     """
-    instance = await service.service_create_mark(mark, user)
-    # background.add_task(
-    #     ws_manager.broadcast_json, ReadMark(**data).model_dump(mode="json")
-    # )
+    instance = await service.create_mark(mark, user)
+    background.add_task(
+        notify_mark_action,
+        mark=instance,
+        action="create",
+    )
     return instance
 
 
 @router.get("/{mark_id}/", response_model=ReadMark, status_code=200)
-# @cache(expire=3600) # TODO FIX
+# @cache(expire=3600)
 async def get_mark(
     mark_id: int,
-    repo: Annotated["MarkRepository", Depends(get_mark_repository)],
+    service: Annotated["MarkService", Depends(get_mark_service)],
 ):
-    result = await repo.get_by_id(mark_id)
+    result = await service.get_mark_by_id(mark_id)
     return result
 
 
 @router.delete("/{mark_id}", status_code=204)
 async def delete_mark(
     mark_id: int,
+    background: BackgroundTasks,
     user: Annotated["User", Depends(current_active_user)],
     service: Annotated["MarkService", Depends(get_mark_service)],
 ):
-    await service.mark_repo.delete_mark(mark_id, user)
-
+    instance = await service.mark_repo.delete_mark(mark_id, user)
     return Response(status_code=204)
 
 
-# FIX, Context, serialize datetime field
 @router.websocket("/")
-async def websocket_endpoint(
-    websocket: WebSocket, service: Annotated["MarkService", Depends(get_mark_service)]
+async def mark_websocket_endpoint(
+    websocket: WebSocket,
+    service: Annotated["MarkService", Depends(get_mark_service)],
 ):
-    await marks_websocket.connect(websocket)
+    await service.manager.connect(websocket)
 
     while True:
-        try:
-            cords = await websocket.receive_json()
-            await marks_websocket.update_coordinates(websocket, cords)
-            actual_coords = marks_websocket.get_user_cords(websocket)
-            result = await service.mark_repo.get_marks(
-                MarkRequestParams(**actual_coords.model_dump())
-            )
-            result_json = [mark.model_dump(mode="json") for mark in result]
-            await marks_websocket.broadcast_json(websocket, result_json)
-        except Exception as e:
-            await websocket.send_json({"message": "Disconnected", "error": str(e)})
-            await marks_websocket.disconnect(websocket)
+        params = await websocket.receive_json()
+        await service.manager.set_params(
+            websocket=websocket, params=MarkRequestParams(**params)
+        )

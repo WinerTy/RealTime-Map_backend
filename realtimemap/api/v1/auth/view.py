@@ -23,10 +23,12 @@ router.include_router(
     ),
 )
 
+
 router.include_router(
     router=fastapi_users.get_users_router(
-        UserRead, UserUpdate,
+        UserRead,
+        UserUpdate,
     ),
-    prefix = "/users",
-    tags = ["Users"],
+    prefix="/users",
+    tags=["Users"],
 )

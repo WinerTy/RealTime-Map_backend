@@ -1,64 +1,51 @@
-from typing import Dict, Optional
+import asyncio
+from typing import Dict, Optional, Set
 
 from fastapi import WebSocket
-from pydantic import ValidationError
 
-from models.mark.schemas import MarkCoordinates, MarkRequestParams
-from .base import WebsocketManager, AbstractWebSocket
+from models.mark.schemas import MarkRequestParams
 
 
-class MarkWebSocket(WebsocketManager):
-    def __init__(self):
-        super().__init__()
-        self.connection_data: Dict[WebSocket, Optional[MarkCoordinates]] = {}
+class MarkManager:
+    _instance = None
 
-    async def connect(self, websocket: WebSocket):
-        await super().connect(websocket)
-        self.connection_data[websocket] = None
-
-    async def update_coordinates(
-        self, websocket: WebSocket, new_coords: Dict[str, float]
-    ):
-        coords = await self._validate_coords(websocket, new_coords)
-        if websocket in self.active_connections:
-            self.connection_data[websocket] = coords
-
-    async def _validate_coords(
-        self, websocket: WebSocket, coords: Dict[str, float]
-    ) -> MarkCoordinates:
-        try:
-            return MarkCoordinates(**coords)
-        except ValidationError as e:
-            await websocket.send_text(str(e))
-            await self.disconnect(websocket)
-
-    async def disconnect(self, websocket: WebSocket):
-        if websocket in self.active_connections:
-            await super().disconnect(websocket)
-            self.connection_data.pop(websocket)
-
-    def get_user_cords(self, websocket: WebSocket) -> MarkCoordinates:
-        return self.connection_data.get(websocket)
-
-    async def check_include_mark(self):
-        pass
-
-
-marks_websocket = MarkWebSocket()
-
-
-class MarksWebSocket(AbstractWebSocket):
-    def __init__(self):
-        self.connections: Dict[WebSocket, Optional[MarkRequestParams]] = dict()
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance.connections: Dict[WebSocket, Optional[MarkRequestParams]] = (
+                dict()
+            )
+            cls._instance._lock = asyncio.Lock()
+        return cls._instance
 
     async def connect(self, websocket: WebSocket):
-        await websocket.accept()
-        self.connections[websocket] = None
+        async with self._lock:
+            await websocket.accept()
+            self.connections[websocket] = None
 
     async def disconnect(self, websocket: WebSocket):
-        if websocket in self.connections:
-            self.connections.pop(websocket)
+        async with self._lock:
+            self.connections.pop(websocket, None)
 
     async def set_params(self, websocket: WebSocket, params: MarkRequestParams):
-        if websocket in self.connections:
-            self.connections[websocket] = params
+        async with self._lock:
+            if websocket in self.connections:
+                self.connections[websocket] = params
+
+    async def get_sockets_by_params(self, filter_func) -> Set[WebSocket]:
+        async with self._lock:
+            return {
+                ws
+                for ws, params in self.connections.items()
+                if params is not None and filter_func(params)
+            }
+
+    async def broadcast(self, message: dict, filter_func=None):
+        targets = (
+            await self.get_sockets_by_params(filter_func)
+            if filter_func
+            else set(self.connections.keys())
+        )
+
+        for websocket in targets:
+            await websocket.send_json(message)

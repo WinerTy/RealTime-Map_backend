@@ -1,11 +1,11 @@
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Literal
 
 from fastapi import UploadFile
 from geoalchemy2 import WKBElement
 from geoalchemy2.shape import to_shape
 from geojson_pydantic import Point
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, field_serializer
 from sqlalchemy_file.mutable_list import MutableList
 
 
@@ -60,14 +60,16 @@ class ReadMark(BaseMark):
             datetime: lambda dt: dt.isoformat(),
         }
 
+    @field_serializer("end_at")
+    def serialize_end_at(self, value: datetime) -> str:
+        return value.isoformat()
+
     @field_validator("geom", mode="before")
-    @classmethod
     def convert_geom(cls, v: WKBElement):
         result = to_shape(v)
         return Point(**result.__geo_interface__)
 
     @field_validator("photo", mode="before")
-    @classmethod
     def convert_photos_url(cls, v: MutableList):
         if v is None:
             return []
@@ -79,12 +81,12 @@ class ReadMark(BaseMark):
         return result
 
 
-class MarkCoordinates(BaseModel):
+class Coordinates(BaseModel):
     longitude: float = Field(..., ge=-180, le=180, examples=["63.201907"])
     latitude: float = Field(..., ge=-90, le=90, examples=["75.445675"])
 
 
-class MarkRequestParams(MarkCoordinates):
+class MarkRequestParams(Coordinates):
     radius: int = Field(500, description="Search radius in meters.")
     srid: int = Field(4326, description="SRID")
     date: datetime = Field(datetime.now(), description="Date")
@@ -92,6 +94,9 @@ class MarkRequestParams(MarkCoordinates):
     show_ended: Optional[bool] = Field(False, description="Show ended.")
 
 
-class MarkRequestWebSocket(BaseModel):
-    action_type: str
+action_type = Literal["create", "read", "update", "delete"]
+
+
+class MarkResponseWebSocket(BaseModel):
+    action_type: action_type
     items: List[ReadMark] = []

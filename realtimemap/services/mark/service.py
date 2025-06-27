@@ -4,7 +4,10 @@ from fastapi import HTTPException
 from fastapi_babel import _
 
 from models import User, Mark
-from models.mark.schemas import CreateMarkRequest
+from models.mark.schemas import (
+    CreateMarkRequest,
+    MarkRequestParams,
+)
 from models.mark_comment.schemas import CreateMarkCommentRequest
 from services.base import BaseService
 
@@ -13,6 +16,7 @@ if TYPE_CHECKING:
     from crud.mark import MarkRepository
     from crud.category import CategoryRepository
     from crud.mark_comment.repository import MarkCommentRepository
+    from websocket.mark_socket import MarkManager
 
 
 class MarkService(BaseService):
@@ -22,15 +26,15 @@ class MarkService(BaseService):
         mark_repo: "MarkRepository",
         category_repo: "CategoryRepository",
         mark_comment_repo: "MarkCommentRepository",
+        manager: "MarkManager",
     ):
         super().__init__(session)
         self.mark_repo = mark_repo
         self.category_repo = category_repo
         self.mark_comment_repo = mark_comment_repo
+        self.manager = manager
 
-    async def service_create_mark(
-        self, mark_data: CreateMarkRequest, user: User
-    ) -> Mark:
+    async def create_mark(self, mark_data: CreateMarkRequest, user: User) -> Mark:
         category_exist = await self.category_repo.exist(mark_data.category_id)
         if not category_exist:
             raise HTTPException(
@@ -47,3 +51,9 @@ class MarkService(BaseService):
 
     async def get_comments(self, mark_id: int):
         return await self.mark_comment_repo.get_comment_for_mark(mark_id)
+
+    async def get_mark_by_id(self, mark_id: int) -> Mark:
+        return await self.mark_repo.get_by_id(mark_id)
+
+    async def get_marks(self, params: MarkRequestParams):
+        return await self.mark_repo.get_marks(params)

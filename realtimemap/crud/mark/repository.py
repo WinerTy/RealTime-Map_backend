@@ -20,7 +20,6 @@ from models.mark.schemas import (
     UpdateMark,
     CreateMarkRequest,
     MarkRequestParams,
-    MarkCoordinates,
 )
 
 if TYPE_CHECKING:
@@ -33,7 +32,7 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
         super().__init__(Mark, session, "id")
         self.upload_dir = "upload_marks"
 
-    async def get_marks(self, params: MarkRequestParams) -> List[ReadMark]:
+    async def get_marks(self, params: MarkRequestParams) -> List[Mark]:
         current_point = ST_SetSRID(
             ST_MakePoint(params.longitude, params.latitude), params.srid
         )
@@ -79,20 +78,21 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
 
         return result
 
-    async def delete_mark(self, mark_id: int, user: "User") -> None:
+    async def delete_mark(self, mark_id: int, user: "User") -> Mark:
         mark = await self.get_mark_by_id(mark_id)
         if not mark.owner == user:
             raise HTTPException(status_code=403)
         await super().delete(mark_id)
+        return mark
 
     async def check_distance(
-        self, current_location: MarkCoordinates, mark: Mark, radius: int = 500
+        self, current_location: MarkRequestParams, mark: Mark, radius: int = 500
     ) -> bool:
         user_point = ST_SetSRID(
             ST_MakePoint(current_location.longitude, current_location.latitude), 4326
         )
 
-        # Преобразуем обе точки в метрическую проекцию (3857)
+        print(type(mark.geom))
         stmt = select(
             ST_Distance(ST_Transform(mark.geom, 3857), ST_Transform(user_point, 3857))
             <= radius
