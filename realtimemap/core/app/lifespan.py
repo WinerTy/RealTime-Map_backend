@@ -13,6 +13,7 @@ from utils.cache import OrJsonEncoder, custom_key_builder
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     redis = asyncredis.from_url(str(conf.redis.url))
+    app.state.redis = redis
     FastAPICache.init(
         RedisBackend(redis),
         prefix=conf.redis.prefix,
