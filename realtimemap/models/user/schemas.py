@@ -1,7 +1,9 @@
 from typing import Optional
 
+from fastapi import Request
 from fastapi_users import schemas
 from pydantic import BaseModel, field_validator
+from pydantic_core.core_schema import ValidationInfo
 from pydantic_extra_types.phone_numbers import PhoneNumber
 
 
@@ -11,11 +13,25 @@ class UserRead(schemas.BaseUser[int]):
     username: str
     avatar: Optional[str] = None
 
+    class Config:
+        from_attributes = True
+
     @field_validator("avatar", mode="before")
-    def convert_photos_url(cls, v) -> Optional[str]:
-        if v is None:
+    def convert_photos_url(cls, v, info: ValidationInfo) -> Optional[str]:
+        if not info.context or "request" not in info.context:
+            # Если контекста нет, мы не можем создать полный URL.
+            # Возвращаем просто путь или None.
+            return v.path if v else None
+        request: Optional[Request] = info.context.get("request")
+
+        if v is None or request is None:
             return None
-        return v.path
+
+        base_url = str(request.base_url)
+        base_url += "media/"
+        file_path = v.path.lstrip("/")
+
+        return f"{base_url}{file_path}"
 
 
 class UserCreate(schemas.BaseUserCreate):
