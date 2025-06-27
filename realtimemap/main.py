@@ -1,3 +1,4 @@
+import os
 import time
 
 from fastapi import Request, Path
@@ -11,6 +12,20 @@ from core.app import create_app
 from core.config import conf
 
 app = create_app()
+
+os.makedirs("uploads/default", exist_ok=True)
+os.makedirs("uploads/mark", exist_ok=True)
+os.makedirs("uploads/users", exist_ok=True)
+
+default_container = LocalStorageDriver("uploads").get_container("default")
+category_container = LocalStorageDriver("uploads").get_container("category")
+mark_container = LocalStorageDriver("uploads").get_container("mark")
+users_container = LocalStorageDriver("uploads").get_container("users")
+
+StorageManager.add_storage("default", default_container)
+StorageManager.add_storage("category", category_container)
+StorageManager.add_storage("mark", mark_container)
+StorageManager.add_storage("users", users_container)
 
 
 @app.get("/", tags=["Root"], status_code=307)

@@ -1,12 +1,9 @@
-import os
 from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from fastapi_babel import BabelConfigs, BabelMiddleware
 from fastapi_pagination import add_pagination
-from libcloud.storage.drivers.local import LocalStorageDriver
-from sqlalchemy_file.storage import StorageManager
 from starlette.middleware.cors import CORSMiddleware
 from starlette.staticfiles import StaticFiles
 
@@ -43,19 +40,7 @@ def mount_socket_io(app: FastAPI) -> None:
 
 
 def setup_file_storage():
-    os.makedirs("uploads/default", exist_ok=True)
-    os.makedirs("uploads/mark", exist_ok=True)
-    os.makedirs("uploads/users", exist_ok=True)
-
-    default_container = LocalStorageDriver("uploads").get_container("default")
-    category_container = LocalStorageDriver("uploads").get_container("category")
-    mark_container = LocalStorageDriver("uploads").get_container("mark")
-    users_container = LocalStorageDriver("uploads").get_container("users")
-
-    StorageManager.add_storage("default", default_container)
-    StorageManager.add_storage("category", category_container)
-    StorageManager.add_storage("mark", mark_container)
-    StorageManager.add_storage("users", users_container)
+    pass
 
 
 def create_app() -> FastAPI:
@@ -67,7 +52,7 @@ def create_app() -> FastAPI:
     add_babel_middleware(app)
     setup_pagination(app)
     setup_admin(app)
-    setup_file_storage()
+    setup_file_storage()  # FIX
     mount_socket_io(app)
     app.add_middleware(
         CORSMiddleware,
