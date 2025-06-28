@@ -16,7 +16,7 @@ sio_app = socketio.ASGIApp(socketio_server=sio)
 
 
 class MarksNamespace(AsyncNamespace):
-    async def on_connect(self, sid, environ):
+    async def on_connect(self, sid, environ, auth):
         print(f"Клиент подключился к marks_ws: {sid}")
 
     async def on_disconnect(self, sid):

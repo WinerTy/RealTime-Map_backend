@@ -23,7 +23,6 @@ class UserRead(schemas.BaseUser[int]):
             # Возвращаем просто путь или None.
             return v.path if v else None
         request: Optional[Request] = info.context.get("request")
-
         if v is None or request is None:
             return None
 
