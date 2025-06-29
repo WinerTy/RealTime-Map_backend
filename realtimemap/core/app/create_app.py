@@ -44,18 +44,18 @@ def mount_socket_io(app: FastAPI) -> None:
 
 def setup_file_storage():
     os.makedirs("uploads/default", exist_ok=True)
-    os.makedirs("uploads/mark", exist_ok=True)
+    os.makedirs("uploads/marks", exist_ok=True)
     os.makedirs("uploads/users", exist_ok=True)
     os.makedirs("uploads/category", exist_ok=True)
 
     default_container = LocalStorageDriver("uploads").get_container("default")
     category_container = LocalStorageDriver("uploads").get_container("category")
-    mark_container = LocalStorageDriver("uploads").get_container("mark")
+    mark_container = LocalStorageDriver("uploads").get_container("marks")
     users_container = LocalStorageDriver("uploads").get_container("users")
 
     StorageManager.add_storage("default", default_container)
     StorageManager.add_storage("category", category_container)
-    StorageManager.add_storage("mark", mark_container)
+    StorageManager.add_storage("marks", mark_container)
     StorageManager.add_storage("users", users_container)
 
 

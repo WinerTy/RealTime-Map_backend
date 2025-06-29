@@ -27,7 +27,7 @@ async def add_process_time_header(request: Request, call_next):
     return response
 
 
-@app.get("/api/v1/media/{storage}/{file_id}", tags=["Root"])
+@app.get("/media/{storage}/{file_id}", tags=["Root"])
 def serve_files(storage: str = Path(...), file_id: str = Path(...)):
     try:
         file = StorageManager.get_file(f"{storage}/{file_id}")
