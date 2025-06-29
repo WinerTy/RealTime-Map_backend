@@ -17,12 +17,14 @@ sio_app = socketio.ASGIApp(socketio_server=sio)
 
 class MarksNamespace(AsyncNamespace):
     async def on_connect(self, sid, environ, auth):
-        print(f"Клиент подключился к marks_ws: {sid}")
+        print(f"Клиент подключился к marks: {sid}")
+        print(environ["HTTP_HOST"])
+        print(environ["wsgi.url_scheme"])
 
     async def on_disconnect(self, sid):
         pass
 
-    async def on_message(self, sid, data):
+    async def on_marks_message(self, sid, data):
         params = self._validate_params(data)
         await self.save_session(sid, params)
         if params:
@@ -30,12 +32,13 @@ class MarksNamespace(AsyncNamespace):
                 repo = MarkRepository(session)
                 result = await repo.get_marks(params)
                 result = [
-                    ReadMark(end_at=mark.end_at, **mark.__dict__).model_dump(
-                        mode="json"
-                    )
+                    ReadMark.model_validate(mark).model_dump(mode="json")
                     for mark in result
                 ]
-                await self.emit("get_marks", data=result, to=sid)
+                await self.emit("marks_get", data=result, to=sid)
+
+    async def on_message(self, sid, data):
+        pass
 
     @staticmethod
     def _validate_params(data: Any) -> Optional[MarkRequestParams]:

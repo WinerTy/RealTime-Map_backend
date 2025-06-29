@@ -8,7 +8,6 @@ from fastapi import (
     BackgroundTasks,
     Request,
     Response,
-    WebSocket,
 )
 
 from api.v1.auth.fastapi_users import current_active_user
@@ -30,13 +29,28 @@ router = APIRouter(prefix="/marks", tags=["Marks"])
 logger = logging.getLogger(__name__)
 
 
-async def notify_mark_action(mark: Mark, action: action_type):
+def get_sids(namespace: str = "/") -> List[Optional[str]]:
+    try:
+        connections = sio.manager.rooms.get(namespace, {})
+        if not connections:
+            return []
+        result = []
+        for room_sid in connections:
+            if room_sid:
+                result.append(room_sid)
+        return result
+    except Exception:
+        return []
+
+
+# Разбить на функции
+async def notify_mark_action(
+    mark: Mark, action: action_type, request: Optional[Request] = None
+):
     try:
         async with db_helper.session_factory() as session:
             repo = MarkRepository(session)
-            connections = sio.manager.rooms.get("/marks", {})
-            if not connections:
-                return
+            connections = get_sids(namespace="/marks")
             for room_name in connections:
                 if room_name:
                     params: Optional[MarkRequestParams] = await sio.get_session(
@@ -49,7 +63,12 @@ async def notify_mark_action(mark: Mark, action: action_type):
                         await sio.emit(
                             action,
                             to=room_name,
-                            data=mark.id,
+                            data=ReadMark.model_validate(
+                                mark,
+                                context={
+                                    "request": request,
+                                },
+                            ).model_dump(mode="json"),
                             namespace="/marks",
                         )
     except Exception as e:
@@ -58,7 +77,7 @@ async def notify_mark_action(mark: Mark, action: action_type):
 
 @router.get("/", response_model=List[ReadMark], status_code=200)
 async def get_marks(
-    # request: Request, mb for generate full url
+    request: Request,
     service: Annotated["MarkService", Depends(get_mark_service)],
     params: MarkRequestParams = Depends(),
 ):
@@ -66,7 +85,9 @@ async def get_marks(
     Endpoint for getting all marks in radius, filtered by params.
     """
     result = await service.get_marks(params)
-    return result
+    return [
+        ReadMark.model_validate(mark, context={"request": request}) for mark in result
+    ]
 
 
 @router.post("/", response_model=ReadMark, status_code=201)
@@ -84,9 +105,9 @@ async def create_mark_point(
     background.add_task(
         notify_mark_action,
         mark=instance,
-        action="create",
+        action="marks_created",
     )
-    return instance
+    return ReadMark.model_validate(instance, context={"request": request})
 
 
 @router.get("/{mark_id}/", response_model=ReadMark, status_code=200)
@@ -107,18 +128,9 @@ async def delete_mark(
     service: Annotated["MarkService", Depends(get_mark_service)],
 ):
     instance = await service.mark_repo.delete_mark(mark_id, user)
+    background.add_task(
+        notify_mark_action,
+        mark=instance,
+        action="marks_deleted",
+    )
     return Response(status_code=204)
-
-
-@router.websocket("/")
-async def mark_websocket_endpoint(
-    websocket: WebSocket,
-    service: Annotated["MarkService", Depends(get_mark_service)],
-):
-    await service.manager.connect(websocket)
-
-    while True:
-        params = await websocket.receive_json()
-        await service.manager.set_params(
-            websocket=websocket, params=MarkRequestParams(**params)
-        )
