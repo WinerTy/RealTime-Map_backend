@@ -1,15 +1,16 @@
 services:
+  redis:
+    image: redis:latest
+    container_name: redis-service
+    ports:
+      - "6379:6379"
+
   backend:
     build: .
     container_name: realtime-map-backend
     ports:
       - "8001:8001"
     
-    command: ../.venv/bin/python main.py
+    command: ../.venv/bin/python run_main.py
     depends_on:
       - redis
-  redis:
-    image: redis:latest
-    container_name: redis-service
-    ports:
-      - "6379:6379"

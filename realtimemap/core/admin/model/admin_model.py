@@ -8,8 +8,8 @@ from starlette_admin.contrib.sqla.ext.pydantic import ModelView as PydanticView
 from starlette_admin.exceptions import FormValidationError
 from starlette_admin.fields import PhoneField, PasswordField
 
+from core.admin.fields import GeomField
 from models import User, Mark
-from .fields import GeomField
 
 
 class AdminCategory(ModelView):
@@ -54,7 +54,7 @@ class AdminUser(ModelView):
         User.is_active,
         User.is_superuser,
         User.is_verified,
-        User.avatar
+        User.avatar,
     ]
 
     exclude_fields_from_detail = [User.hashed_password]

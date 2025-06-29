@@ -1,10 +1,15 @@
 from fastapi import FastAPI
 from starlette_admin.contrib.sqla import Admin
 
+from core.admin.model.admin_model import (
+    AdminCategory,
+    AdminUser,
+    AdminMarkComment,
+    AdminMark,
+)
 from database.helper import db_helper
 from models import Category, User, MarkComment, Mark
 from models.mark.schemas import CreateMark
-from .admin_model import AdminCategory, AdminUser, AdminMarkComment, AdminMark
 
 
 def setup_admin(app: FastAPI) -> None:

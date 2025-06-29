@@ -11,8 +11,8 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.staticfiles import StaticFiles
 
 from api.v1 import router as v1_router
+from core.admin.admin import setup_admin
 from core.config import conf
-from .admin import setup_admin
 from .lifespan import lifespan
 from .socket import sio_app
 
@@ -21,6 +21,10 @@ ROOT_DIR = Path(__file__).parent.parent
 
 def setup_pagination(app: FastAPI) -> None:
     add_pagination(app)
+
+
+def setup_logging() -> None:
+    os.makedirs("logs", exist_ok=True)
 
 
 # pybabel init -i messages.pot -d i18n -l en -D messages
@@ -62,6 +66,7 @@ def setup_file_storage():
 
 def create_app() -> FastAPI:
     setup_file_storage()
+    setup_logging()
     app = FastAPI(lifespan=lifespan, default_response_class=ORJSONResponse)
     app.mount(
         "/static", StaticFiles(directory=ROOT_DIR.parent / conf.static), name="static"

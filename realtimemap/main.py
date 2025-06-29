@@ -60,7 +60,7 @@ def serve_files(storage: str = Path(...), file_id: str = Path(...)):
 STATIC_DIR = conf.static
 
 
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(app, host=conf.server.host, port=conf.server.port)
+# if __name__ == "__main__":
+#     import uvicorn
+#
+#     uvicorn.run(app, host=conf.server.host, port=conf.server.port)
