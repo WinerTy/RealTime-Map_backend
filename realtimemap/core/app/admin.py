@@ -8,6 +8,7 @@ from .admin_model import AdminCategory, AdminUser, AdminMarkComment, AdminMark
 
 
 def setup_admin(app: FastAPI) -> None:
+    # Fix статики в адм на хостинге
     admin = Admin(engine=db_helper.engine, title="RealTime-Map")
     admin.add_view(AdminCategory(Category))
     admin.add_view(AdminMarkComment(MarkComment))
