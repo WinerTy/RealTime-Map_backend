@@ -23,14 +23,11 @@ class UserRead(schemas.BaseUser[int]):
             # Возвращаем просто путь или None.
             return v.path if v else None
         request: Optional[Request] = info.context.get("request")
+        base_url = request.url.scheme + "://" + request.url.netloc + "/media/"
         if v is None or request is None:
             return None
 
-        base_url = str(request.base_url)
-        base_url += "media/"
-        file_path = v.path.lstrip("/")
-
-        return f"{base_url}{file_path}"
+        return f"{base_url}{v.path}"
 
 
 class UserCreate(schemas.BaseUserCreate):

@@ -21,7 +21,7 @@ class Mark(BaseSqlModel, IntIdMixin, TimeMarkMixin):
         Geometry(geometry_type="POINT", srid=4326), nullable=False
     )
     photo: Mapped[ImageField] = mapped_column(
-        ImageField(upload_storage="mark", multiple=True), nullable=True
+        ImageField(upload_storage="marks", multiple=True), nullable=True
     )
     owner_id: Mapped[int] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), nullable=False

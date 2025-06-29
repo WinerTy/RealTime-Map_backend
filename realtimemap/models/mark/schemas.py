@@ -6,7 +6,9 @@ from geoalchemy2 import WKBElement
 from geoalchemy2.shape import to_shape
 from geojson_pydantic import Point
 from pydantic import BaseModel, Field, field_validator, field_serializer
+from pydantic_core.core_schema import ValidationInfo
 from sqlalchemy_file.mutable_list import MutableList
+from starlette.requests import Request
 
 
 class BaseMark(BaseModel):
@@ -59,6 +61,7 @@ class ReadMark(BaseMark):
         json_encoders = {
             datetime: lambda dt: dt.isoformat(),
         }
+        from_attributes = True
 
     @field_serializer("end_at")
     def serialize_end_at(self, value: datetime) -> str:
@@ -70,15 +73,15 @@ class ReadMark(BaseMark):
         return Point(**result.__geo_interface__)
 
     @field_validator("photo", mode="before")
-    def convert_photos_url(cls, v: MutableList):
-        if v is None:
-            return []
-        result: List[str] = []
+    def convert_photos_url(cls, v: MutableList, info: ValidationInfo):
+        if not info.context or "request" not in info.context:
+            if v is None:
+                return []
+            return [photo.path for photo in v]
+        request: Optional[Request] = info.context.get("request")
+        base_url = request.url.scheme + "://" + request.url.netloc + "/media/"
 
-        for photo in v:
-            result.append(photo.path)
-
-        return result
+        return [base_url + photo.path for photo in v]
 
 
 class Coordinates(BaseModel):
@@ -94,7 +97,7 @@ class MarkRequestParams(Coordinates):
     show_ended: Optional[bool] = Field(False, description="Show ended.")
 
 
-action_type = Literal["create", "read", "update", "delete"]
+action_type = Literal["marks_created", "marks_get", "marks_updated", "marks_deleted"]
 
 
 class MarkResponseWebSocket(BaseModel):
