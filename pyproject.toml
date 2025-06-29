@@ -26,6 +26,7 @@ dependencies = [
     "uvicorn>=0.34.2",
     "websockets>=15.0.1",
     "python-socketio[asyncio-client]>=5.13.0",
+    "gunicorn>=23.0.0",
 ]
 
 [dependency-groups]

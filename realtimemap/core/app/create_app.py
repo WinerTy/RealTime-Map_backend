@@ -43,6 +43,7 @@ def mount_socket_io(app: FastAPI) -> None:
 
 
 def setup_file_storage():
+    os.makedirs("static", exist_ok=True)
     os.makedirs("uploads/default", exist_ok=True)
     os.makedirs("uploads/marks", exist_ok=True)
     os.makedirs("uploads/users", exist_ok=True)
@@ -60,6 +61,7 @@ def setup_file_storage():
 
 
 def create_app() -> FastAPI:
+    setup_file_storage()
     app = FastAPI(lifespan=lifespan, default_response_class=ORJSONResponse)
     app.mount(
         "/static", StaticFiles(directory=ROOT_DIR.parent / conf.static), name="static"
@@ -68,7 +70,6 @@ def create_app() -> FastAPI:
     add_babel_middleware(app)
     setup_pagination(app)
     setup_admin(app)
-    setup_file_storage()  # FIX
     mount_socket_io(app)
     app.add_middleware(
         CORSMiddleware,
