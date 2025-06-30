@@ -27,7 +27,7 @@ async def add_process_time_header(request: Request, call_next):
     return response
 
 
-@app.get("/media/{storage}/{file_id}", tags=["Root"])
+@app.get("/media/{storage}/{file_id}", tags=["Root"], name="get_file")
 def serve_files(storage: str = Path(...), file_id: str = Path(...)):
     try:
         file = StorageManager.get_file(f"{storage}/{file_id}")
@@ -60,7 +60,7 @@ def serve_files(storage: str = Path(...), file_id: str = Path(...)):
 STATIC_DIR = conf.static
 
 
-# if __name__ == "__main__":
-#     import uvicorn
-#
-#     uvicorn.run(app, host=conf.server.host, port=conf.server.port)
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host=conf.server.host, port=conf.server.port)

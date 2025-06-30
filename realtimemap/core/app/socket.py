@@ -20,9 +20,10 @@ class MarksNamespace(AsyncNamespace):
         print(f"Клиент подключился к marks: {sid}")
         print(environ["HTTP_HOST"])
         print(environ["wsgi.url_scheme"])
+        print(environ)
 
     async def on_disconnect(self, sid):
-        pass
+        print(sid, "disconnect")
 
     async def on_marks_message(self, sid, data):
         params = self._validate_params(data)

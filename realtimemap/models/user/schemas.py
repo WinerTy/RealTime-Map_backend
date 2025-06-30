@@ -19,15 +19,17 @@ class UserRead(schemas.BaseUser[int]):
     @field_validator("avatar", mode="before")
     def convert_photos_url(cls, v, info: ValidationInfo) -> Optional[str]:
         if not info.context or "request" not in info.context:
-            # Если контекста нет, мы не можем создать полный URL.
-            # Возвращаем просто путь или None.
             return v.path if v else None
-        request: Optional[Request] = info.context.get("request")
-        base_url = request.url.scheme + "://" + request.url.netloc + "/media/"
-        if v is None or request is None:
+
+        if v is None:
             return None
 
-        return f"{base_url}{v.path}"
+        request: Optional[Request] = info.context.get("request")
+        file_url = request.url_for(
+            "get_file", storage=v.upload_storage, file_id=v.file_id
+        )
+
+        return file_url
 
 
 class UserCreate(schemas.BaseUserCreate):

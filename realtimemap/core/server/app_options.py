@@ -6,7 +6,7 @@ def get_application_options(
 ) -> dict:
     return {
         "accesslog": "-",
-        "errorlog": "logs/error.log",
+        "errorlog": "-",
         "loglevel": log_level,
         "logger_class": GunicornLogger,
         "bind": bind,
