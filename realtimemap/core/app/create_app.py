@@ -8,6 +8,7 @@ from fastapi_pagination import add_pagination
 from libcloud.storage.drivers.local import LocalStorageDriver
 from sqlalchemy_file.storage import StorageManager
 from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 from starlette.staticfiles import StaticFiles
 
 from api.v1 import router as v1_router
@@ -25,6 +26,12 @@ def setup_pagination(app: FastAPI) -> None:
 
 def setup_logging() -> None:
     os.makedirs("logs", exist_ok=True)
+
+
+def add_header_middleware(app: FastAPI) -> None:
+    app.add_middleware(
+        TrustedHostMiddleware, allowed_hosts=["127.0.0.1", "realtimemap.ru"]
+    )
 
 
 # pybabel init -i messages.pot -d i18n -l en -D messages
@@ -76,11 +83,12 @@ def create_app() -> FastAPI:
     #     StaticFiles(directory=ROOT_DIR.parent / "uploads"),
     #     name="uploads",
     # )
-    add_routers(app)
     add_babel_middleware(app)
+    add_header_middleware(app)
+    add_routers(app)
+    mount_socket_io(app)
     setup_pagination(app)
     setup_admin(app)
-    mount_socket_io(app)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
