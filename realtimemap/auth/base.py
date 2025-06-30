@@ -6,7 +6,7 @@ from fastapi_users.models import ID, UP
 
 class MyBaseUserDatabase(BaseUserDatabase[UP, ID]):
     async def validate_user_credentials(
-        self, phone: str, username: str, email: str
+        self, username: str, email: str
     ) -> Optional[UP]:
         raise NotImplementedError()
 

@@ -22,9 +22,11 @@ if TYPE_CHECKING:
 class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
     __tablename__ = "users"
     phone: Mapped[str] = mapped_column(
+        String(32), unique=True, nullable=True, index=True
+    )
+    username: Mapped[str] = mapped_column(
         String(32), unique=True, nullable=False, index=True
     )
-    username: Mapped[str] = mapped_column(String(32), unique=True, nullable=False)
 
     avatar: Mapped[ImageField] = mapped_column(
         ImageField(upload_storage="users"), nullable=True
@@ -32,9 +34,7 @@ class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
 
     @classmethod
     def get_db(cls, session: "AsyncSession"):
-        return MySQLAlchemyUserDatabase(
-            session, cls
-        )  # TODO Переписать метод на получения пользователя с email на (email, phone, username)
+        return MySQLAlchemyUserDatabase(session, cls)
 
     def __str__(self):
         return self.username

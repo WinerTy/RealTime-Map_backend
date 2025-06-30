@@ -9,7 +9,7 @@ from pydantic_extra_types.phone_numbers import PhoneNumber
 
 class UserRead(schemas.BaseUser[int]):
     id: int
-    phone: PhoneNumber
+    phone: Optional[PhoneNumber] = None
     username: str
     avatar: Optional[str] = None
 
@@ -31,7 +31,6 @@ class UserRead(schemas.BaseUser[int]):
 
 
 class UserCreate(schemas.BaseUserCreate):
-    phone: PhoneNumber
     username: str
 
 
