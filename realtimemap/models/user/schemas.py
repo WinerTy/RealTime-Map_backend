@@ -25,8 +25,8 @@ class UserRead(schemas.BaseUser[int]):
             return None
 
         request: Optional[Request] = info.context.get("request")
-        file_url = request.url_for(
-            "get_file", storage=v.upload_storage, file_id=v.file_id
+        file_url = str(
+            request.url_for("get_file", storage=v.upload_storage, file_id=v.file_id)
         )
 
         return file_url
