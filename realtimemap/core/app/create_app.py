@@ -2,7 +2,6 @@ import os
 from pathlib import Path
 
 from fastapi import FastAPI
-from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.responses import ORJSONResponse
 from fastapi_babel import BabelConfigs, BabelMiddleware
 from fastapi_pagination import add_pagination
@@ -31,7 +30,7 @@ def setup_logging() -> None:
 
 def add_header_middleware(app: FastAPI) -> None:
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=[conf.server.domains])
-    app.add_middleware(HTTPSRedirectMiddleware)
+    # app.add_middleware(HTTPSRedirectMiddleware)
 
 
 # pybabel init -i messages.pot -d i18n -l en -D messages
