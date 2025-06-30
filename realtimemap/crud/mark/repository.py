@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import List, TYPE_CHECKING
+from typing import List, TYPE_CHECKING, Union
 
 from fastapi import HTTPException
 from geoalchemy2.functions import (
@@ -20,6 +20,7 @@ from models.mark.schemas import (
     UpdateMark,
     CreateMarkRequest,
     MarkRequestParams,
+    UpdateMarkRequest,
 )
 
 if TYPE_CHECKING:
@@ -61,11 +62,18 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
 
         return result.scalars().all()
 
-    async def create_mark(self, mark: CreateMarkRequest, user: "User") -> Mark:
+    @staticmethod
+    def _preparation_data(
+        mark: Union[CreateMarkRequest, UpdateMarkRequest], user: "User"
+    ) -> CreateMark:
         geom = f"SRID=4326;POINT({mark.longitude} {mark.latitude})"
         mark_data = mark.model_dump(exclude={"longitude", "latitude"})
         formated_data = CreateMark(**mark_data, geom=geom, owner_id=user.id)
-        result: Mark = await super().create(formated_data)
+        return formated_data
+
+    async def create_mark(self, mark: CreateMarkRequest, user: "User") -> Mark:
+        data = self._preparation_data(mark, user)
+        result: Mark = await super().create(data)
 
         return result
 
@@ -100,3 +108,13 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
 
         result = await self.session.execute(stmt)
         return result.scalar()
+
+    async def update_mark(
+        self, mark_id: int, update_data: UpdateMarkRequest, user: "User"
+    ) -> Mark:
+        geom = f"SRID=4326;POINT({update_data.longitude} {update_data.latitude})"
+        mark_data = update_data.model_dump(
+            exclude={"longitude", "latitude"}, exclude_unset=True
+        )
+        formated_data = UpdateMark(**mark_data, geom=geom, owner_id=user.id)
+        return await self.update(mark_id, formated_data)

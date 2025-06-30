@@ -1,11 +1,12 @@
 import logging
-from typing import Generic, Type, Any
+from typing import Generic, Type, Any, Optional, List, Union, Dict
 
 from fastapi import HTTPException
 from fastapi_babel import _  # noqa
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, Select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.expression import exists as sql_exists
 from starlette.responses import Response
 
@@ -28,20 +29,23 @@ class BaseRepository(Generic[Model, CreateSchema, ReadSchema, UpdateSchema]):
     async def get_by_id(
         self,
         item_id: Any,
+        join_related: Optional[Union[List[str], Dict[str, Any]]] = None,
+        load_strategy: Any = joinedload,
     ) -> Model:
-        """
-        Получает объект из базы данных по его идентификатору.
+        stmt: Select = select(self.model).where(
+            getattr(self.model, self.id_field) == item_id
+        )
+        if join_related:
+            if isinstance(join_related, list):
+                for relation in join_related:
+                    # Получаем реальный атрибут модели по строковому имени
+                    relation_attr = getattr(self.model, relation)
+                    stmt = stmt.options(load_strategy(relation_attr))
+            elif isinstance(join_related, dict):
+                for relation, strategy in join_related.items():
+                    relation_attr = getattr(self.model, relation)
+                    stmt = stmt.options(strategy(relation_attr))
 
-        Args:
-            item_id: Идентификатор объекта (int, str или UUID в зависимости от модели).
-
-        Returns:
-            Model: Найденный объект модели. Если объект не найден и raise_ex=False, возвращает None.
-
-        Raises:
-            HTTPException: Исключение с кодом 404, если объект не найден и raise_ex=True.
-        """
-        stmt = select(self.model).where(getattr(self.model, self.id_field) == item_id)
         result = await self.session.execute(stmt)
         instance = result.scalars().first()
         if not instance:
@@ -74,6 +78,25 @@ class BaseRepository(Generic[Model, CreateSchema, ReadSchema, UpdateSchema]):
                 status_code=500,
                 detail=f"Error in Repository Class, please check create method. {str(e)}",
             )
+
+    async def update(self, item_id: Any, data: UpdateSchema, *kwargs) -> Model:
+        try:
+            instance = await self.get_by_id(item_id)
+
+            update_data = data.model_dump(exclude_unset=True)
+
+            # Update attributes
+            for k, v in update_data.items():
+                setattr(instance, k, v)
+
+            self.session.add(instance)
+            await self.session.commit()
+            await self.session.refresh(instance)
+
+            return instance
+        except Exception as e:
+            await self.session.rollback()
+            raise HTTPException(status_code=500, detail=str(e))
 
     async def delete(self, record_id: Any) -> None:
         try:

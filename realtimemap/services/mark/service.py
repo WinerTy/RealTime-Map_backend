@@ -7,6 +7,7 @@ from models import User, Mark
 from models.mark.schemas import (
     CreateMarkRequest,
     MarkRequestParams,
+    UpdateMarkRequest,
 )
 from models.mark_comment.schemas import CreateMarkCommentRequest
 from services.base import BaseService
@@ -53,7 +54,17 @@ class MarkService(BaseService):
         return await self.mark_comment_repo.get_comment_for_mark(mark_id)
 
     async def get_mark_by_id(self, mark_id: int) -> Mark:
-        return await self.mark_repo.get_by_id(mark_id)
+        return await self.mark_repo.get_by_id(mark_id, join_related=["owner"])
 
     async def get_marks(self, params: MarkRequestParams):
         return await self.mark_repo.get_marks(params)
+
+    async def update_mark(
+        self, user: User, update_data: UpdateMarkRequest, mark_id: int
+    ) -> Mark:
+        instance = await self.mark_repo.get_mark_by_id(mark_id)
+        if instance.owner_id != user.id:
+            raise HTTPException(
+                status_code=403, detail="You are not the owner of this mark"
+            )
+        return await self.mark_repo.update_mark(instance, update_data, user)

@@ -10,6 +10,8 @@ from pydantic_core.core_schema import ValidationInfo
 from sqlalchemy_file.mutable_list import MutableList
 from starlette.requests import Request
 
+from models.user.schemas import UserRead
+
 
 class BaseMark(BaseModel):
     mark_name: str = Field(
@@ -37,6 +39,25 @@ class CreateMarkRequest(BaseMark):
     category_id: int
 
 
+class UpdateMarkRequest(BaseModel):
+    mark_name: Optional[str] = Field(
+        default=None, min_length=1, max_length=128, description="Название метки"
+    )
+    start_at: Optional[datetime] = Field(default=None, description="Current date")
+    duration: Optional[int] = Field(default=None, description="Duration in hours.")
+    latitude: Optional[float] = Field(
+        default=None, ge=-90, le=90, description="Широта (от -90 до 90)"
+    )
+    longitude: Optional[float] = Field(
+        default=None, ge=-180, le=180, description="Долгота (от -180 до 180)"
+    )
+    additional_info: Optional[str] = Field(
+        default=None, description="Дополнительная информация"
+    )
+    photo: Optional[List[UploadFile]] = None
+    category_id: Optional[int] = None
+
+
 class CreateMark(BaseMark):
     geom: str
     owner_id: int
@@ -46,7 +67,22 @@ class CreateMark(BaseMark):
 
 
 class UpdateMark(CreateMark):
-    pass
+    mark_name: Optional[str] = Field(
+        default=None, min_length=1, max_length=128, description="Название метки"
+    )
+    start_at: Optional[datetime] = Field(default=None, description="Current date")
+    duration: Optional[int] = Field(default=None, description="Duration in hours.")
+    latitude: Optional[float] = Field(
+        default=None, ge=-90, le=90, description="Широта (от -90 до 90)"
+    )
+    longitude: Optional[float] = Field(
+        default=None, ge=-180, le=180, description="Долгота (от -180 до 180)"
+    )
+    additional_info: Optional[str] = Field(
+        default=None, description="Дополнительная информация"
+    )
+    photo: Optional[List[UploadFile]] = None
+    category_id: Optional[int] = None
 
 
 class ReadMark(BaseMark):
@@ -81,7 +117,11 @@ class ReadMark(BaseMark):
         request: Optional[Request] = info.context.get("request")
         base_url = request.url.scheme + "://" + request.url.netloc + "/media/"
 
-        return [base_url + photo.path for photo in v]
+        return [base_url + photo.path for photo in v] if v else []
+
+
+class DetailMark(ReadMark):
+    owner: UserRead
 
 
 class Coordinates(BaseModel):

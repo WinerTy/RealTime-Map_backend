@@ -8,11 +8,11 @@ from fastapi_users_db_sqlalchemy.access_token import (
 )
 from jinja2 import Template
 from sqlalchemy import String, Integer, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy_file import ImageField
 
 from auth.user_database import MySQLAlchemyUserDatabase
-from models import BaseSqlModel
+from models import BaseSqlModel, Mark
 from models.mixins import IntIdMixin
 
 if TYPE_CHECKING:
@@ -30,6 +30,10 @@ class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
 
     avatar: Mapped[ImageField] = mapped_column(
         ImageField(upload_storage="users"), nullable=True
+    )
+    marks: Mapped["Mark"] = relationship(
+        "Mark",
+        back_populates="owner",
     )
 
     @classmethod
