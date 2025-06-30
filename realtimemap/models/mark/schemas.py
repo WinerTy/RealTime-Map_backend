@@ -92,6 +92,9 @@ class ReadMark(BaseMark):
     photo: List[str] = []
     end_at: datetime
     is_ended: bool
+    additional_info: Optional[str] = Field(
+        default=None, description="Дополнительная информация"
+    )
 
     class Config:
         json_encoders = {

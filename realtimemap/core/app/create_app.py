@@ -77,11 +77,6 @@ def create_app() -> FastAPI:
     app.mount(
         "/static", StaticFiles(directory=ROOT_DIR.parent / conf.static), name="static"
     )
-    # app.mount(
-    #     "/uploads",
-    #     StaticFiles(directory=ROOT_DIR.parent / "uploads"),
-    #     name="uploads",
-    # )
     add_babel_middleware(app)
     add_header_middleware(app)
     add_routers(app)
