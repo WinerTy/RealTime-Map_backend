@@ -10,13 +10,13 @@ from .server import ServerConfig
 
 
 class AppConfig(BaseSettings):
-    server: ServerConfig = ServerConfig()
     db: DatabaseConfig
     redis: RedisConfig
+    server: ServerConfig =ServerConfig()
     api: ApiPrefix = ApiPrefix()
     static: Path = Path("static")
     log: LoggingConfig = LoggingConfig()
-    
+
     model_config = SettingsConfigDict(
         env_file=".env",
         case_sensitive=False,

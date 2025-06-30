@@ -17,7 +17,6 @@ class MySQLAlchemyUserDatabase(SQLAlchemyUserDatabase):
     async def validate_user_credentials(self, username: str, email: str):
         stmt = select(self.user_table).where(
             # (self.user_table.phone == phone)
-            (self.user_table.username == username)
-            | (self.user_table.email == email),
+            (self.user_table.username == username) | (self.user_table.email == email),
         )
         return await self._get_user(stmt)

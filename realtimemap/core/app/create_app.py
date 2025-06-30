@@ -29,9 +29,7 @@ def setup_logging() -> None:
 
 
 def add_header_middleware(app: FastAPI) -> None:
-    app.add_middleware(
-        TrustedHostMiddleware, allowed_hosts=["127.0.0.1", "realtimemap.ru"]
-    )
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=[conf.server.domains])
 
 
 # pybabel init -i messages.pot -d i18n -l en -D messages
