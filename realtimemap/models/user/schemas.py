@@ -4,12 +4,11 @@ from fastapi import Request
 from fastapi_users import schemas
 from pydantic import BaseModel, field_validator
 from pydantic_core.core_schema import ValidationInfo
-from pydantic_extra_types.phone_numbers import PhoneNumber
 
 
 class UserRead(schemas.BaseUser[int]):
     id: int
-    phone: Optional[PhoneNumber] = None
+    phone: Optional[str] = None
     username: str
     avatar: Optional[str] = None
 
