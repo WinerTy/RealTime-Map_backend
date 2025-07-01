@@ -53,7 +53,7 @@ def serve_files(storage: str = Path(...), file_id: str = Path(...)):
             headers={"Content-Disposition": "inline"},
         )
 
-    except ObjectDoesNotExistError:
+    except ObjectDoesNotExistError or RuntimeError:
         return ORJSONResponse({"detail": "Not found"}, status_code=404)
 
 

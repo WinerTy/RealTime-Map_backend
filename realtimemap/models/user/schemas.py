@@ -1,9 +1,9 @@
 from typing import Optional
 
-from fastapi import Request
 from fastapi_users import schemas
 from pydantic import BaseModel, field_validator
-from pydantic_core.core_schema import ValidationInfo
+
+from utils.url_generator import generate_full_image_url
 
 
 class UserRead(schemas.BaseUser[int]):
@@ -12,23 +12,10 @@ class UserRead(schemas.BaseUser[int]):
     username: str
     avatar: Optional[str] = None
 
+    _validate_avatar = field_validator("avatar", mode="before")(generate_full_image_url)
+
     class Config:
         from_attributes = True
-
-    @field_validator("avatar", mode="before")
-    def convert_photos_url(cls, v, info: ValidationInfo) -> Optional[str]:
-        if not info.context or "request" not in info.context:
-            return v.path if v else None
-
-        if v is None:
-            return None
-
-        request: Optional[Request] = info.context.get("request")
-        file_url = str(
-            request.url_for("get_file", storage=v.upload_storage, file_id=v.file_id)
-        )
-
-        return file_url
 
 
 class UserCreate(schemas.BaseUserCreate):

@@ -6,11 +6,9 @@ from geoalchemy2 import WKBElement
 from geoalchemy2.shape import to_shape
 from geojson_pydantic import Point
 from pydantic import BaseModel, Field, field_validator, field_serializer
-from pydantic_core.core_schema import ValidationInfo
-from sqlalchemy_file.mutable_list import MutableList
-from starlette.requests import Request
 
 from models.user.schemas import UserRead
+from utils.url_generator import generate_full_image_url
 
 
 class BaseMark(BaseModel):
@@ -96,6 +94,8 @@ class ReadMark(BaseMark):
         default=None, description="Дополнительная информация"
     )
 
+    _validate_photo = field_validator("photo", mode="before")(generate_full_image_url)
+
     class Config:
         json_encoders = {
             datetime: lambda dt: dt.isoformat(),
@@ -110,17 +110,6 @@ class ReadMark(BaseMark):
     def convert_geom(cls, v: WKBElement):
         result = to_shape(v)
         return Point(**result.__geo_interface__)
-
-    @field_validator("photo", mode="before")
-    def convert_photos_url(cls, v: MutableList, info: ValidationInfo):
-        if not info.context or "request" not in info.context:
-            if v is None:
-                return []
-            return [photo.path for photo in v]
-        request: Optional[Request] = info.context.get("request")
-        base_url = request.url.scheme + "://" + request.url.netloc + "/media/"
-
-        return [base_url + photo.path for photo in v] if v else []
 
 
 class DetailMark(ReadMark):
