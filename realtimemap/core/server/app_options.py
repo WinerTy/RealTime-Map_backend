@@ -2,7 +2,7 @@ from .logger import GunicornLogger
 
 
 def get_application_options(
-    bind: str, timeout: int, workers: int, log_level: str
+    bind: str, timeout: int, workers: int, log_level: str, domains: str
 ) -> dict:
     return {
         "accesslog": "-",
@@ -13,4 +13,5 @@ def get_application_options(
         "workers": workers,
         "timeout": timeout,
         "worker_class": "uvicorn.workers.UvicornWorker",
+        "forwarded_allow_ips": domains,
     }

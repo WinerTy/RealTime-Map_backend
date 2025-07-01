@@ -12,6 +12,7 @@ def main():
             workers=conf.server.workers,
             timeout=conf.server.timeout,
             log_level=conf.log.log_level,
+            domains=conf.server.domains,
         ),
     )
     app.run()
