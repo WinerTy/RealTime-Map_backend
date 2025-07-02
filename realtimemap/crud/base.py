@@ -98,7 +98,7 @@ class BaseRepository(Generic[Model, CreateSchema, ReadSchema, UpdateSchema]):
             await self.session.rollback()
             raise HTTPException(status_code=500, detail=str(e))
 
-    async def delete(self, record_id: Any) -> None:
+    async def delete(self, record_id: Any) -> Response:
         try:
             record = await self.get_by_id(record_id)
             stmt = delete(self.model).where(

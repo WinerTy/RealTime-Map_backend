@@ -1,5 +1,6 @@
 from typing import Optional
 
+from fastapi import UploadFile
 from fastapi_users import schemas
 from pydantic import BaseModel, field_validator
 
@@ -28,6 +29,9 @@ class UserUpdate(schemas.BaseUserUpdate):
         if len(password) < 8:
             raise ValueError("Password must be at least 8 characters long")
         return password
+
+    username: Optional[str] = None
+    avatar: Optional[UploadFile] = None
 
 
 class UserLogin(BaseModel):

@@ -17,5 +17,3 @@ class ServerConfig(BaseModel):
     @property
     def base_url(self) -> str:
         return f"https://{self.main_domain}"
-
-

@@ -12,7 +12,7 @@ from .server import ServerConfig
 class AppConfig(BaseSettings):
     db: DatabaseConfig
     redis: RedisConfig
-    server: ServerConfig =ServerConfig()
+    server: ServerConfig = ServerConfig()
     api: ApiPrefix = ApiPrefix()
     static: Path = Path("static")
     log: LoggingConfig = LoggingConfig()
