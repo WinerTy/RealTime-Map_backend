@@ -5,7 +5,13 @@ from fastapi import UploadFile
 from geoalchemy2 import WKBElement
 from geoalchemy2.shape import to_shape
 from geojson_pydantic import Point
-from pydantic import BaseModel, Field, field_validator, field_serializer
+from pydantic import (
+    BaseModel,
+    Field,
+    field_validator,
+    field_serializer,
+    model_validator,
+)
 
 from models.user.schemas import UserRead
 from utils.url_generator import generate_full_image_url
@@ -38,22 +44,24 @@ class CreateMarkRequest(BaseMark):
 
 
 class UpdateMarkRequest(BaseModel):
-    mark_name: Optional[str] = Field(
-        default=None, min_length=1, max_length=128, description="Название метки"
-    )
-    start_at: Optional[datetime] = Field(default=None, description="Current date")
-    duration: Optional[int] = Field(default=None, description="Duration in hours.")
-    latitude: Optional[float] = Field(
-        default=None, ge=-90, le=90, description="Широта (от -90 до 90)"
-    )
-    longitude: Optional[float] = Field(
-        default=None, ge=-180, le=180, description="Долгота (от -180 до 180)"
-    )
-    additional_info: Optional[str] = Field(
-        default=None, description="Дополнительная информация"
-    )
+    longitude: Optional[float] = None
+    latitude: Optional[float] = None
+    mark_name: Optional[str] = None
+    start_at: Optional[datetime] = None
+    duration: Optional[int] = None
+    additional_info: Optional[str] = None
     photo: Optional[List[UploadFile]] = None
     category_id: Optional[int] = None
+
+    @model_validator(mode="after")
+    def check_lat_lon_pair(self) -> "UpdateMarkRequest":
+        if (self.latitude is not None and self.longitude is None) or (
+            self.latitude is None and self.longitude is not None
+        ):
+            raise ValueError(
+                "Both latitude and longitude must be provided together or neither"
+            )
+        return self
 
 
 class CreateMark(BaseMark):
@@ -64,30 +72,21 @@ class CreateMark(BaseMark):
     category_id: int
 
 
-class UpdateMark(CreateMark):
-    mark_name: Optional[str] = Field(
-        default=None, min_length=1, max_length=128, description="Название метки"
-    )
-    start_at: Optional[datetime] = Field(default=None, description="Current date")
-    duration: Optional[int] = Field(default=None, description="Duration in hours.")
-    latitude: Optional[float] = Field(
-        default=None, ge=-90, le=90, description="Широта (от -90 до 90)"
-    )
-    longitude: Optional[float] = Field(
-        default=None, ge=-180, le=180, description="Долгота (от -180 до 180)"
-    )
-    additional_info: Optional[str] = Field(
-        default=None, description="Дополнительная информация"
-    )
+class UpdateMark(BaseModel):
+    mark_name: Optional[str] = None
+    start_at: Optional[datetime] = None
+    duration: Optional[int] = None
+    additional_info: Optional[str] = None
     photo: Optional[List[UploadFile]] = None
     category_id: Optional[int] = None
+    geom: Optional[str] = None
 
 
 class ReadMark(BaseMark):
     id: int
     owner_id: int
     geom: Optional[Point] = None
-    photo: List[str] = []
+    photo: Optional[List[str]] = []
     end_at: datetime
     is_ended: bool
     additional_info: Optional[str] = Field(

@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
 from fastapi import HTTPException
@@ -59,12 +60,29 @@ class MarkService(BaseService):
     async def get_marks(self, params: MarkRequestParams):
         return await self.mark_repo.get_marks(params)
 
+    async def _before_update_mark(
+        self, mark: Mark, user: User, update_data: UpdateMarkRequest
+    ) -> None:
+        if update_data.category_id:
+            if not await self.category_repo.exist(update_data.category_id):
+                raise HTTPException(
+                    status_code=404,
+                    detail=_(f"Category with id {update_data.category_id} not found."),
+                )
+        if mark.owner_id != user.id:  # Check record owner
+            raise HTTPException(
+                status_code=403, detail="You are not the owner of this mark"
+            )
+
+        passed_time = datetime.now() - mark.created_at
+        if passed_time > timedelta(hours=1):
+            raise HTTPException(
+                status_code=400, detail="The record update time has expired"
+            )
+
     async def update_mark(
         self, user: User, update_data: UpdateMarkRequest, mark_id: int
     ) -> Mark:
         instance = await self.mark_repo.get_mark_by_id(mark_id)
-        if instance.owner_id != user.id:
-            raise HTTPException(
-                status_code=403, detail="You are not the owner of this mark"
-            )
-        return await self.mark_repo.update_mark(instance, update_data, user)
+        await self._before_update_mark(instance, user, update_data)
+        return await self.mark_repo.update_mark(instance.id, update_data, user)

@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import List, TYPE_CHECKING, Union
+from typing import List, TYPE_CHECKING, Union, Type
 
 from fastapi import HTTPException
 from geoalchemy2.functions import (
@@ -10,6 +10,7 @@ from geoalchemy2.functions import (
     ST_AsGeoJSON,
     ST_Distance,
 )
+from pydantic import BaseModel
 from sqlalchemy import select
 
 from crud import BaseRepository
@@ -64,15 +65,19 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
 
     @staticmethod
     def _preparation_data(
-        mark: Union[CreateMarkRequest, UpdateMarkRequest], user: "User"
-    ) -> CreateMark:
-        geom = f"SRID=4326;POINT({mark.longitude} {mark.latitude})"
+        mark: Union[CreateMarkRequest, UpdateMarkRequest],
+        user: "User",
+        response_class: Type[BaseModel],
+    ) -> Type[BaseModel]:
+        geom = None
+        if mark.longitude and mark.latitude:
+            geom = f"SRID=4326;POINT({mark.longitude} {mark.latitude})"
         mark_data = mark.model_dump(exclude={"longitude", "latitude"})
-        formated_data = CreateMark(**mark_data, geom=geom, owner_id=user.id)
+        formated_data = response_class(**mark_data, geom=geom, owner_id=user.id)
         return formated_data
 
     async def create_mark(self, mark: CreateMarkRequest, user: "User") -> Mark:
-        data = self._preparation_data(mark, user)
+        data = self._preparation_data(mark, user, CreateMark)
         result: Mark = await super().create(data)
 
         return result
@@ -112,9 +117,5 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
     async def update_mark(
         self, mark_id: int, update_data: UpdateMarkRequest, user: "User"
     ) -> Mark:
-        geom = f"SRID=4326;POINT({update_data.longitude} {update_data.latitude})"
-        mark_data = update_data.model_dump(
-            exclude={"longitude", "latitude"}, exclude_unset=True
-        )
-        formated_data = UpdateMark(**mark_data, geom=geom, owner_id=user.id)
+        formated_data = self._preparation_data(update_data, user, UpdateMark)
         return await self.update(mark_id, formated_data)

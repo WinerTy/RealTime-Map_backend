@@ -7,7 +7,7 @@ from fastapi_users_db_sqlalchemy.access_token import (
     SQLAlchemyBaseAccessTokenTable,
 )
 from jinja2 import Template
-from sqlalchemy import String, Integer, ForeignKey
+from sqlalchemy import String, Integer, ForeignKey, event
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy_file import ImageField
 
@@ -61,3 +61,10 @@ class AccessToken(BaseSqlModel, SQLAlchemyBaseAccessTokenTable[int]):
     @classmethod
     def get_db(cls, session: "AsyncSession"):
         return SQLAlchemyAccessTokenDatabase(session, cls)
+
+
+@event.listens_for(User, "before_insert")
+def before_insert_listener(mapper, connection, target):
+    print("before_insert")
+    print("-" * 50)
+    print(target.username)

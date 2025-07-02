@@ -83,7 +83,7 @@ class BaseRepository(Generic[Model, CreateSchema, ReadSchema, UpdateSchema]):
         try:
             instance = await self.get_by_id(item_id)
 
-            update_data = data.model_dump(exclude_unset=True)
+            update_data = data.model_dump(exclude_unset=True, exclude_none=True)
 
             # Update attributes
             for k, v in update_data.items():

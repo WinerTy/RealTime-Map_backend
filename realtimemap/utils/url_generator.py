@@ -17,7 +17,7 @@ def generate_full_image_url(
 
     def _generate_url(photo_obj: Any) -> Optional[str]:
         if not photo_obj:
-            return None
+            return ""
 
         if request:
             print("Реализация через request")

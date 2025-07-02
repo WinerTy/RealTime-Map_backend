@@ -22,6 +22,7 @@ from models.mark.schemas import (
     MarkRequestParams,
     action_type,
     DetailMark,
+    UpdateMarkRequest,
 )
 from services.mark.service import MarkService
 
@@ -115,12 +116,9 @@ async def create_mark_point(
 
 @router.get("/{mark_id}/", response_model=DetailMark, status_code=200)
 # @cache(expire=3600)
-async def get_mark(
-    mark_id: int,
-    service: mark_service,
-):
+async def get_mark(mark_id: int, service: mark_service, request: Request):
     result = await service.get_mark_by_id(mark_id)
-    return result
+    return DetailMark.model_validate(result, context={"request": request})
 
 
 @router.delete("/{mark_id}", status_code=204)
@@ -142,12 +140,13 @@ async def delete_mark(
 
 
 # Compleat this
-# @router.patch("/{mark_id}", response_model=ReadMark, status_code=200)
-# async def update_mark(
-#     mark_id: int,
-#     mark: Annotated[UpdateMarkRequest, Form(media_type="multipart/form-data")],
-#     service: mark_service,
-#     user: current_user,
-# ):
-#     result = await service.update_mark(user=user, update_data=mark, mark_id=mark_id)
-#     return result
+@router.patch("/{mark_id}", response_model=ReadMark, status_code=200)
+async def update_mark(
+    mark_id: int,
+    mark: Annotated[UpdateMarkRequest, Form(media_type="multipart/form-data")],
+    service: mark_service,
+    user: current_user,
+    request: Request,
+):
+    result = await service.update_mark(mark_id=mark_id, update_data=mark, user=user)
+    return ReadMark.model_validate(result, context={"request": request})
