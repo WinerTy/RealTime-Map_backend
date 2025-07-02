@@ -10,7 +10,6 @@ def generate_full_image_url(
     value: Any,
     info: ValidationInfo,
 ) -> Optional[Union[str, List[str]]]:
-
     if not value:
         return None
 
@@ -38,5 +37,8 @@ def generate_full_image_url(
 
     if isinstance(value, list):
         return [_generate_url(photo) for photo in value if photo]
+
+    if isinstance(value, str):  # TODO SEE THIS MB BAGS
+        return value
 
     return _generate_url(value)

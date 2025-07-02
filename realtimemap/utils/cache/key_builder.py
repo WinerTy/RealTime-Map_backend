@@ -20,8 +20,10 @@ def custom_key_builder(
     if "service" in kwargs_for_key:
         del kwargs_for_key["service"]
 
-    print(args)
-    print(kwargs_for_key)
+    if "user" in kwargs_for_key:
+        kwargs_for_key["user_id"] = kwargs_for_key["user"].id
+        del kwargs_for_key["user"]
+
     cache_key = (
         namespace
         + f":{func.__module__}:{func.__name__}"
