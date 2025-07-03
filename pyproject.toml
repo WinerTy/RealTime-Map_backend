@@ -27,6 +27,7 @@ dependencies = [
     "websockets>=15.0.1",
     "python-socketio[asyncio-client]>=5.13.0",
     "gunicorn>=23.0.0",
+    "celery>=5.5.3",
 ]
 
 [dependency-groups]

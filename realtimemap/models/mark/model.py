@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 from geoalchemy2 import Geometry
 from geoalchemy2.functions import ST_Y, ST_X
-from sqlalchemy import ForeignKey, String, Index, DateTime, Integer, Boolean
+from sqlalchemy import ForeignKey, String, Index, DateTime, Integer, Boolean, event
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy_file import ImageField
 
@@ -75,3 +75,10 @@ class Mark(BaseSqlModel, IntIdMixin, TimeMarkMixin):
 
     def __str__(self):
         return f"{self.mark_name}: {self.id}"
+
+
+@event.listens_for(Mark, "before_insert")
+@event.listens_for(Mark, "before_update")
+def test(mapper, connection, target: Mark):
+    print(target.end_at)
+    print(target.check_ended)
