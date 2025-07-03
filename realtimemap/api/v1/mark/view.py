@@ -147,6 +147,13 @@ async def update_mark(
     service: mark_service,
     user: current_user,
     request: Request,
+    background: BackgroundTasks,
 ):
     result = await service.update_mark(mark_id=mark_id, update_data=mark, user=user)
+    background.add_task(
+        notify_mark_action,
+        mark=result,
+        action="marks_updated",
+        request=request,
+    )
     return ReadMark.model_validate(result, context={"request": request})
