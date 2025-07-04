@@ -1,12 +1,13 @@
+from datetime import datetime
 from typing import Dict, Any
 
 from fastapi import Request
 from fastapi_users.password import PasswordHelper
 from sqlalchemy.ext.asyncio import AsyncSession
-from starlette_admin import ColorField, DateTimeField, FloatField
+from starlette_admin import ColorField, DateTimeField, FloatField, IntegerField
 from starlette_admin.contrib.sqla import ModelView
 from starlette_admin.exceptions import FormValidationError
-from starlette_admin.fields import PasswordField, FileField
+from starlette_admin.fields import PasswordField, FileField, HasOne
 
 from core.admin.fields import GeomField
 from models import User, Mark
@@ -27,24 +28,17 @@ class AdminMark(ModelView):
             exclude_from_edit=True,
         ),
         FloatField(
-            "longitude",
-            exclude_from_list=True,
-            exclude_from_detail=True,
+            "longitude", exclude_from_list=True, exclude_from_detail=True, required=True
         ),
         FloatField(
-            "latitude",
-            exclude_from_list=True,
-            exclude_from_detail=True,
+            "latitude", exclude_from_list=True, exclude_from_detail=True, required=True
         ),
         Mark.mark_name,
-        Mark.owner,
+        HasOne("owner", identity="user", required=True),
         Mark.additional_info,
-        Mark.category,
-        Mark.duration,
-        DateTimeField(
-            "start_at",
-            label="Start at",
-        ),
+        HasOne("category", identity="category", required=True),
+        IntegerField("duration", min=12, max=48, step=12, required=True),
+        DateTimeField("start_at", label="Start at", required=True),
         Mark.photo,
         Mark.is_ended,
     ]
@@ -64,10 +58,19 @@ class AdminMark(ModelView):
 
     async def validate(self, request: Request, data: Dict[str, Any]) -> None:
         errors: Dict[str, str] = dict()
-        valid_data = self.convert_geom(data)
-        print(valid_data["geom"])
+
+        if data["longitude"] < -180 or data["latitude"] > 180:
+            errors["longitude"] = "Not valid longitude"
+
+        if data["latitude"] < -90 or data["longitude"] > 180:
+            errors["latitude"] = "Not valid latitude"
+
+        if data["start_at"] < datetime.now():
+            errors["start_at"] = "Not valid start at"
+
         if len(errors) > 0:
             raise FormValidationError(errors)
+        valid_data = self.convert_geom(data)
         return await super().validate(request, valid_data)
 
     async def create(self, request: Request, data: Dict[str, Any]) -> Any:

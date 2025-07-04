@@ -16,6 +16,8 @@ from pydantic import (
 from models.user.schemas import UserRead
 from utils.url_generator import generate_full_image_url
 
+allowed_duration = [12, 24, 36, 48]
+
 
 class BaseMark(BaseModel):
     mark_name: str = Field(
@@ -26,7 +28,7 @@ class BaseMark(BaseModel):
 
     @field_validator("duration")
     def validate_duration(cls, value):
-        if value not in [12, 24, 48]:
+        if value not in allowed_duration:
             raise ValueError("Duration not supported.")
         return value
 

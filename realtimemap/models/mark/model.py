@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
 from geoalchemy2 import Geometry
-from sqlalchemy import ForeignKey, String, Index, DateTime, Integer, Boolean, event
+from sqlalchemy import ForeignKey, String, Index, DateTime, Integer, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy_file import ImageField
 
@@ -68,8 +68,8 @@ class Mark(BaseSqlModel, IntIdMixin, TimeMarkMixin):
         return f"{self.mark_name}: {self.id}"
 
 
-@event.listens_for(Mark, "before_insert")
-@event.listens_for(Mark, "before_update")
-def test(mapper, connection, target: Mark):
-    print(target.end_at)
-    print(target.check_ended)
+# @event.listens_for(Mark, "before_insert")
+# @event.listens_for(Mark, "before_update")
+# def test(mapper, connection, target: Mark):
+#     print(target.end_at)
+#     print(target.check_ended)
