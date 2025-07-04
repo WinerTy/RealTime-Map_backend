@@ -66,10 +66,3 @@ class Mark(BaseSqlModel, IntIdMixin, TimeMarkMixin):
 
     def __str__(self):
         return f"{self.mark_name}: {self.id}"
-
-
-# @event.listens_for(Mark, "before_insert")
-# @event.listens_for(Mark, "before_update")
-# def test(mapper, connection, target: Mark):
-#     print(target.end_at)
-#     print(target.check_ended)

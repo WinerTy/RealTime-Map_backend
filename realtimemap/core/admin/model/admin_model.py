@@ -51,7 +51,7 @@ class AdminMark(ModelView):
 
     @staticmethod
     def convert_geom(data: Dict[str, Any]) -> Dict[str, Any]:
-        data["geom"] = f"SRID=4326;POINT({data["longitude"]} {data["latitude"]})"
+        data["geom"] = f"SRID=4326;POINT({data['longitude']} {data['latitude']})"
         del data["longitude"]
         del data["latitude"]
         return data
@@ -70,6 +70,7 @@ class AdminMark(ModelView):
 
         if len(errors) > 0:
             raise FormValidationError(errors)
+
         valid_data = self.convert_geom(data)
         return await super().validate(request, valid_data)
 
