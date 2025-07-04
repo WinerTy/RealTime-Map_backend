@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette_admin import ColorField, NumberField, DateTimeField
 from starlette_admin.contrib.sqla import ModelView
 from starlette_admin.exceptions import FormValidationError
-from starlette_admin.fields import PasswordField
+from starlette_admin.fields import PasswordField, FileField
 
 from core.admin.fields import GeomField
 from models import User, Mark
@@ -49,7 +49,7 @@ class AdminMark(ModelView):
             "start_at",
             label="Start at",
         ),
-        # Mark.photo,
+        Mark.photo,
         Mark.is_ended,
     ]
     exclude_fields_from_create = [Mark.is_ended]
@@ -79,7 +79,8 @@ class AdminMark(ModelView):
             new_data = await self._arrange_data(request, data)
             await self.validate(request, new_data)
             session: AsyncSession = request.state.session
-            mark = Mark(**new_data)
+            mark = await self._populate_obj(request, self.model(), new_data)
+            mark.geom = new_data["geom"]
             session.add(mark)
             await self.before_create(request, new_data, mark)
             await session.commit()
@@ -87,6 +88,29 @@ class AdminMark(ModelView):
             await self.after_create(request, mark)
         except Exception as e:
             return self.handle_exception(e)
+
+    async def _populate_obj(
+        self,
+        request: Request,
+        obj: Any,
+        data: Dict[str, Any],
+        is_edit: bool = False,
+    ) -> Any:
+        for field in self.get_fields_list(request, request.state.action):
+            if field.name in ["longitude", "latitude"]:
+                continue
+            name, value = field.name, data.get(field.name, None)
+            if isinstance(field, FileField):
+                value, should_be_deleted = value
+                if should_be_deleted:
+                    setattr(obj, name, None)
+                elif (not field.multiple and value is not None) or (
+                    field.multiple and isinstance(value, list) and len(value) > 0
+                ):
+                    setattr(obj, name, value)
+            else:
+                setattr(obj, name, value)
+        return obj
 
 
 class AdminUser(ModelView):
