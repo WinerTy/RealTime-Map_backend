@@ -32,6 +32,13 @@ services:
       - redis
       - backend
 
+  celery-beat:
+    build: .
+    container_name: celery-beat
+    command: ../.venv/bin/celery --app core.celery.celery_app beat --loglevel INFO
+    depends_on:
+      - redis
+      - backend
 
 volumes:
   uploads_volume:
