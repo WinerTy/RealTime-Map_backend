@@ -3,7 +3,7 @@ from typing import Dict, Any
 from fastapi import Request
 from fastapi_users.password import PasswordHelper
 from sqlalchemy.ext.asyncio import AsyncSession
-from starlette_admin import ColorField, NumberField, DateTimeField
+from starlette_admin import ColorField, DateTimeField, FloatField
 from starlette_admin.contrib.sqla import ModelView
 from starlette_admin.exceptions import FormValidationError
 from starlette_admin.fields import PasswordField, FileField
@@ -26,19 +26,15 @@ class AdminMark(ModelView):
             exclude_from_create=True,
             exclude_from_edit=True,
         ),
-        NumberField(
+        FloatField(
             "longitude",
             exclude_from_list=True,
             exclude_from_detail=True,
-            min=-180,
-            max=180,
         ),
-        NumberField(
+        FloatField(
             "latitude",
             exclude_from_list=True,
             exclude_from_detail=True,
-            min=-90,
-            max=90,
         ),
         Mark.mark_name,
         Mark.owner,
