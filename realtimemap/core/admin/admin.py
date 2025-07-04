@@ -9,7 +9,6 @@ from core.admin.model.admin_model import (
 )
 from database.helper import db_helper
 from models import Category, User, MarkComment, Mark
-from models.mark.schemas import CreateMark
 
 
 def setup_admin(app: FastAPI) -> None:
@@ -18,5 +17,5 @@ def setup_admin(app: FastAPI) -> None:
     admin.add_view(AdminCategory(Category))
     admin.add_view(AdminMarkComment(MarkComment))
     admin.add_view(AdminUser(User))
-    admin.add_view(AdminMark(Mark, pydantic_model=CreateMark))
+    admin.add_view(AdminMark(Mark))
     admin.mount_to(app)

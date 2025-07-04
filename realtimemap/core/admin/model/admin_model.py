@@ -2,11 +2,11 @@ from typing import Dict, Any
 
 from fastapi import Request
 from fastapi_users.password import PasswordHelper
-from starlette_admin import ColorField, StringField
+from sqlalchemy.ext.asyncio import AsyncSession
+from starlette_admin import ColorField, NumberField, DateTimeField
 from starlette_admin.contrib.sqla import ModelView
-from starlette_admin.contrib.sqla.ext.pydantic import ModelView as PydanticView
 from starlette_admin.exceptions import FormValidationError
-from starlette_admin.fields import PhoneField, PasswordField
+from starlette_admin.fields import PasswordField
 
 from core.admin.fields import GeomField
 from models import User, Mark
@@ -17,7 +17,7 @@ class AdminCategory(ModelView):
     fields = ["id", "category_name", ColorField("color"), "icon", "is_active"]
 
 
-class AdminMark(PydanticView):
+class AdminMark(ModelView):
     fields = [
         Mark.id,
         GeomField(
@@ -26,35 +26,87 @@ class AdminMark(PydanticView):
             exclude_from_create=True,
             exclude_from_edit=True,
         ),
-        StringField("longitude", exclude_from_list=True, exclude_from_detail=True),
-        StringField("latitude", exclude_from_list=True, exclude_from_detail=True),
+        NumberField(
+            "longitude",
+            exclude_from_list=True,
+            exclude_from_detail=True,
+            min=-180,
+            max=180,
+        ),
+        NumberField(
+            "latitude",
+            exclude_from_list=True,
+            exclude_from_detail=True,
+            min=-90,
+            max=90,
+        ),
         Mark.mark_name,
         Mark.owner,
         Mark.additional_info,
         Mark.category,
         Mark.duration,
-        Mark.start_at,
+        DateTimeField(
+            "start_at",
+            label="Start at",
+        ),
+        # Mark.photo,
         Mark.is_ended,
     ]
+    exclude_fields_from_create = [Mark.is_ended]
+
+    async def before_create(
+        self, request: Request, data: Dict[str, Any], obj: Mark
+    ) -> None:
+        pass
+
+    @staticmethod
+    def convert_geom(data: Dict[str, Any]) -> Dict[str, Any]:
+        data["geom"] = f"SRID=4326;POINT({data["longitude"]} {data["latitude"]})"
+        del data["longitude"]
+        del data["latitude"]
+        return data
+
+    async def validate(self, request: Request, data: Dict[str, Any]) -> None:
+        errors: Dict[str, str] = dict()
+        valid_data = self.convert_geom(data)
+        print(valid_data["geom"])
+        if len(errors) > 0:
+            raise FormValidationError(errors)
+        return await super().validate(request, valid_data)
+
+    async def create(self, request: Request, data: Dict[str, Any]) -> Any:
+        try:
+            new_data = await self._arrange_data(request, data)
+            await self.validate(request, new_data)
+            session: AsyncSession = request.state.session
+            mark = Mark(**new_data)
+            session.add(mark)
+            await self.before_create(request, new_data, mark)
+            await session.commit()
+            await session.refresh(mark)
+            await self.after_create(request, mark)
+        except Exception as e:
+            return self.handle_exception(e)
 
 
 class AdminUser(ModelView):
     fields = [
         User.id,
-        PhoneField("phone", label="Phone"),
+        User.username,
+        User.email,
+        User.phone,
         PasswordField(
             "hashed_password",
             label="Password",
             exclude_from_detail=True,
             exclude_from_edit=True,
             exclude_from_list=True,
+            required=True,
         ),
-        User.email,
-        User.username,
+        User.avatar,
         User.is_active,
         User.is_superuser,
         User.is_verified,
-        User.avatar,
     ]
 
     exclude_fields_from_detail = [User.hashed_password]
@@ -68,12 +120,10 @@ class AdminUser(ModelView):
         helper = PasswordHelper()
         user_password = data["hashed_password"]
         hashed_password = helper.hash(password=user_password)
-        print(hashed_password)
         data["hashed_password"] = hashed_password
 
     async def validate(self, request: Request, data: Dict[str, Any]) -> None:
         errors: Dict[str, str] = dict()
-        print(data["phone"])
         if len(errors) > 0:
             raise FormValidationError(errors)
         return await super().validate(request, data)

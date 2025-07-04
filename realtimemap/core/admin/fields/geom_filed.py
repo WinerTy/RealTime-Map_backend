@@ -37,21 +37,3 @@ class GeomField(BaseField):
         """
         print(form_data.values())
         return form_data.get(self.id)
-
-    # async def parse_form_data(self, request: Request, value: Any) -> Optional[str]:
-    #     """
-    #     Processes the form data (a JSON string `{"lat": ..., "lng": ...}`)
-    #     back into a WKTElement for the database.
-    #     """
-    #     if not value:
-    #         return None
-    #     try:
-    #         coords = json.loads(value)
-    #         if coords.get("lat") is None or coords.get("lon") is None:
-    #             return None
-    #
-    #         point_wkt = f"POINT({coords['lon']} {coords['lat']})"
-    #         print(point_wkt)
-    #         return point_wkt
-    #     except (json.JSONDecodeError, TypeError):
-    #         return None
