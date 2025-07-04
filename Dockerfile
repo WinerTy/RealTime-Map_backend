@@ -9,7 +9,7 @@ COPY . /app
 
 WORKDIR /app/realtimemap
 
-RUN uv sync --frozen --no-cache --no-dev --no-windows
+RUN uv sync --frozen --no-cache --no-dev
 
 # CMD ["../.venv/bin/uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 CMD ["../.venv/bin/python", "run_main.py"]
