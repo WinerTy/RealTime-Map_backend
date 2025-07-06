@@ -2,9 +2,11 @@ services:
   redis:
     image: redis:latest
     container_name: redis-service
-    command: redis-server --bind 0.0.0.0  # Разрешаем внешние подключения
+    command: redis-server --bind 0.0.0.0 --appendonly yes
     ports:
       - "6379:6379"
+    volumes:
+      - redis_data:/data
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
       interval: 5s
@@ -42,3 +44,4 @@ services:
 
 volumes:
   uploads_volume:
+  redis_data:
