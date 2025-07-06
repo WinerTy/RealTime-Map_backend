@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
 from fastapi import HTTPException
-from fastapi_babel import _
 
 from models import User, Mark
 from models.mark.schemas import (
@@ -41,7 +40,7 @@ class MarkService(BaseService):
         if not category_exist:
             raise HTTPException(
                 status_code=422,
-                detail=_(f"Category with id {mark_data.category_id} not found."),
+                detail=f"Category with id {mark_data.category_id} not found.",
             )
         mark = await self.mark_repo.create_mark(mark_data, user)
         return mark
@@ -67,7 +66,7 @@ class MarkService(BaseService):
             if not await self.category_repo.exist(update_data.category_id):
                 raise HTTPException(
                     status_code=404,
-                    detail=_(f"Category with id {update_data.category_id} not found."),
+                    detail=f"Category with id {update_data.category_id} not found.",
                 )
         if mark.owner_id != user.id:  # Check record owner
             raise HTTPException(

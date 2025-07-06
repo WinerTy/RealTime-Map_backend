@@ -2,7 +2,6 @@ import logging
 from typing import Generic, Type, Any, Optional, List, Union, Dict
 
 from fastapi import HTTPException
-from fastapi_babel import _  # noqa
 from sqlalchemy import select, delete, Select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -68,7 +67,7 @@ class BaseRepository(Generic[Model, CreateSchema, ReadSchema, UpdateSchema]):
                 f"Record {data} already exists in Repository: {self.model.__name__}"
             )
             await self.session.rollback()
-            raise HTTPException(status_code=400, detail=_("Record already exists"))
+            raise HTTPException(status_code=400, detail="Record already exists")
         except Exception as e:
             logger.error(
                 f"Create record {data} in Repository: {self.model.__name__}", e
