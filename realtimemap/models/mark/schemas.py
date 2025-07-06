@@ -2,8 +2,6 @@ from datetime import datetime
 from typing import Optional, List, Literal
 
 from fastapi import UploadFile
-from geoalchemy2 import WKBElement
-from geoalchemy2.shape import to_shape
 from geojson_pydantic import Point
 from pydantic import (
     BaseModel,
@@ -14,6 +12,7 @@ from pydantic import (
 )
 
 from models.user.schemas import UserRead
+from utils.geom_serializator import serialization_geom
 from utils.url_generator import generate_full_image_url
 
 allowed_duration = [12, 24, 36, 48]
@@ -96,6 +95,7 @@ class ReadMark(BaseMark):
     )
 
     _validate_photo = field_validator("photo", mode="before")(generate_full_image_url)
+    _validate_geom = field_validator("geom", mode="before")(serialization_geom)
 
     class Config:
         json_encoders = {
@@ -106,11 +106,6 @@ class ReadMark(BaseMark):
     @field_serializer("end_at")
     def serialize_end_at(self, value: datetime) -> str:
         return value.isoformat()
-
-    @field_validator("geom", mode="before")
-    def convert_geom(cls, v: WKBElement):
-        result = to_shape(v)
-        return Point(**result.__geo_interface__)
 
 
 class DetailMark(ReadMark):

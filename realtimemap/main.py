@@ -33,10 +33,11 @@ blocked_resources = [".php", ".env"]
 @app.middleware("http")
 async def secure_headers(request: Request, call_next):
     path = request.url.path.lower()
-
     for resource in blocked_resources:
-        if path in resource:
-            return ORJSONResponse(status_code=403, content="Blocked")
+        if resource in path:
+            return ORJSONResponse(
+                status_code=403, content={"detail": "Blocked resource"}
+            )
 
     return await call_next(request)
 
