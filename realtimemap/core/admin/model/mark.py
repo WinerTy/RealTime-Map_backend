@@ -3,7 +3,13 @@ from typing import Dict, Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
-from starlette_admin import FloatField, HasOne, IntegerField, DateTimeField, FileField
+from starlette_admin import (
+    FloatField,
+    HasOne,
+    IntegerField,
+    DateTimeField,
+    FileField,
+)
 from starlette_admin.contrib.sqla import ModelView
 from starlette_admin.exceptions import FormValidationError
 
@@ -104,3 +110,20 @@ class AdminMark(ModelView):
             else:
                 setattr(obj, name, value)
         return obj
+
+    # async def edit(self, request: Request, pk: Any, data: Dict[str, Any]) -> Any:
+    #     try:
+    #         data = await self._arrange_data(request, data, True)
+    #         await self.validate(request, data)
+    #         session: AsyncSession = request.state.session
+    #         obj = await self.find_by_pk(request, pk)
+    #         await self._populate_obj(request, obj, data, True)
+    #         session.add(obj)
+    #         await self.before_edit(request, data, obj)
+    #         await session.commit()
+    #         await session.refresh(obj)
+    #
+    #         await self.after_edit(request, obj)
+    #         return obj
+    #     except Exception as e:
+    #         self.handle_exception(e)
