@@ -9,7 +9,7 @@ from models.mark.schemas import MarkRequestParams, ReadMark
 
 class MarksNamespace(AsyncNamespace):
     async def on_connect(self, sid, environ, auth):
-        pass
+        print(auth)
 
     async def on_disconnect(self, sid):
         print(sid, "disconnect")
