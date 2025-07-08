@@ -6,7 +6,7 @@ from socket_io.namespace.mark_namespac import MarksNamespace
 
 sio = socketio.AsyncServer(
     async_mode="asgi",
-    cors_allowed_origins="*",
+    cors_allowed_origins=[],
     client_manager=socketio.AsyncManager(),
 )
 sio_app = socketio.ASGIApp(socketio_server=sio)
