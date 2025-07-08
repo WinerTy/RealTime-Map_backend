@@ -12,6 +12,7 @@ from geoalchemy2.functions import (
 )
 from pydantic import BaseModel
 from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 
 from crud import BaseRepository
 from models import Mark
@@ -55,8 +56,10 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
         if not params.show_ended:
             conditions.append(self.model.is_ended == params.show_ended)
 
-        query = select(self.model, ST_AsGeoJSON(self.model.geom).label("geom")).where(
-            *conditions
+        query = (
+            select(self.model, ST_AsGeoJSON(self.model.geom).label("geom"))
+            .where(*conditions)
+            .options(joinedload(self.model.category))
         )
 
         result = await self.session.execute(query)
@@ -79,7 +82,7 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
     async def create_mark(self, mark: CreateMarkRequest, user: "User") -> Mark:
         data = self._preparation_data(mark, user, CreateMark)
         result: Mark = await super().create(data)
-
+        await self.session.refresh(result, ["category"])
         return result
 
     async def get_mark_by_id(self, mark_id: int) -> Mark:

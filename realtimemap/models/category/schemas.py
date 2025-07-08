@@ -4,6 +4,8 @@ from fastapi import UploadFile
 from pydantic import BaseModel, Field, field_validator
 from pydantic_extra_types.color import Color
 
+from utils.url_generator import generate_full_image_url
+
 
 class BaseCategory(BaseModel):
     category_name: str = Field(..., max_length=64)
@@ -14,7 +16,6 @@ class CreateCategory(BaseCategory):
     icon: UploadFile
 
     @field_validator("color", mode="before")
-    @classmethod
     def validate_and_convert_color_to_hex(cls, v: Any) -> str:
         try:
             color_obj = Color(v)
@@ -29,13 +30,10 @@ class UpdateCategory(CreateCategory):
 
 class ReadCategory(BaseCategory):
     id: int
-    icon: str
     color: str
+    icon: str
 
-    @field_validator("icon", mode="before")
-    @classmethod
-    def generate_url(cls, v: Any):
-        try:
-            return v.path
-        except AttributeError:
-            return v
+    _validate_icon = field_validator("icon", mode="before")(generate_full_image_url)
+
+    class Config:
+        from_attributes = True

@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Request, Form, Depends
 from fastapi_cache.decorator import cache
+from fastapi_limiter.depends import RateLimiter
 from starlette.responses import Response
 
 from api.v1.auth.fastapi_users import current_user
@@ -21,7 +22,11 @@ async def me(user: current_user, request: Request):
     return UserRead.model_validate(user, context={"request": request})
 
 
-@router.patch("/me", response_model=UserRead)
+@router.patch(
+    "/me",
+    response_model=UserRead,
+    dependencies=[Depends(RateLimiter(times=2, minutes=5))],
+)
 async def update_me(
     user: current_user,
     update_data: Annotated[UserUpdate, Form(media_type="multipart/form-data")],

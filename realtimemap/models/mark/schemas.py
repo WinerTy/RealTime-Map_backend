@@ -11,6 +11,7 @@ from pydantic import (
     model_validator,
 )
 
+from models.category.schemas import ReadCategory
 from models.user.schemas import UserRead
 from utils.geom_serializator import serialization_geom
 from utils.url_generator import generate_full_image_url
@@ -90,10 +91,10 @@ class ReadMark(BaseMark):
     photo: Optional[List[str]] = []
     end_at: datetime
     is_ended: bool
+    category: ReadCategory
     additional_info: Optional[str] = Field(
         default=None, description="Дополнительная информация"
     )
-
     _validate_photo = field_validator("photo", mode="before")(generate_full_image_url)
     _validate_geom = field_validator("geom", mode="before")(serialization_geom)
 

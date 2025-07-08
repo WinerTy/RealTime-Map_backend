@@ -20,7 +20,6 @@ def generate_full_image_url(
             return ""
 
         if request:
-            print("Реализация через request")
             return str(
                 request.url_for(
                     "get_file",
@@ -32,7 +31,6 @@ def generate_full_image_url(
         base_url = conf.server.base_url
 
         file_url = photo_obj.path
-        print(f"{base_url}/media/{file_url}")
         return f"{base_url}/media/{file_url}"
 
     if isinstance(value, list):
