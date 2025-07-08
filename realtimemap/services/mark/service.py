@@ -54,7 +54,9 @@ class MarkService(BaseService):
         return await self.mark_comment_repo.get_comment_for_mark(mark_id)
 
     async def get_mark_by_id(self, mark_id: int) -> Mark:
-        return await self.mark_repo.get_by_id(mark_id, join_related=["owner"])
+        return await self.mark_repo.get_by_id(
+            mark_id, join_related=["owner", "category"]
+        )
 
     async def get_marks(self, params: MarkRequestParams):
         return await self.mark_repo.get_marks(params)
