@@ -8,6 +8,7 @@ from .database import DatabaseConfig
 from .logging import LoggingConfig
 from .redis import RedisConfig
 from .server import ServerConfig
+from .socket import SocketIOConfig
 
 
 class AppConfig(BaseSettings):
@@ -15,6 +16,7 @@ class AppConfig(BaseSettings):
     redis: RedisConfig
     celery: CeleryConfig
     server: ServerConfig = ServerConfig()
+    socket: SocketIOConfig
     api: ApiPrefix = ApiPrefix()
     static: Path = Path("static")
     log: LoggingConfig = LoggingConfig()

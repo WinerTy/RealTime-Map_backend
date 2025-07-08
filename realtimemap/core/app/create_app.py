@@ -29,18 +29,6 @@ def setup_logging() -> None:
 
 def add_header_middleware(app: FastAPI) -> None:
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=[conf.server.domains])
-    # app.add_middleware(HTTPSRedirectMiddleware)
-
-
-# pybabel init -i messages.pot -d i18n -l en -D messages
-# pybabel compile -d i18n -D messages
-# def add_babel_middleware(app: FastAPI) -> None:
-#     babel = BabelConfigs(
-#         ROOT_DIR=ROOT_DIR,
-#         BABEL_DEFAULT_LOCALE="en",
-#         BABEL_TRANSLATION_DIRECTORY="i18n",
-#     )
-#     app.add_middleware(BabelMiddleware, babel_configs=babel)
 
 
 def add_routers(app: FastAPI):
@@ -76,7 +64,6 @@ def create_app() -> FastAPI:
     app.mount(
         "/static", StaticFiles(directory=ROOT_DIR.parent / conf.static), name="static"
     )
-    # add_babel_middleware(app)
     add_header_middleware(app)
     add_routers(app)
     mount_socket_io(app)

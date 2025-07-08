@@ -12,7 +12,10 @@ from models.user.schemas import UserRead, UserUpdate
 router = APIRouter(prefix="/user", tags=["user"])
 
 
-@router.get("/me", response_model=UserRead)
+@router.get(
+    "/me",
+    response_model=UserRead,
+)
 @cache(expire=3600, namespace="user")
 async def me(user: current_user, request: Request):
     return UserRead.model_validate(user, context={"request": request})
