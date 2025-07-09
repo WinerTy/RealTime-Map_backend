@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Приватный чат</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 80vh;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: white;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 15px;
+            background-color: #4a76a8;
+            color: white;
+            text-align: center;
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            border-bottom: 1px solid #eee;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 18px;
+            max-width: 70%;
+        }
+
+        .message-incoming {
+            align-self: flex-start;
+            background-color: #e5e5ea;
+        }
+
+        .message-outgoing {
+            align-self: flex-end;
+            background-color: #007aff;
+            color: white;
+        }
+
+        .message-info {
+            font-size: 0.8em;
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+
+        #messageInput {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            margin-right: 10px;
+        }
+
+        #sendButton {
+            padding: 10px 20px;
+            background-color: #4a76a8;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        #sendButton:hover {
+            background-color: #3a6698;
+        }
+
+        .user-panel {
+            display: flex;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-info {
+            flex-grow: 1;
+        }
+
+        .online-status {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .online {
+            background-color: #4CAF50;
+        }
+
+        .offline {
+            background-color: #f44336;
+        }
+
+        .controls {
+            margin-bottom: 15px;
+        }
+
+        input, button {
+            padding: 8px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+<h1>Приватный чат</h1>
+
+<div class="controls">
+    <input type="text" id="tokenInput" placeholder="Ваш JWT токен">
+    <button id="connectBtn">Подключиться</button>
+    <button id="disconnectBtn">Отключиться</button>
+</div>
+
+<div class="user-panel">
+    <div class="user-info">
+        <div id="userStatus">
+            Статус: <span class="online-status offline"></span>
+            <span id="statusText">Не подключено</span>
+        </div>
+        <div>Ваш ID: <span id="userId">-</span></div>
+    </div>
+</div>
+
+<div class="controls">
+    <input type="number" id="recipientId" placeholder="ID получателя">
+    <button id="checkStatusBtn">Проверить статус</button>
+    <div id="recipientStatus"></div>
+</div>
+
+<div class="chat-container">
+    <div class="chat-header">Приватные сообщения</div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input">
+        <input type="text" id="messageInput" placeholder="Введите сообщение..." disabled>
+        <button id="sendButton" disabled>Отправить</button>
+    </div>
+</div>
+
+<script>
+    const tokenInput = document.getElementById('tokenInput');
+    const connectBtn = document.getElementById('connectBtn');
+    const disconnectBtn = document.getElementById('disconnectBtn');
+    const checkStatusBtn = document.getElementById('checkStatusBtn');
+    const recipientId = document.getElementById('recipientId');
+    const recipientStatus = document.getElementById('recipientStatus');
+    const messageInput = document.getElementById('messageInput');
+    const sendButton = document.getElementById('sendButton');
+    const chatMessages = document.getElementById('chatMessages');
+    const userStatus = document.getElementById('userStatus');
+    const statusText = document.getElementById('statusText');
+    const userId = document.getElementById('userId');
+
+    let socket = null;
+    let currentUser = null;
+
+    // Функция добавления сообщения в чат
+    function addMessage(text, isOutgoing = false, senderId = null, timestamp = null) {
+        const messageElement = document.createElement('div');
+        messageElement.className = `message ${isOutgoing ? 'message-outgoing' : 'message-incoming'}`;
+
+        const infoElement = document.createElement('div');
+        infoElement.className = 'message-info';
+
+        if (senderId) {
+            infoElement.textContent = `ID ${senderId} • ${timestamp || new Date().toLocaleTimeString()}`;
+        } else {
+            infoElement.textContent = timestamp || new Date().toLocaleTimeString();
+        }
+
+        const textElement = document.createElement('div');
+        textElement.textContent = text;
+
+        messageElement.appendChild(infoElement);
+        messageElement.appendChild(textElement);
+        chatMessages.appendChild(messageElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Подключение к чату
+    connectBtn.addEventListener('click', () => {
+        const token = tokenInput.value.trim();
+
+        if (!token) {
+            alert('Пожалуйста, введите токен');
+            return;
+        }
+
+        if (socket) {
+            socket.disconnect();
+        }
+
+        // Подключение к namespace /chat
+        socket = io('http://localhost:8000/chat', {
+            auth: {
+                token: token
+            }
+        });
+
+        // Обработчики событий
+        socket.on('connect', () => {
+            statusText.textContent = 'Подключено';
+            userStatus.querySelector('.online-status').className = 'online-status online';
+            addMessage('Вы подключились к чату', true);
+            messageInput.disabled = false;
+            sendButton.disabled = false;
+        });
+
+        socket.on('disconnect', () => {
+            statusText.textContent = 'Не подключено';
+            userStatus.querySelector('.online-status').className = 'online-status offline';
+            addMessage('Вы отключились от чата', true);
+            messageInput.disabled = true;
+            sendButton.disabled = true;
+        });
+
+        socket.on('connect_error', (err) => {
+            console.error('Ошибка подключения:', err);
+            statusText.textContent = 'Ошибка подключения';
+            addMessage(`Ошибка подключения: ${err.message}`, true);
+        });
+
+        socket.on('status', (data) => {
+            if (data.online) {
+                // Добавляем проверку на существование данных пользователя
+                if (data.user && data.user.id) {
+                    currentUser = data.user;
+                    userId.textContent = currentUser.id;
+                    addMessage(`Вы вошли как пользователь ID: ${currentUser.id}`, true);
+                } else {
+                    // Если данные пользователя не пришли, запрашиваем их
+                    socket.emit('get_user_info');
+                }
+            }
+        });
+        socket.on('user_info', (userData) => {
+            if (userData && userData.id) {
+                currentUser = userData;
+                userId.textContent = currentUser.id;
+                addMessage(`Вы вошли как пользователь ID: ${currentUser.id}`, true);
+            }
+        });
+        socket.on('private_message', (data) => {
+            addMessage(data.message, false, data.from, data.timestamp);
+        });
+
+        socket.on('message_delivered', (data) => {
+            addMessage(`Сообщение доставлено пользователю ID: ${data.recipient_id}`, true);
+        });
+
+        socket.on('error', (data) => {
+            addMessage(`Ошибка: ${data.message}`, true);
+        });
+
+        socket.on('online_status', (data) => {
+            const status = data[recipientId.value] ? 'онлайн' : 'оффлайн';
+            recipientStatus.innerHTML = `Статус пользователя ID ${recipientId.value}:
+                    <span class="online-status ${data[recipientId.value] ? 'online' : 'offline'}"></span>
+                    ${status}`;
+        });
+    });
+
+    // Отключение от чата
+    disconnectBtn.addEventListener('click', () => {
+        if (socket) {
+            socket.disconnect();
+        }
+    });
+
+    // Проверка статуса пользователя
+    checkStatusBtn.addEventListener('click', () => {
+        if (!socket || !socket.connected) {
+            alert('Сначала подключитесь к чату');
+            return;
+        }
+
+        if (!recipientId.value) {
+            alert('Введите ID пользователя');
+            return;
+        }
+
+        socket.emit('get_online_status', {user_ids: [recipientId.value]});
+    });
+
+    // Отправка сообщения
+    sendButton.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
+    function sendMessage() {
+        const message = messageInput.value.trim();
+        const toUserId = recipientId.value;
+
+        if (!message) {
+            alert('Введите текст сообщения');
+            return;
+        }
+
+        if (!toUserId) {
+            alert('Введите ID получателя');
+            return;
+        }
+
+        // Добавляем проверку currentUser
+        if (!currentUser || !currentUser.id) {
+            alert('Информация о пользователе не загружена. Попробуйте переподключиться.');
+            return;
+        }
+
+        if (socket && socket.connected) {
+            socket.emit('private_message', {
+                recipient_id: parseInt(toUserId),
+                message: message
+            });
+
+            addMessage(message, true, currentUser.id);
+            messageInput.value = '';
+        } else {
+            alert('Вы не подключены к чату');
+        }
+    }
+</script>
+</body>
+</html>

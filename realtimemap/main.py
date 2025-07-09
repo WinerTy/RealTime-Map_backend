@@ -5,7 +5,8 @@ from fastapi.responses import RedirectResponse, ORJSONResponse
 from libcloud.storage.drivers.local import LocalStorageDriver
 from libcloud.storage.types import ObjectDoesNotExistError
 from sqlalchemy_file.storage import StorageManager
-from starlette.responses import FileResponse, StreamingResponse
+from starlette.responses import FileResponse, StreamingResponse, HTMLResponse
+from starlette.templating import Jinja2Templates
 
 from core.app import create_app
 from core.config import conf
@@ -70,6 +71,14 @@ def serve_files(storage: str = Path(...), file_id: str = Path(...)):
 
     except ObjectDoesNotExistError or RuntimeError:
         return ORJSONResponse({"detail": "Not found"}, status_code=404)
+
+
+templates = Jinja2Templates(directory="templates")
+
+
+@app.get("/test", response_class=HTMLResponse)
+async def get_form(request: Request):
+    return templates.TemplateResponse("form.html", {"request": request})
 
 
 STATIC_DIR = conf.static
