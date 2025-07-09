@@ -9,6 +9,7 @@ from pydantic import (
     field_validator,
     field_serializer,
     model_validator,
+    ConfigDict,
 )
 
 from models.category.schemas import ReadCategory
@@ -98,15 +99,11 @@ class ReadMark(BaseMark):
     _validate_photo = field_validator("photo", mode="before")(generate_full_image_url)
     _validate_geom = field_validator("geom", mode="before")(serialization_geom)
 
-    class Config:
-        json_encoders = {
-            datetime: lambda dt: dt.isoformat(),
-        }
-        from_attributes = True
-
     @field_serializer("end_at")
     def serialize_end_at(self, value: datetime) -> str:
         return value.isoformat()
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class DetailMark(ReadMark):

@@ -1,7 +1,7 @@
 from typing import Any
 
 from fastapi import UploadFile
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, ConfigDict
 from pydantic_extra_types.color import Color
 
 from utils.url_generator import generate_full_image_url
@@ -35,5 +35,4 @@ class ReadCategory(BaseCategory):
 
     _validate_icon = field_validator("icon", mode="before")(generate_full_image_url)
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
