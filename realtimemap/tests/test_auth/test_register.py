@@ -2,10 +2,10 @@ from typing import Dict, Any
 
 import pytest
 
-from .data import VALID_REGISTER_DATA, INVALID_CASES
+from .data import VALID_REGISTER_DATA, INVALID_REGISTER_CASES
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_register_success(async_client):
     response = await async_client.post(
         "/api/v1/auth/register", json=VALID_REGISTER_DATA
@@ -17,8 +17,14 @@ async def test_register_success(async_client):
     assert "password" not in result
 
 
-@pytest.mark.asyncio
-@pytest.mark.parametrize("invalid_data", INVALID_CASES)
-async def test_invalid_register(async_client, invalid_data: Dict[str, Any]):
-    response = await async_client.post("/api/v1/auth/register", json=invalid_data)
-    assert response.status_code == 422
+@pytest.mark.anyio
+@pytest.mark.parametrize(
+    "data, status_code, _",
+    INVALID_REGISTER_CASES,
+    ids=[test_id[2].lower() for test_id in INVALID_REGISTER_CASES],
+)
+async def test_invalid_register(
+    async_client, data: Dict[str, Any], status_code: int, _: str
+):
+    response = await async_client.post("/api/v1/auth/register", json=data)
+    assert response.status_code == status_code

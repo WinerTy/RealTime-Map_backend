@@ -20,6 +20,12 @@ class UserRead(schemas.BaseUser[int]):
 class UserCreate(schemas.BaseUserCreate):
     username: str
 
+    @field_validator("password")
+    def validate_password(cls, value: str):
+        if len(value) < 6:
+            raise ValueError("Password must be at least 6 characters")
+        return value
+
 
 class UserUpdate(schemas.BaseUserUpdate):
     @field_validator("password")
