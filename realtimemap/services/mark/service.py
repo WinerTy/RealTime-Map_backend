@@ -3,13 +3,13 @@ from typing import TYPE_CHECKING
 
 from fastapi import HTTPException
 
-from models import User, Mark
+from models import User, Mark, MarkComment
 from models.mark.schemas import (
     CreateMarkRequest,
     MarkRequestParams,
     UpdateMarkRequest,
 )
-from models.mark_comment.schemas import CreateMarkCommentRequest
+from models.mark_comment.schemas import CreateMarkCommentRequest, UpdateMarkComment
 from services.base import BaseService
 
 if TYPE_CHECKING:
@@ -45,14 +45,6 @@ class MarkService(BaseService):
         mark = await self.mark_repo.create_mark(mark_data, user)
         return mark
 
-    async def create_comment(
-        self, user: User, data: CreateMarkCommentRequest, mark_id: int
-    ):
-        return await self.mark_comment_repo.create_comment(user, data, mark_id)
-
-    async def get_comments(self, mark_id: int):
-        return await self.mark_comment_repo.get_comment_for_mark(mark_id)
-
     async def get_mark_by_id(self, mark_id: int) -> Mark:
         return await self.mark_repo.get_by_id(
             mark_id, join_related=["owner", "category"]
@@ -60,6 +52,11 @@ class MarkService(BaseService):
 
     async def get_marks(self, params: MarkRequestParams):
         return await self.mark_repo.get_marks(params)
+
+    async def create_comment(
+        self, user: User, data: CreateMarkCommentRequest, mark_id: int
+    ):
+        return await self.mark_comment_repo.create_comment(user, data, mark_id)
 
     async def _before_update_mark(
         self, mark: Mark, user: User, update_data: UpdateMarkRequest
@@ -87,3 +84,14 @@ class MarkService(BaseService):
         instance = await self.mark_repo.get_mark_by_id(mark_id)
         await self._before_update_mark(instance, user, update_data)
         return await self.mark_repo.update_mark(instance.id, update_data, user)
+
+    async def get_comments(self, mark_id: int):
+        return await self.mark_comment_repo.get_comment_for_mark(mark_id)
+
+    async def _before_mark_comment_update(
+        self, update_data: UpdateMarkComment, comment: MarkComment
+    ):
+        update_dict = update_data.model_dump(exclude_unset=True)
+
+    async def update_comment(self, record_id: int, update_data: UpdateMarkComment):
+        comment = await self.mark_comment_repo.get_by_id(record_id)

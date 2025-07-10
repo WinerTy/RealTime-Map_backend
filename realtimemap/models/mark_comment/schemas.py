@@ -1,19 +1,13 @@
-from pydantic import BaseModel, Field, field_validator
-from models.user.schemas import UserRead
-from typing import Optional
 from datetime import datetime
+from typing import Optional
+
+from pydantic import BaseModel, Field
+
+from models.user.schemas import UserRead
 
 
 class BaseMarkComment(BaseModel):
-    content: str = Field(..., description="Mark content", min_length=1)
-
-    @field_validator("content", mode="before")
-    @classmethod
-    def validate_content(cls, value: str):
-        if len(value) > 256:
-            raise ValueError("Mark content must be less than 256 characters")
-
-        return value
+    content: str = Field(..., description="Mark content", min_length=1, max_length=256)
 
 
 class CreateMarkComment(BaseMarkComment):
@@ -21,9 +15,13 @@ class CreateMarkComment(BaseMarkComment):
     user_id: int = Field(..., description="User id", ge=0)
 
 
-class UpdateMarkComment(CreateMarkComment):
+class UpdateMarkCommentReaction(BaseModel):
     likes: int = Field(..., description="Likes", ge=0)
     dislikes: int = Field(..., description="Dislikes", ge=0)
+
+
+class UpdateMarkComment(BaseMarkComment, UpdateMarkCommentReaction):
+    pass
 
 
 class ReadMarkComment(BaseMarkComment):

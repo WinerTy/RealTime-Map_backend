@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING
+
 from sqlalchemy import select
 
 from crud import BaseRepository
@@ -36,3 +37,9 @@ class MarkCommentRepository(
             .order_by(self.model.created_at.desc())
         ).join(self.model.user)
         return stmt
+
+    async def update_reaction(self):
+        pass
+
+    async def update_comment(self):
+        pass
