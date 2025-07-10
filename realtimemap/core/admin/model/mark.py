@@ -38,6 +38,9 @@ class AdminMark(ModelView):
         HasOne("category", identity="category", required=True),
         IntegerField("duration", min=12, max=48, step=12, required=True),
         DateTimeField("start_at", label="Start at", required=True),
+        DateTimeField(
+            "end_at", label="End at", exclude_from_create=True, exclude_from_edit=True
+        ),
         Mark.photo,
         Mark.is_ended,
     ]
