@@ -24,9 +24,11 @@ async def auth_async_client():
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
     ) as client:
-        await client.post(
+        response = await client.post(
             "api/v1/auth/login",
             data=LOGIN_DATA,
             headers={"Content-Type": "application/x-www-form-urlencoded"},
         )
+        token = response.json().get("access_token")
+        client.headers.update({"Authorization": f"Bearer {token}"})
         yield client
