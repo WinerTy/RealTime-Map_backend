@@ -6,7 +6,6 @@ VALID_REGISTER_DATA: Dict[str, Any] = {
     "username": "UserForTesting",
 }
 
-LOGIN_DATA = {"username": "UserForTesting", "password": "TestingPassword123"}
 
 INVALID_REGISTER_CASES: List[Tuple[Dict[str, Any], int, str]] = [
     ({"username": "", "password": "", "email": ""}, 422, "Empty_fields"),
@@ -36,5 +35,35 @@ INVALID_REGISTER_CASES: List[Tuple[Dict[str, Any], int, str]] = [
         },
         400,
         "User_already_exist",
+    ),
+]
+
+LOGIN_DATA = {"username": "UserForTesting", "password": "TestingPassword123"}
+
+
+INVALID_LOGIN_CASES: List[Tuple[Dict[str, Any], int, str]] = [
+    (
+        {
+            "username": "Testing@realtimemap.ru",
+            "password": "<PASSWORD>",
+        },
+        400,
+        "incorrect_password",
+    ),
+    (
+        {
+            "username": "Testing@realtimemap1.ru",
+            "password": "TestingPassword123",
+        },
+        400,
+        "incorrect_username",
+    ),
+    (
+        {
+            "username": "",
+            "password": "",
+        },
+        400,
+        "empty_fields",
     ),
 ]

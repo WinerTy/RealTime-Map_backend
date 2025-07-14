@@ -5,6 +5,7 @@ import pytest
 from .data import VALID_REGISTER_DATA, INVALID_REGISTER_CASES
 
 
+@pytest.mark.order(1)
 @pytest.mark.anyio
 async def test_register_success(async_client):
     response = await async_client.post(
