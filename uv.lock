@@ -1281,15 +1281,6 @@ wheels = [
 ]
 
 [[package]]
-name = "psycopg2"
-version = "2.9.10"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/62/51/2007ea29e605957a17ac6357115d0c1a1b60c8c984951c19419b3474cdfd/psycopg2-2.9.10.tar.gz", hash = "sha256:12ec0b40b0273f95296233e8750441339298e6a572f7039da5b260e3c8b60e11", size = 385672, upload-time = "2024-10-16T11:24:54.832Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/ae/49/a6cfc94a9c483b1fa401fbcb23aca7892f60c7269c5ffa2ac408364f80dc/psycopg2-2.9.10-cp313-cp313-win_amd64.whl", hash = "sha256:91fd603a2155da8d0cfcdbf8ab24a2d54bca72795b90d2a3ed2b6da8d979dee2", size = 2569060, upload-time = "2025-01-04T20:09:15.28Z" },
-]
-
-[[package]]
 name = "psycopg2-binary"
 version = "2.9.10"
 source = { registry = "https://pypi.org/simple" }
@@ -1469,6 +1460,18 @@ wheels = [
 ]
 
 [[package]]
+name = "pytest-order"
+version = "1.3.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pytest" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/1d/66/02ae17461b14a52ce5a29ae2900156b9110d1de34721ccc16ccd79419876/pytest_order-1.3.0.tar.gz", hash = "sha256:51608fec3d3ee9c0adaea94daa124a5c4c1d2bb99b00269f098f414307f23dde", size = 47544, upload-time = "2024-08-22T12:29:54.512Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1b/73/59b038d1aafca89f8e9936eaa8ffa6bb6138d00459d13a32ce070be4f280/pytest_order-1.3.0-py3-none-any.whl", hash = "sha256:2cd562a21380345dd8d5774aa5fd38b7849b6ee7397ca5f6999bbe6e89f07f6e", size = 14609, upload-time = "2024-08-22T12:29:53.156Z" },
+]
+
+[[package]]
 name = "python-dateutil"
 version = "2.9.0.post0"
 source = { registry = "https://pypi.org/simple" }
@@ -1577,7 +1580,6 @@ dependencies = [
     { name = "orjson" },
     { name = "phonenumbers" },
     { name = "pillow" },
-    { name = "psycopg2" },
     { name = "psycopg2-binary" },
     { name = "pydantic-extra-types" },
     { name = "pydantic-settings" },
@@ -1598,11 +1600,9 @@ dev = [
     { name = "pytest" },
     { name = "pytest-anyio" },
     { name = "pytest-asyncio" },
+    { name = "pytest-order" },
     { name = "ruff" },
     { name = "trio" },
-]
-windows = [
-    { name = "psycopg2" },
 ]
 
 [package.metadata]
@@ -1625,7 +1625,6 @@ requires-dist = [
     { name = "orjson", specifier = ">=3.10.18" },
     { name = "phonenumbers", specifier = ">=9.0.7" },
     { name = "pillow", specifier = ">=11.2.1" },
-    { name = "psycopg2", specifier = ">=2.9.10" },
     { name = "psycopg2-binary", specifier = ">=2.9.10" },
     { name = "pydantic-extra-types", specifier = ">=2.10.5" },
     { name = "pydantic-settings", specifier = ">=2.9.1" },
@@ -1646,10 +1645,10 @@ dev = [
     { name = "pytest", specifier = ">=8.4.1" },
     { name = "pytest-anyio", specifier = ">=0.0.0" },
     { name = "pytest-asyncio", specifier = ">=1.0.0" },
+    { name = "pytest-order", specifier = ">=1.3.0" },
     { name = "ruff", specifier = ">=0.11.10" },
     { name = "trio", specifier = ">=0.30.0" },
 ]
-windows = [{ name = "psycopg2", specifier = ">=2.9.10" }]
 
 [[package]]
 name = "redis"
