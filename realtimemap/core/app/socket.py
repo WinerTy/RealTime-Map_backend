@@ -3,6 +3,7 @@ import socketio
 from core.config import conf
 from socket_io.namespace.chat_namespace import ChatNamespace
 from socket_io.namespace.mark_namespac import MarksNamespace
+from socket_io.namespace.user_count_namespace import UserCountNamespace
 
 sio = socketio.AsyncServer(
     async_mode="asgi",
@@ -19,3 +20,4 @@ sio.instrument(
 
 sio.register_namespace(MarksNamespace(conf.socket.prefix.marks))
 sio.register_namespace(ChatNamespace(conf.socket.prefix.chat))
+sio.register_namespace(UserCountNamespace("/count"))
