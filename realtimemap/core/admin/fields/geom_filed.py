@@ -1,3 +1,4 @@
+import logging
 from typing import Any
 
 from fastapi import Request
@@ -6,6 +7,8 @@ from starlette_admin import RequestAction
 from starlette_admin.fields import StringField
 
 from utils.geom_serializator import serialization_geom
+
+logger = logging.getLogger(__name__)
 
 
 class GeomField(StringField):
@@ -54,5 +57,6 @@ class GeomField(StringField):
             geom = form_data.get(self.id)
             wkb_coords = self._validate_coords(geom)
             return wkb_coords
-        except Exception:
+        except Exception as e:
+            logger.warning(f"Failed to parse value in {self.id}. {str(e)}")
             return None

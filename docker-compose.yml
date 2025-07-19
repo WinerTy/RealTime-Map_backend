@@ -45,9 +45,12 @@ services:
     build: .
     container_name: celery-flower
     command: ../.venv/bin/celery --app core.celery.celery_app flower
+    ports:
+      - "5555:5555"
     depends_on:
       - redis
       - backend
+      - celery
 
 volumes:
   uploads_volume:
