@@ -14,7 +14,7 @@ from pydantic import (
 
 from models.category.schemas import ReadCategory
 from models.user.schemas import UserRead
-from utils.geom_serializator import serialization_geom
+from utils.geom.geom_serializator import serialization_geom
 from utils.url_generator import generate_full_image_url
 
 allowed_duration = [12, 24, 36, 48]
@@ -73,6 +73,7 @@ class CreateMark(BaseMark):
     additional_info: Optional[str] = None
     photo: Optional[List[UploadFile]] = None
     category_id: int
+    geohash: str
 
 
 class UpdateMark(BaseModel):

@@ -1,3 +1,5 @@
+from typing import Dict
+
 from socketio import AsyncNamespace
 
 
@@ -5,6 +7,7 @@ class UserCountNamespace(AsyncNamespace):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.count: int = 0
+        self.active_connections: Dict[str, str] = dict()
 
     async def on_connect(self, sid, environ):
         self.count += 1

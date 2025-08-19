@@ -6,7 +6,7 @@ from starlette.datastructures import FormData
 from starlette_admin import RequestAction
 from starlette_admin.fields import StringField
 
-from utils.geom_serializator import serialization_geom
+from utils.geom.geom_serializator import serialization_geom
 
 logger = logging.getLogger(__name__)
 

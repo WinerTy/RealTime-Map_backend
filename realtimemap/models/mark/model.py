@@ -10,8 +10,7 @@ from models.base import BaseSqlModel
 from models.mixins import IntIdMixin, TimeMarkMixin
 
 if TYPE_CHECKING:
-    from models.user.model import User
-    from models.category.model import Category
+    pass
 
 
 class Mark(BaseSqlModel, IntIdMixin, TimeMarkMixin):
@@ -44,6 +43,7 @@ class Mark(BaseSqlModel, IntIdMixin, TimeMarkMixin):
     is_ended: Mapped[bool] = mapped_column(
         Boolean, default=False, server_default="false", nullable=False
     )
+    geohash: Mapped[str] = mapped_column(String(64), nullable=False)
 
     __table_args__ = (Index("idx_locations_geom", geom, postgresql_using="gist"),)
 

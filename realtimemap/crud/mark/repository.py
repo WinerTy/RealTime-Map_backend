@@ -24,10 +24,10 @@ from models.mark.schemas import (
     MarkRequestParams,
     UpdateMarkRequest,
 )
+from utils.geom.geom_sector import get_geohash, get_neighbors
 
 if TYPE_CHECKING:
-    from models import User
-    from sqlalchemy.ext.asyncio import AsyncSession
+    pass
 
 
 class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
@@ -43,8 +43,11 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
         # Вычисляем границы временного окна (используем Python timedelta для параметров)
         min_start = params.date - timedelta(hours=params.duration)
         max_end = params.date + timedelta(hours=params.duration)
-
+        geohash = get_geohash(params.latitude, params.longitude)
+        neighbors = get_neighbors(geohash)
+        neighbors.append(geohash)
         conditions = [
+            self.model.geohash.in_(neighbors),
             ST_DWithin(
                 ST_Transform(self.model.geom, 3857),
                 ST_Transform(current_point, 3857),
@@ -76,7 +79,12 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
         if mark.longitude and mark.latitude:
             geom = f"SRID=4326;POINT({mark.longitude} {mark.latitude})"
         mark_data = mark.model_dump(exclude={"longitude", "latitude"})
-        formated_data = response_class(**mark_data, geom=geom, owner_id=user.id)
+        formated_data = response_class(
+            **mark_data,
+            geom=geom,
+            owner_id=user.id,
+            geohash=get_geohash(mark.latitude, mark.longitude),
+        )
         return formated_data
 
     async def create_mark(self, mark: CreateMarkRequest, user: "User") -> Mark:
