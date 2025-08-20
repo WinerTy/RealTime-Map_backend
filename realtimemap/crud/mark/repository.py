@@ -8,7 +8,7 @@ from geoalchemy2.functions import (
     ST_DWithin,
     ST_Transform,
     ST_AsGeoJSON,
-    ST_Distance,
+    ST_DistanceSphere,
 )
 from pydantic import BaseModel
 from sqlalchemy import select
@@ -40,12 +40,15 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
             ST_MakePoint(params.longitude, params.latitude), params.srid
         )
 
-        # Вычисляем границы временного окна (используем Python timedelta для параметров)
-        min_start = params.date - timedelta(hours=params.duration)
-        max_end = params.date + timedelta(hours=params.duration)
+        # Работа с geohash для фильтрации по зонам
         geohash = get_geohash(params.latitude, params.longitude)
         neighbors = get_neighbors(geohash)
         neighbors.append(geohash)
+
+        # Вычисляем границы временного окна (используем Python timedelta для параметров)
+        min_start = params.date - timedelta(hours=params.duration)
+        max_end = params.date + timedelta(hours=params.duration)
+        # Условия фильтрации
         conditions = [
             self.model.geohash.in_(neighbors),
             ST_DWithin(
@@ -112,15 +115,18 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
     async def check_distance(
         self, current_location: MarkRequestParams, mark: Mark, radius: int = 500
     ) -> bool:
+        # Проверка вложена ли метка в зону
+        geohash = get_geohash(current_location.latitude, current_location.longitude)
+
+        if mark.geohash not in [geohash] + get_neighbors(geohash):
+            return False
+
+        # Проверка вложена ли метка в радиус пользователя
         user_point = ST_SetSRID(
             ST_MakePoint(current_location.longitude, current_location.latitude), 4326
         )
 
-        print(type(mark.geom))
-        stmt = select(
-            ST_Distance(ST_Transform(mark.geom, 3857), ST_Transform(user_point, 3857))
-            <= radius
-        )
+        stmt = select(ST_DistanceSphere(mark.geom, user_point, radius))
 
         result = await self.session.execute(stmt)
         return result.scalar()

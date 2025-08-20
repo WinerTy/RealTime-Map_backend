@@ -2,7 +2,7 @@ import socketio
 
 from core.config import conf
 from socket_io.namespace.chat_namespace import ChatNamespace
-from socket_io.namespace.mark_namespac import MarksNamespace
+from socket_io.namespace.mark_namespace import MarksNamespace
 from socket_io.namespace.user_count_namespace import UserCountNamespace
 
 sio = socketio.AsyncServer(

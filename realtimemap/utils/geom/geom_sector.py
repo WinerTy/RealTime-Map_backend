@@ -15,9 +15,9 @@ def get_neighbors(geohash: str) -> List[str]:
         get_adjacent(geohash, "top"),
         get_adjacent(geohash, "bottom"),
         left_sector,
-        right_sector,
         get_adjacent(left_sector, "top"),
         get_adjacent(left_sector, "bottom"),
+        right_sector,
         get_adjacent(right_sector, "top"),
         get_adjacent(right_sector, "bottom"),
     ]
