@@ -6,7 +6,6 @@ from utils.geom.geom_sector import get_geohash
 
 
 class GeoHashField(StringField):
-
     async def parse_form_data(
         self, request: Request, form_data: FormData, action: RequestAction
     ) -> str:

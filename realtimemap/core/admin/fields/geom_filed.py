@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 
 
 class GeomField(StringField):
-
     def __init__(self, *args, srid=4326, **kwargs):
         super().__init__(*args, **kwargs)
         self.srid = srid
@@ -27,7 +26,7 @@ class GeomField(StringField):
         result = serialization_geom(value)
         coords = result.coordinates._asdict()
 
-        return f"{coords.get("latitude")}, {coords.get("longitude")}"
+        return f"{coords.get('latitude')}, {coords.get('longitude')}"
 
     @staticmethod
     def _validate_coords(data: str) -> str:
