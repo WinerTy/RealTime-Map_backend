@@ -1,5 +1,5 @@
 import logging
-from typing import Annotated, List, Optional
+from typing import Annotated, List
 
 from fastapi import (
     APIRouter,
@@ -11,72 +11,22 @@ from fastapi import (
 )
 
 from api.v1.auth.fastapi_users import current_user
-from core.app.socket import sio
-from crud.mark import MarkRepository
-from database.helper import db_helper
 from dependencies.service import get_mark_service
-from models import Mark
 from models.mark.schemas import (
     CreateMarkRequest,
     ReadMark,
     MarkRequestParams,
-    action_type,
     DetailMark,
     UpdateMarkRequest,
 )
 from services.mark.service import MarkService
+from socket_io.notify import notify_mark_action
 
 router = APIRouter(prefix="/marks", tags=["Marks"])
 
 logger = logging.getLogger(__name__)
 
 mark_service = Annotated[MarkService, Depends(get_mark_service)]
-
-
-def get_sids(namespace: str = "/") -> List[Optional[str]]:
-    try:
-        connections = sio.manager.rooms.get(namespace, {})
-        if not connections:
-            return []
-        result = []
-        for room_sid in connections:
-            if room_sid:
-                result.append(room_sid)
-        return result
-    except Exception:
-        return []
-
-
-# Разбить на функции
-async def notify_mark_action(
-    mark: Mark, action: action_type, request: Optional[Request] = None
-):
-    try:
-        async with db_helper.session_factory() as session:
-            repo = MarkRepository(session)
-            connections = get_sids(namespace="/marks")
-            for room_name in connections:
-                if room_name:
-                    params: Optional[MarkRequestParams] = await sio.get_session(
-                        room_name, "/marks"
-                    )
-                    if not params:
-                        continue
-                    in_range = await repo.check_distance(params, mark)
-                    if in_range:
-                        await sio.emit(
-                            action,
-                            to=room_name,
-                            data=ReadMark.model_validate(
-                                mark,
-                                context={
-                                    "request": request,
-                                },
-                            ).model_dump(mode="json"),
-                            namespace="/marks",
-                        )
-    except Exception as e:
-        print(e)
 
 
 @router.get("/", response_model=List[ReadMark], status_code=200)
