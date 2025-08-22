@@ -15,7 +15,7 @@ from models.mark_comment.schemas import (
 )
 
 if TYPE_CHECKING:
-    from services.mark.service import MarkService
+    pass
 
 router = APIRouter(prefix="/{record_id}", tags=["Mark Comments"])
 
@@ -29,7 +29,7 @@ async def create_comment(
     record_id: int,
     user: current_user,
     data: CreateMarkCommentRequest,
-    service: Annotated[MarkService, Depends(get_mark_service)],
+    service: Annotated["MarkService", Depends(get_mark_service)],
 ):
     result = await service.create_comment(user=user, data=data, mark_id=record_id)
     return result
@@ -44,7 +44,7 @@ async def create_comment(
 @cache(expire=3600, namespace="comments_list")
 async def get_comments(
     record_id: int,
-    service: Annotated[MarkService, Depends(get_mark_service)],
+    service: Annotated["MarkService", Depends(get_mark_service)],
     params: Params = Depends(),
 ):
     comments = await service.get_comments(mark_id=record_id)
@@ -58,7 +58,7 @@ async def get_comments(
 )
 async def update_comment(
     record_id: int,
-    service: Annotated[MarkService, Depends(get_mark_service)],
+    service: Annotated["MarkService", Depends(get_mark_service)],
 ):
     pass
 
@@ -68,6 +68,6 @@ async def reaction_comment(
     record_id: int,
     user: current_user,
     reaction: UpdateMarkCommentReaction,
-    service: Annotated[MarkService, Depends(get_mark_service)],
+    service: Annotated["MarkService", Depends(get_mark_service)],
 ):
     pass

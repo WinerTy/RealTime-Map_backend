@@ -13,21 +13,17 @@ from models.mark_comment.schemas import CreateMarkCommentRequest
 from services.base import BaseService
 
 if TYPE_CHECKING:
-    from sqlalchemy.ext.asyncio import AsyncSession
-    from crud.category import CategoryRepository
-    from crud.mark import MarkRepository
-    from crud.mark_comment import MarkCommentRepository
-    from websocket.mark_socket import MarkManager
+    pass
 
 
 class MarkService(BaseService):
     def __init__(
         self,
-        session: AsyncSession,
-        mark_repo: MarkRepository,
-        category_repo: CategoryRepository,
-        mark_comment_repo: MarkCommentRepository,
-        manager: MarkManager,
+        session: "AsyncSession",
+        mark_repo: "MarkRepository",
+        category_repo: "CategoryRepository",
+        mark_comment_repo: "MarkCommentRepository",
+        manager: "MarkManager",
     ):
         super().__init__(session)
         self.mark_repo = mark_repo

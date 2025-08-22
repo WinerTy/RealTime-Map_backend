@@ -27,12 +27,11 @@ from models.mark.schemas import (
 from utils.geom.geom_sector import get_geohash, get_neighbors
 
 if TYPE_CHECKING:
-    from sqlalchemy.ext.asyncio import AsyncSession
-    from models import User
+    pass
 
 
 class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: "AsyncSession"):
         super().__init__(Mark, session, "id")
         self.upload_dir = "upload_marks"
 
@@ -76,7 +75,7 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
     @staticmethod
     def _preparation_data(
         mark: Union[CreateMarkRequest, UpdateMarkRequest],
-        user: User,
+        user: "User",
         response_class: Type[BaseModel],
     ) -> Type[BaseModel]:
         geom = None
@@ -106,7 +105,7 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
 
         return result
 
-    async def delete_mark(self, mark_id: int, user: User) -> Mark:
+    async def delete_mark(self, mark_id: int, user: "User") -> Mark:
         mark = await self.get_mark_by_id(mark_id)
         if not mark.owner == user:
             raise HTTPException(status_code=403)
@@ -133,7 +132,7 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
         return result.scalar()
 
     async def update_mark(
-        self, mark_id: int, update_data: UpdateMarkRequest, user: User
+        self, mark_id: int, update_data: UpdateMarkRequest, user: "User"
     ) -> Mark:
         formated_data = self._preparation_data(update_data, user, UpdateMark)
         return await self.update(mark_id, formated_data)
