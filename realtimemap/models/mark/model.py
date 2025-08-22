@@ -10,7 +10,8 @@ from models.base import BaseSqlModel
 from models.mixins import IntIdMixin, TimeMarkMixin
 
 if TYPE_CHECKING:
-    pass
+    from models.user.model import User
+    from models.category.model import Category
 
 
 class Mark(BaseSqlModel, IntIdMixin, TimeMarkMixin):
@@ -24,14 +25,14 @@ class Mark(BaseSqlModel, IntIdMixin, TimeMarkMixin):
     owner_id: Mapped[int] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
-    owner: Mapped["User"] = relationship(
+    owner: Mapped[User] = relationship(
         "User",
         foreign_keys=[owner_id],
     )
     category_id: Mapped[int] = mapped_column(
         ForeignKey("categories.id", ondelete="CASCADE"), nullable=False
     )
-    category: Mapped["Category"] = relationship(
+    category: Mapped[Category] = relationship(
         "Category",
         foreign_keys=[category_id],
     )
