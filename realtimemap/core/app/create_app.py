@@ -19,26 +19,32 @@ from .socket import sio_app
 ROOT_DIR = Path(__file__).parent.parent
 
 
+# Интеграция и настройка пагинации
 def setup_pagination(app: FastAPI) -> None:
     add_pagination(app)
 
 
+# Функция для настрйоки логов
 def setup_logging() -> None:
     os.makedirs("logs", exist_ok=True)
 
 
+# Настройки Хэдеров
 def add_header_middleware(app: FastAPI) -> None:
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=[conf.server.domains])
 
 
+# Добавление роутеров для эндпоинтов
 def add_routers(app: FastAPI):
     app.include_router(v1_router)
 
 
+# Интеграция Socket.io
 def mount_socket_io(app: FastAPI) -> None:
     app.mount("/socket.io", app=sio_app)
 
 
+# Настройка структуры для хранения медиа файлов пользователей (Можно интегрировать удаленное хранилище. См доку по sqlalchemy-file)
 def setup_file_storage():
     os.makedirs("static", exist_ok=True)
     os.makedirs("uploads/default", exist_ok=True)
@@ -57,13 +63,17 @@ def setup_file_storage():
     StorageManager.add_storage("users", users_container)
 
 
+# Создание настроенного класса приложения
 def create_app() -> FastAPI:
     setup_file_storage()
     setup_logging()
     app = FastAPI(lifespan=lifespan, default_response_class=ORJSONResponse)
+    # root_dit = app.state.root_dir
+    # print(root_dit)
     app.mount(
         "/static", StaticFiles(directory=ROOT_DIR.parent / conf.static), name="static"
     )
+
     add_header_middleware(app)
     add_routers(app)
     mount_socket_io(app)
