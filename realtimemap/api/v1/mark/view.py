@@ -71,6 +71,7 @@ async def get_mark(mark_id: int, service: mark_service, request: Request):
     return DetailMark.model_validate(result, context={"request": request})
 
 
+# TODO поменять на СЕРВИС!!!
 @router.delete("/{mark_id}", status_code=204)
 async def delete_mark(
     mark_id: int,
@@ -79,7 +80,9 @@ async def delete_mark(
     service: mark_service,
     request: Request,
 ):
-    instance = await service.mark_repo.delete_mark(mark_id, user)
+    instance = await service.mark_repo.delete_mark(
+        mark_id, user
+    )  # TODO ПОМЕНЯТЬ ЛОГИКУ!!!!
     background.add_task(
         notify_mark_action,
         mark=instance,
