@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import timedelta
-from typing import List, TYPE_CHECKING, Union, Type
+from typing import List, TYPE_CHECKING, Union, Type, Optional
 
 from fastapi import HTTPException
 from geoalchemy2.functions import (
@@ -38,10 +38,12 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
     Repository for the Mark model.
     """
 
-    def __init__(self, session: "AsyncSession", geo_service: GeoService):
+    def __init__(
+        self, session: "AsyncSession", geo_service: Optional[GeoService] = None
+    ):
         super().__init__(Mark, session, "id")
         self.upload_dir = "upload_marks"
-        self.geo_service = geo_service
+        self.geo_service = geo_service if geo_service is not None else GeoService()
 
     async def get_marks(self, params: MarkRequestParams) -> List[Mark]:
         current_point = self.geo_service.create_point(params, params.srid)
