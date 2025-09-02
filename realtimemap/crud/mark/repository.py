@@ -163,9 +163,8 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
             bool: True or False
         """
         # Проверка вложена ли метка в зону
-        neighbors = self.geo_service.get_neighbors(
-            self.geo_service.get_geohash(current_location)
-        )
+        geohash = self.geo_service.get_geohash(current_location)
+        neighbors = self.geo_service.get_neighbors(geohash, need_include=True)
 
         if mark.geohash not in neighbors:
             return False

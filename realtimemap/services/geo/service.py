@@ -10,6 +10,7 @@ from geoalchemy2.functions import (
     ST_DistanceSphere,
 )
 
+from models import Mark
 from models.mark.schemas import Coordinates
 
 
@@ -60,3 +61,11 @@ class GeoService:
         if hasattr(data, "latitude") and hasattr(data, "longitude"):
             return Coordinates(latitude=data.latitude, longitude=data.longitude)
         raise ValueError("Data object must have 'latitude' and 'longitude' attributes")
+
+    def check_geohash_proximity(self, coords: "Coordinates", mark: Mark) -> bool:
+        geohash = self.get_geohash(coords)
+        neighbors = self.get_neighbors(geohash, need_include=True)
+
+        if mark.geohash in neighbors:
+            return True
+        return False

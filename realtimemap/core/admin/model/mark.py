@@ -8,8 +8,8 @@ from starlette_admin.exceptions import FormValidationError
 
 from core.admin.fields import GeomField
 from core.admin.fields.geohash_field import GeoHashField
+from dependencies.notification import get_mark_notification_service
 from models import Mark
-from socket_io.notify import notify_mark_action
 
 
 class AdminMark(ModelView):
@@ -62,8 +62,11 @@ class AdminMark(ModelView):
 
         return await super().validate(request, data)
 
+    # TODO integrate notify service
     async def after_create(self, request: Request, obj: Mark) -> None:
-        await notify_mark_action(action="marks_created", request=request, mark=obj)
+        # await notify_mark_action(action="marks_created", request=request, mark=obj)
+        pass
 
     async def after_edit(self, request: Request, obj: Mark) -> None:
-        await notify_mark_action(action="marks_updated", request=request, mark=obj)
+        # await notify_mark_action(action="marks_updated", request=request, mark=obj)
+        pass

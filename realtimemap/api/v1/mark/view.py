@@ -11,6 +11,9 @@ from fastapi import (
 )
 
 from api.v1.auth.fastapi_users import current_user
+from dependencies.notification import (
+    get_mark_notification_service,
+)
 from dependencies.service import get_mark_service
 from models.mark.schemas import (
     CreateMarkRequest,
@@ -20,13 +23,17 @@ from models.mark.schemas import (
     UpdateMarkRequest,
 )
 from services.mark.service import MarkService
-from socket_io.notify import notify_mark_action
+from services.notification import MarkNotificationService
 
 router = APIRouter(prefix="/marks", tags=["Marks"])
 
 logger = logging.getLogger(__name__)
 
 mark_service = Annotated[MarkService, Depends(get_mark_service)]
+
+mark_notification_service = Annotated[
+    MarkNotificationService, Depends(get_mark_notification_service)
+]
 
 
 @router.get("/", response_model=List[ReadMark], status_code=200)
@@ -51,15 +58,17 @@ async def create_mark_point(
     user: current_user,
     service: mark_service,
     request: Request,
+    notification: mark_notification_service,
 ):
     """
     Protected endpoint for create mark.
     """
     instance = await service.create_mark(mark, user)
     background.add_task(
-        notify_mark_action,
+        notification.notify_mark_action,
         mark=instance,
         action="marks_created",
+        request=request,
     )
     return ReadMark.model_validate(instance, context={"request": request})
 
@@ -78,10 +87,11 @@ async def delete_mark(
     user: current_user,
     service: mark_service,
     request: Request,
+    notification: mark_notification_service,
 ):
     instance = await service.delete_mark(mark_id, user)
     background.add_task(
-        notify_mark_action,
+        notification.notify_mark_action,
         mark=instance,
         action="marks_deleted",
         request=request,
@@ -98,10 +108,11 @@ async def update_mark(
     user: current_user,
     request: Request,
     background: BackgroundTasks,
+    notification: mark_notification_service,
 ):
     result = await service.update_mark(mark_id=mark_id, update_data=mark, user=user)
     background.add_task(
-        notify_mark_action,
+        notification.notify_mark_action,
         mark=result,
         action="marks_updated",
         request=request,
