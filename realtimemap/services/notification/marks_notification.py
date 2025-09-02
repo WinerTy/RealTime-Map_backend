@@ -27,7 +27,6 @@ class MarkNotificationService(BaseNotificationSocketIO):
         self, mark: Mark, action: action_type, request: Optional[Request] = None
     ):
         try:
-
             room_sids = self.get_sids(self.namespace)
             if not room_sids:
                 return
@@ -65,14 +64,14 @@ class MarkNotificationService(BaseNotificationSocketIO):
     async def _filter_connection_in_range(
         self, sessions: Dict[str, Optional[MarkRequestParams]], mark: Mark
     ) -> Set[str]:
-
         targets = set()
 
         for sid, params in sessions.items():
             if not params:
                 continue
-
-            if not self.geo_service.check_geohash_proximity(params, mark):
+            print(params)
+            print(mark)
+            if not self.geo_service.check_geohash_proximity(coords=params, mark=mark):
                 continue
 
             in_range = await self.mark_repo.check_distance(params, mark)

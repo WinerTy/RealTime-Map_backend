@@ -3,14 +3,10 @@ from __future__ import annotations
 from datetime import timedelta
 from typing import List, TYPE_CHECKING, Union, Type, Optional
 
-from fastapi import HTTPException
 from geoalchemy2.functions import (
-    ST_SetSRID,
-    ST_MakePoint,
     ST_DWithin,
     ST_Transform,
     ST_AsGeoJSON,
-    ST_DistanceSphere,
 )
 from pydantic import BaseModel
 from sqlalchemy import select
@@ -27,7 +23,6 @@ from models.mark.schemas import (
     UpdateMarkRequest,
 )
 from services.geo.service import GeoService
-from utils.geom.geom_sector import get_geohash, get_neighbors
 
 if TYPE_CHECKING:
     from models import User

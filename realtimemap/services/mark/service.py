@@ -1,8 +1,6 @@
 from datetime import datetime, timedelta
-from functools import wraps
-from typing import TYPE_CHECKING, Callable, Any
+from typing import TYPE_CHECKING
 
-from fastapi import HTTPException
 
 from crud.mark import MarkRepository
 from exeptions import RecordNotFoundError, UserPermissionError, TimeOutError

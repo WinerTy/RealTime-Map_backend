@@ -9,7 +9,6 @@ from dependencies.crud import (
 )
 from dependencies.session import get_session
 from dependencies.websocket import get_mark_websocket_manager
-from services.geo.service import GeoService
 from services.mark.service import MarkService
 
 if TYPE_CHECKING:
