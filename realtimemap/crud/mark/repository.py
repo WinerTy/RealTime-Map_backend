@@ -122,7 +122,7 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
         await self.session.refresh(result, ["category"])
         return result
 
-    async def get_mark_by_id(self, mark_id: int) -> Mark:
+    async def get_mark_by_id(self, mark_id: int) -> Optional[Mark]:
         """
         Method for getting a mark by its id
         Args:
@@ -134,24 +134,17 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
         """
         stmt = select(self.model).where(self.model.id == mark_id)
         result = await self.session.execute(stmt)
-        result = result.scalar_one_or_none()
-        if not result:
-            raise HTTPException(status_code=404, detail="mark not found")
+        return result.scalar_one_or_none()
 
-        return result
-
-    async def delete_mark(self, mark_id: int, user: "User") -> Mark:
+    async def delete_mark(self, mark_id: int) -> Mark:
         """
         Method for deleting a mark by its id
         Args:
             mark_id (int): The id of the mark
-            user (User): The user. Need for check permission
         Returns:
             Mark (Mark): The mark
         """
         mark = await self.get_mark_by_id(mark_id)
-        if not mark.owner == user:
-            raise HTTPException(status_code=403)
         await super().delete(mark_id)
         return mark
 

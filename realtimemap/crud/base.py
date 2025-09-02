@@ -30,7 +30,7 @@ class BaseRepository(Generic[Model, CreateSchema, ReadSchema, UpdateSchema]):
         item_id: Any,
         join_related: Optional[Union[List[str], Dict[str, Any]]] = None,
         load_strategy: Any = joinedload,
-    ) -> Model:
+    ) -> Optional[Model]:
         stmt: Select = select(self.model).where(
             getattr(self.model, self.id_field) == item_id
         )
@@ -47,8 +47,6 @@ class BaseRepository(Generic[Model, CreateSchema, ReadSchema, UpdateSchema]):
 
         result = await self.session.execute(stmt)
         instance = result.scalars().first()
-        if not instance:
-            raise HTTPException(status_code=404, detail="Record not found")
         return instance
 
     async def create(self, data: CreateSchema, *kwargs) -> Model:

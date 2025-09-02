@@ -1,3 +1,3 @@
-__all__ = ["RecordNotFoundError"]
+__all__ = ["RecordNotFoundError", "ClientError", "UserPermissionError", "TimeOutError"]
 
-from .http import RecordNotFoundError
+from .http import RecordNotFoundError, ClientError, UserPermissionError, TimeOutError
