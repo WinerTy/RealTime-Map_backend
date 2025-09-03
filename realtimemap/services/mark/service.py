@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 
 from crud.mark import MarkRepository
-from exeptions import RecordNotFoundError, UserPermissionError, TimeOutError
+from exceptions import RecordNotFoundError, UserPermissionError, TimeOutError
 from models import User, Mark
 from models.mark.schemas import (
     CreateMarkRequest,
