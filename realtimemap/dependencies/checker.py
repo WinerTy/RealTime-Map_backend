@@ -3,6 +3,7 @@ from typing import Annotated, TYPE_CHECKING
 from fastapi import Depends, HTTPException
 
 from dependencies.crud import get_mark_repository, get_mark_comment_repository
+from exceptions import RecordNotFoundError
 
 if TYPE_CHECKING:
     from crud.mark import MarkRepository
@@ -10,13 +11,11 @@ if TYPE_CHECKING:
 
 
 async def check_mark_exist(
-    record_id: int, repo: Annotated["MarkRepository", Depends(get_mark_repository)]
+    mark_id: int, repo: Annotated["MarkRepository", Depends(get_mark_repository)]
 ):
-    is_exist = await repo.exist(record_id)
+    is_exist = await repo.exist(mark_id)
     if not is_exist:
-        raise HTTPException(
-            status_code=404, detail=f"Mark with id {record_id} not found."
-        )
+        raise RecordNotFoundError()
 
 
 async def check_mark_comment_exist(
