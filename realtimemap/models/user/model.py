@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 from fastapi import Request
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
@@ -12,7 +12,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy_file import ImageField
 
 from auth.user_database import MySQLAlchemyUserDatabase
-from models import BaseSqlModel, Mark
+from models import BaseSqlModel, Mark, Comment
 from models.mixins import IntIdMixin
 
 if TYPE_CHECKING:
@@ -35,6 +35,7 @@ class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
         "Mark",
         back_populates="owner",
     )
+    comments: Mapped[List["Comment"]] = relationship(back_populates="owner")
 
     @classmethod
     def get_db(cls, session: "AsyncSession"):

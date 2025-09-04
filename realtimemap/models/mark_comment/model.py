@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, List
 
 from sqlalchemy import (
     ForeignKey,
@@ -60,10 +60,16 @@ class Comment(BaseSqlModel, IntIdMixin, TimeMarkMixin):
     )
 
     # RS
-    #
+    parent: Mapped["Comment"] = relationship(
+        remote_side="Comment.id",
+        back_populates="replies",
+    )
+    replies: Mapped[List["Comment"]] = relationship(back_populates="parent")
+    owner: Mapped["User"] = relationship(back_populates="comments")
+    stats: Mapped["CommentStat"] = relationship(back_populates="comment")
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        print("Вызов init")
 
 
 class CommentReaction(BaseSqlModel, IntIdMixin, TimeMarkMixin):
@@ -97,7 +103,8 @@ class CommentStat(BaseSqlModel, IntIdMixin):
     last_activity: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
     # RS
-    #
+    comment: Mapped["Comment"] = relationship(back_populates="stats")
+
     __table_args__ = (
         Index("ix_comment_stats_likes", "likes_count"),
         Index("ix_comment_stats_activity", "last_activity"),
