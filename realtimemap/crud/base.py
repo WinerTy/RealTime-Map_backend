@@ -65,7 +65,7 @@ class BaseRepository(Generic[Model, CreateSchema, ReadSchema, UpdateSchema]):
                 f"Record {data} already exists in Repository: {self.model.__name__}"
             )
             await self.session.rollback()
-            raise HTTPException(status_code=400, detail="Record already exists")
+            raise HTTPException(status_code=400, detail="Record already exists")  # TODO
         except Exception as e:
             logger.error(
                 f"Create record {data} in Repository: {self.model.__name__}", e
