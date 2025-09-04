@@ -9,6 +9,7 @@ __all__ = [
     "Comment",
     "CommentStat",
     "CommentReaction",
+    "UsersBan",
 ]
 
 
@@ -19,3 +20,4 @@ from .mark_comment.model import Comment, CommentStat, CommentReaction
 from .message import Message
 from .request_log.model import RequestLog
 from .user.model import User, AccessToken
+from .user_ban.model import UsersBan
