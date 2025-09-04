@@ -1,13 +1,14 @@
 from typing import TYPE_CHECKING
 
-from sqlalchemy import select
+from sqlalchemy import select, Select
+from sqlalchemy.orm import selectinload
 
 from crud import BaseRepository
 from models import User, Comment
 from models.mark_comment.schemas import (
     CreateComment,
     UpdateComment,
-    DeleteComment,
+    ReadComment,
 )
 
 if TYPE_CHECKING:
@@ -15,7 +16,7 @@ if TYPE_CHECKING:
 
 
 class MarkCommentRepository(
-    BaseRepository[Comment, CreateComment, UpdateComment, DeleteComment]
+    BaseRepository[Comment, CreateComment, ReadComment, UpdateComment]
 ):
     def __init__(self, session: "AsyncSession"):
         super().__init__(session=session, model=Comment)
@@ -24,13 +25,27 @@ class MarkCommentRepository(
         result = await self.create(data=data)
         return result
 
-    async def get_comment_for_mark(self, mark_id: int):
+    def get_comment_for_mark(self, mark_id: int) -> Select:
         stmt = (
             select(self.model)
-            .where(self.model.mark_id == mark_id)
+            .where(self.model.mark_id == mark_id, self.model.parent_id.is_(None))
+            .options(
+                selectinload(self.model.replies).options(
+                    selectinload(Comment.stats),
+                    selectinload(Comment.owner),
+                ),
+                selectinload(self.model.owner),
+                selectinload(self.model.stats),
+            )
             .order_by(self.model.created_at.desc())
         )
         return stmt
+
+    async def get_comments(self, mark_id: int):
+        stmt = self.get_comment_for_mark(mark_id=mark_id)
+        result = await self.session.execute(stmt)
+        comments = result.scalars().unique().all()
+        return comments
 
     async def update_reaction(self):
         pass

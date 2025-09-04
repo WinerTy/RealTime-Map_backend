@@ -1,3 +1,5 @@
+from typing import Optional, List
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from crud.mark_comment import MarkCommentRepository
@@ -36,3 +38,7 @@ class MarkCommentService(BaseService):
         )
         result = await self.comment_repo.create_comment(full_data)
         return result
+
+    async def get_comments(self, mark_id: int) -> Optional[List[Comment]]:
+        comments = await self.comment_repo.get_comments(mark_id=mark_id)
+        return comments
