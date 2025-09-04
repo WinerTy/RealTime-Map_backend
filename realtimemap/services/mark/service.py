@@ -10,7 +10,7 @@ from models.mark.schemas import (
     MarkRequestParams,
     UpdateMarkRequest,
 )
-from models.mark_comment.schemas import CreateMarkCommentRequest
+
 from services.base import BaseService
 
 if TYPE_CHECKING:
@@ -50,11 +50,6 @@ class MarkService(BaseService):
     async def get_marks(self, params: MarkRequestParams):
         return await self.mark_repo.get_marks(params)
 
-    async def create_comment(
-        self, user: User, data: CreateMarkCommentRequest, mark_id: int
-    ):
-        return await self.mark_comment_repo.create_comment(user, data, mark_id)
-
     async def _before_update_mark(
         self, mark_id: int, user: User, update_data: UpdateMarkRequest
     ) -> Mark:
@@ -80,9 +75,6 @@ class MarkService(BaseService):
         mark = await self._check_mark_ownership(mark_id, user)
         result = await self.mark_repo.delete_mark(mark.id)
         return result
-
-    async def get_comments(self, mark_id: int):
-        return await self.mark_comment_repo.get_comment_for_mark(mark_id)
 
     async def _check_mark_ownership(self, mark_id: int, user: User) -> Mark:
         mark = await self.mark_repo.get_mark_by_id(mark_id)
