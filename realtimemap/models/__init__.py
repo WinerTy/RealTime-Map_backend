@@ -6,14 +6,16 @@ __all__ = [
     "Category",
     "RequestLog",
     "Message",
-    "MarkComment",
+    "Comment",
+    "CommentStat",
+    "CommentReaction",
 ]
 
 
 from .base import BaseSqlModel
 from .category.model import Category
 from .mark.model import Mark
-from .mark_comment.model import MarkComment
+from .mark_comment.model import Comment, CommentStat, CommentReaction
 from .message import Message
 from .request_log.model import RequestLog
 from .user.model import User, AccessToken
