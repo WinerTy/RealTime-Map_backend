@@ -30,5 +30,5 @@ def setup_admin(app: FastAPI) -> None:
     admin.add_view(AdminCategory(Category))
     admin.add_view(AdminUser(User))
     admin.add_view(AdminMark(Mark))
-    admin.add_view(AdminUsersBans(UsersBan))
+    # admin.add_view(AdminUsersBans(UsersBan))
     admin.mount_to(app)
