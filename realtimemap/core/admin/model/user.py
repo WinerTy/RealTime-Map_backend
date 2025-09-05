@@ -1,14 +1,40 @@
-from typing import Dict, Any
+import os
+from typing import Dict, Any, List
 
 from fastapi_users.password import PasswordHelper
-from sqlalchemy import Select
+from jinja2 import Environment, FileSystemLoader
+from sqlalchemy import Select, select, and_, or_
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload, joinedload
+from starlette.datastructures import FormData
 from starlette.requests import Request
-from starlette_admin import PasswordField, BooleanField
+from starlette_admin import (
+    PasswordField,
+    BooleanField,
+    action,
+    row_action,
+    link_row_action,
+)
 from starlette_admin.contrib.sqla import ModelView
-from starlette_admin.exceptions import FormValidationError
+from starlette_admin.exceptions import FormValidationError, ActionFailed
 
+from core.app.lifespan import ROOT_DIR
+from crud.user.repository import UserRepository
 from models import User, UsersBan
+from models.user_ban.model import BanReason
+from datetime import datetime
+
+from models.user_ban.schemas import UserBanCreate
+
+# Пиздец Maybe FIX
+template_dir = os.path.join(ROOT_DIR, "templates")
+env = Environment(loader=FileSystemLoader(template_dir))
+
+
+def generate_ban_form():
+    template = env.get_template("admin/form/ban_form.html")
+    ban_reasons = list(BanReason)
+    return template.render(ban_reasons=ban_reasons)
 
 
 class AdminUser(ModelView):
@@ -59,3 +85,62 @@ class AdminUser(ModelView):
 
     def get_list_query(self, request: Request) -> Select:
         return super().get_list_query(request)
+
+    @row_action(
+        name="ban_user",
+        text="Ban user",
+        confirmation="Are you sure you want to ban this user?",
+        submit_btn_text="Yes, ban",
+        submit_btn_class="btn-success",
+        icon_class="fas fa-check-circle",
+        form=generate_ban_form(),
+    )
+    async def ban_user_action(self, request: Request, pk: Any) -> str:
+        # Preparate data
+        pk = int(pk)
+        current_user = self.get_current_user(request)
+        self.disable_self_ban(current_user.id, pk)
+
+        # Ban Checking
+        session: AsyncSession = request.state.session
+        user_repo = UserRepository(session)
+        is_banned = await user_repo.user_is_banned(pk)
+        if is_banned:
+            raise ActionFailed("User already banned")
+
+        # Validate form data
+        data: FormData = await request.form()
+        valid_data = self.validate_action_form_data(data, pk, current_user.id)
+
+        ban_data = UsersBan(**valid_data.model_dump())
+        session.add(ban_data)
+        await session.commit()
+        await session.refresh(ban_data)
+        return f"User was banned: {valid_data.reason}"
+
+    @staticmethod
+    def validate_action_form_data(data: FormData, user_id: int, moderator_id: int):
+        try:
+            full_data = {
+                "user_id": user_id,
+                "moderator_id": moderator_id,
+                "banned_until": data.get("banned_until", None),
+                "reason": data.get("reason"),
+                "reason_text": data.get("reason_text"),
+                "is_permanent": data.get("is_permanent"),
+            }
+            print(full_data.get("banned_until"))
+            valid_data = UserBanCreate(**full_data)
+            return valid_data
+        except ValueError as e:
+            raise ActionFailed(str(e))
+
+    @staticmethod
+    def disable_self_ban(current_user_id: int, ban_user_id: int) -> None:
+        if current_user_id == ban_user_id:
+            raise ActionFailed("Can be ban yourself!")
+
+    @staticmethod
+    def get_current_user(request: Request) -> User:
+        user: User = request.state.user
+        return user if user is not None else None

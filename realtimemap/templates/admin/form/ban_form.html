@@ -1,0 +1,46 @@
+<form>
+    <div class="mt-3">
+        <label for="reason">Ban Reason</label>
+        <select name="reason" class="form-control" required>
+            <option value="">Select a reason</option>
+            {% for reason in ban_reasons %}
+                <option value="{{ reason.value }}">{{ reason.value|replace('_', ' ')|title }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mt-3">
+        <label for="reason_text">Additional Details (Optional)</label>
+        <input type="text" class="form-control" name="reason_text" placeholder="Write ban reason if needed"/>
+    </div>
+
+    <div class="mt-3">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="is_permanent" id="is_permanent" checked>
+            <label class="form-check-label" for="is_permanent">
+                Permanent Ban
+            </label>
+        </div>
+    </div>
+
+    <div class="mt-3" id="banned_until_container" style="display: none;">
+        <label for="banned_until">Ban Until</label>
+        <input type="datetime-local" class="form-control" name="banned_until" id="banned_until"/>
+    </div>
+
+    <script>
+        document.getElementById('is_permanent').addEventListener('change', function () {
+            var container = document.getElementById('banned_until_container');
+            container.style.display = this.checked ? 'none' : 'block';
+            if (!this.checked) {
+                document.getElementById('banned_until').setAttribute('required', 'required');
+            } else {
+                document.getElementById('banned_until').removeAttribute('required');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('is_permanent').dispatchEvent(new Event('change'));
+        });
+    </script>
+</form>

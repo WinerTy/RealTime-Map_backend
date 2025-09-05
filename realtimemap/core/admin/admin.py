@@ -10,13 +10,13 @@ from core.admin.model import (
     AdminMark,
     AdminUsersBans,
 )
+from core.app.lifespan import ROOT_DIR
 from core.config import conf
 from database.helper import db_helper
 from models import Category, User, Mark, UsersBan
 
 
 def setup_admin(app: FastAPI) -> None:
-    # Fix статики в адм на хостинге
     admin = Admin(
         engine=db_helper.engine,
         title="RealTime-Map",
@@ -26,6 +26,7 @@ def setup_admin(app: FastAPI) -> None:
                 SessionMiddleware, secret_key=conf.api.v1.auth.verification_token_secret
             )
         ],
+        templates_dir=ROOT_DIR / "templates",
     )
     admin.add_view(AdminCategory(Category))
     admin.add_view(AdminUser(User))
