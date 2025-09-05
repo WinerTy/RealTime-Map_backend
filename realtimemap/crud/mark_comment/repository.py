@@ -25,20 +25,25 @@ class MarkCommentRepository(
         result = await self.create(data=data)
         return result
 
+    def _get_load_strategy(self):
+        loads = [
+            # load replies with joined data
+            selectinload(self.model.replies).options(
+                selectinload(Comment.stats),
+                selectinload(Comment.owner),
+            ),
+            # load for main comment
+            selectinload(self.model.owner),
+            selectinload(self.model.stats),
+        ]
+        return loads
+
     def get_comment_for_mark(self, mark_id: int) -> Select:
         stmt = (
             select(self.model)
             .where(self.model.mark_id == mark_id, self.model.parent_id.is_(None))
-            .options(
-                selectinload(self.model.replies).options(
-                    selectinload(Comment.stats),
-                    selectinload(Comment.owner),
-                ),
-                selectinload(self.model.owner),
-                selectinload(self.model.stats),
-            )
-            .order_by(self.model.created_at.desc())
-        )
+            .options(*self._get_load_strategy())
+        ).order_by(self.model.created_at.desc())
         return stmt
 
     async def get_comments(self, mark_id: int):
