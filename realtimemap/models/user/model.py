@@ -17,6 +17,7 @@ from models.mixins import IntIdMixin
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
+    from models import UsersBan
 
 
 class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
@@ -31,11 +32,22 @@ class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
     avatar: Mapped[ImageField] = mapped_column(
         ImageField(upload_storage="users"), nullable=True
     )
+
+    # RS
     marks: Mapped["Mark"] = relationship(
         "Mark",
         back_populates="owner",
     )
     comments: Mapped[List["Comment"]] = relationship(back_populates="owner")
+    bans: Mapped[List["UsersBan"]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+        foreign_keys="UsersBan.user_id",
+        lazy="joined",
+    )
+    given_bans: Mapped[List["UsersBan"]] = relationship(
+        back_populates="moderator", foreign_keys="UsersBan.moderator_id"
+    )
 
     @classmethod
     def get_db(cls, session: "AsyncSession"):

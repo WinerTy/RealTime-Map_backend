@@ -1,12 +1,14 @@
 from typing import Dict, Any
 
 from fastapi_users.password import PasswordHelper
+from sqlalchemy import Select
+from sqlalchemy.orm import selectinload, joinedload
 from starlette.requests import Request
-from starlette_admin import PasswordField
+from starlette_admin import PasswordField, BooleanField
 from starlette_admin.contrib.sqla import ModelView
 from starlette_admin.exceptions import FormValidationError
 
-from models import User
+from models import User, UsersBan
 
 
 class AdminUser(ModelView):
@@ -27,6 +29,13 @@ class AdminUser(ModelView):
         User.is_active,
         User.is_superuser,
         User.is_verified,
+        BooleanField(
+            "bans",
+            label="is_banned",
+            read_only=True,
+            exclude_from_edit=True,
+            exclude_from_create=True,
+        ),
     ]
 
     exclude_fields_from_detail = [User.hashed_password]
@@ -47,3 +56,6 @@ class AdminUser(ModelView):
         if len(errors) > 0:
             raise FormValidationError(errors)
         return await super().validate(request, data)
+
+    def get_list_query(self, request: Request) -> Select:
+        return super().get_list_query(request)
