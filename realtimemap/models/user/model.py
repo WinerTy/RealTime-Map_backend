@@ -17,7 +17,8 @@ from models.mixins import IntIdMixin
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
-    from models import UsersBan
+
+    # from models import UsersBan
 
 
 class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
@@ -78,7 +79,7 @@ class AccessToken(BaseSqlModel, SQLAlchemyBaseAccessTokenTable[int]):
 
 # For Testing sync events in async projects
 @event.listens_for(User, "before_insert")
-def before_insert_listener(mapper, connection, target):
+def before_insert_listener(mapper, connection, target: User):
     print("before_insert")
     print("-" * 50)
     print(target.username)

@@ -8,10 +8,11 @@ from core.admin.model import (
     AdminCategory,
     AdminUser,
     AdminMark,
+    AdminUsersBans,
 )
 from core.config import conf
 from database.helper import db_helper
-from models import Category, User, Mark
+from models import Category, User, Mark, UsersBan
 
 
 def setup_admin(app: FastAPI) -> None:
@@ -29,4 +30,5 @@ def setup_admin(app: FastAPI) -> None:
     admin.add_view(AdminCategory(Category))
     admin.add_view(AdminUser(User))
     admin.add_view(AdminMark(Mark))
+    admin.add_view(AdminUsersBans(UsersBan))
     admin.mount_to(app)
