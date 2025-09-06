@@ -1,7 +1,7 @@
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Annotated
 
-from pydantic import BaseModel, Field, field_validator, field_serializer
+from pydantic import BaseModel, Field
 
 from models.user.schemas import UserRead
 
@@ -11,33 +11,33 @@ class BaseComment(BaseModel):
 
 
 class CreateComment(BaseComment):
-    owner_id: int
-    mark_id: int
-    parent_id: Optional[int] = None
+    owner_id: Annotated[int, Field(0, ge=0, description="Owner id")]
+    mark_id: Annotated[int, Field(0, ge=0, description="Mark id")]
+    parent_id: Annotated[Optional[int], Field(..., description="Parent comment id")]
 
 
 class UpdateComment(BaseComment):
-    owner_id: int
-    mark_id: int
+    owner_id: Annotated[int, Field(0, ge=0, description="Owner id")]
+    mark_id: Annotated[int, Field(0, ge=0, description="Mark id")]
 
     class Config:
         from_attributes = True
 
 
-class CommentStats(BaseModel):
-    likes_count: int
-    dislikes_count: int
-    total_replies: int
+class BaseCommentStats(BaseModel):
+    likes_count: Annotated[int, Field(default=0, description="Likes count", ge=0)]
+    dislikes_count: Annotated[int, Field(default=0, description="Dislikes count", ge=0)]
+    total_replies: Annotated[int, Field(0, ge=0)]
 
     class Config:
         from_attributes = True
 
 
 class BaseReadComment(BaseComment):
-    id: int
+    id: Annotated[int, Field(default=0, ge=0, description="id")]
     owner: UserRead
     created_at: datetime
-    stats: CommentStats
+    stats: BaseCommentStats
 
 
 class ReadCommentReply(BaseReadComment):
@@ -45,8 +45,17 @@ class ReadCommentReply(BaseReadComment):
 
 
 class ReadComment(BaseReadComment):
-    replies: Optional[List[ReadCommentReply]] = []
+    replies: Annotated[
+        Optional[List[ReadCommentReply]],
+        Field(list(), description="Replies to comment"),
+    ]
 
 
 class CreateCommentRequest(BaseComment):
-    parent_id: Optional[int] = Field(None, description="Parent comment id", ge=0)
+    parent_id: Annotated[
+        Optional[int], Field(None, description="Parent comment id", ge=0)
+    ]
+
+
+class CreateCommentStat(BaseCommentStats):
+    comment_id: Annotated[int, Field(..., description="Comment id", ge=0)]
