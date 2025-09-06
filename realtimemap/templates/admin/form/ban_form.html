@@ -30,7 +30,7 @@
 
     <script>
         document.getElementById('is_permanent').addEventListener('change', function () {
-            var container = document.getElementById('banned_until_container');
+            const container = document.getElementById('banned_until_container');
             container.style.display = this.checked ? 'none' : 'block';
             if (!this.checked) {
                 document.getElementById('banned_until').setAttribute('required', 'required');
