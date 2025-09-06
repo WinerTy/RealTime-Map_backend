@@ -10,7 +10,10 @@ from sqlalchemy import (
     DateTime,
     func,
     Index,
+    event,
+    Connection,
 )
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from models import BaseSqlModel
@@ -108,4 +111,13 @@ class CommentStat(BaseSqlModel, IntIdMixin):
     __table_args__ = (
         Index("ix_comment_stats_likes", "likes_count"),
         Index("ix_comment_stats_activity", "last_activity"),
+    )
+
+
+@event.listens_for(Comment, "after_insert")
+def create_base_stats(mapper, connection: Connection, target: Comment):
+    connection.execute(
+        insert(CommentStat).values(
+            comment_id=target.id,
+        )
     )
