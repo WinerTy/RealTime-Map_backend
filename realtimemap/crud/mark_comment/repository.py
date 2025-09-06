@@ -4,11 +4,14 @@ from sqlalchemy import select, Select
 from sqlalchemy.orm import selectinload
 
 from crud import BaseRepository
-from models import User, Comment
+from models import User, Comment, CommentStat
 from models.mark_comment.schemas import (
     CreateComment,
     UpdateComment,
     ReadComment,
+    CreateCommentStat,
+    ReadCommentStat,
+    UpdateCommentStat,
 )
 
 if TYPE_CHECKING:
@@ -57,3 +60,14 @@ class MarkCommentRepository(
 
     async def update_comment(self):
         pass
+
+
+class CommentStatRepository(
+    BaseRepository[CommentStat, CreateCommentStat, ReadCommentStat, UpdateCommentStat]
+):
+    def __init__(self, session: "AsyncSession"):
+        super().__init__(session=session, model=CommentStat)
+
+    async def create_base_stat(self, comment_id: int) -> None:
+        data = CreateCommentStat(comment_id=comment_id)
+        await self.create(data=data)

@@ -6,6 +6,7 @@ from dependencies.crud import (
     get_mark_repository,
     get_category_repository,
     get_mark_comment_repository,
+    get_comment_stat_repository,
 )
 from dependencies.session import get_session
 from dependencies.websocket import get_mark_websocket_manager
@@ -17,7 +18,10 @@ if TYPE_CHECKING:
     from crud.mark import MarkRepository
 
     from websocket.mark_socket import MarkManager
-    from crud.mark_comment.repository import MarkCommentRepository
+    from crud.mark_comment.repository import (
+        MarkCommentRepository,
+        CommentStatRepository,
+    )
 
 
 async def get_mark_service(
@@ -43,5 +47,10 @@ async def get_mark_comment_service(
     comment_repo: Annotated[
         "MarkCommentRepository", Depends(get_mark_comment_repository)
     ],
+    comment_stat_repo: Annotated[
+        "CommentStatRepository", Depends(get_comment_stat_repository)
+    ],
 ) -> MarkCommentService:
-    yield MarkCommentService(session=session, comment_repo=comment_repo)
+    yield MarkCommentService(
+        session=session, comment_repo=comment_repo, comment_stat_repo=comment_stat_repo
+    )

@@ -57,5 +57,13 @@ class CreateCommentRequest(BaseComment):
     ]
 
 
-class CreateCommentStat(BaseCommentStats):
+class CreateCommentStat(BaseModel):
     comment_id: Annotated[int, Field(..., description="Comment id", ge=0)]
+
+
+class ReadCommentStat(BaseCommentStats):
+    pass
+
+
+class UpdateCommentStat(CreateComment, BaseCommentStats):
+    pass

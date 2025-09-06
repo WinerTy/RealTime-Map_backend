@@ -1,19 +1,16 @@
 import os
-from typing import Dict, Any, List
+from typing import Dict, Any
 
 from fastapi_users.password import PasswordHelper
 from jinja2 import Environment, FileSystemLoader
-from sqlalchemy import Select, select, and_, or_
+from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload, joinedload
 from starlette.datastructures import FormData
 from starlette.requests import Request
 from starlette_admin import (
     PasswordField,
     BooleanField,
-    action,
     row_action,
-    link_row_action,
 )
 from starlette_admin.contrib.sqla import ModelView
 from starlette_admin.exceptions import FormValidationError, ActionFailed
@@ -22,7 +19,6 @@ from core.app.lifespan import ROOT_DIR
 from crud.user.repository import UserRepository
 from models import User, UsersBan
 from models.user_ban.model import BanReason
-from datetime import datetime
 
 from models.user_ban.schemas import UserBanCreate
 

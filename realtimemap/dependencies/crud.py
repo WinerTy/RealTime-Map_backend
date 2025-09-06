@@ -4,7 +4,7 @@ from fastapi import Depends
 
 from crud.category.repository import CategoryRepository
 from crud.mark import MarkRepository
-from crud.mark_comment.repository import MarkCommentRepository
+from crud.mark_comment.repository import MarkCommentRepository, CommentStatRepository
 from crud.request_log.repository import RequestLogRepository
 from crud.user.repository import UserRepository
 
@@ -33,3 +33,7 @@ async def get_mark_comment_repository(session: get_session) -> MarkCommentReposi
 
 async def get_user_repository(session: get_session) -> UserRepository:
     yield UserRepository(session=session)
+
+
+async def get_comment_stat_repository(session: get_session) -> CommentStatRepository:
+    yield CommentStatRepository(session=session)
