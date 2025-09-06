@@ -112,7 +112,7 @@ class AdminUser(ModelView):
         session.add(ban_data)
         await session.commit()
         await session.refresh(ban_data)
-        return f"User was banned: {valid_data.reason}"
+        return f"User was banned: {valid_data.reason.value}"
 
     @staticmethod
     def validate_action_form_data(data: FormData, user_id: int, moderator_id: int):
@@ -123,7 +123,7 @@ class AdminUser(ModelView):
                 "banned_until": data.get("banned_until", None),
                 "reason": data.get("reason"),
                 "reason_text": data.get("reason_text"),
-                "is_permanent": data.get("is_permanent"),
+                "is_permanent": data.get("is_permanent", False),
             }
             print(full_data.get("banned_until"))
             valid_data = UserBanCreate(**full_data)
