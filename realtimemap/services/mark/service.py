@@ -1,8 +1,7 @@
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
-
-from crud.mark import MarkRepository
+from crud.category import CategoryRepository
 from exceptions import RecordNotFoundError, UserPermissionError, TimeOutError
 from models import User, Mark
 from models.mark.schemas import (
@@ -10,18 +9,20 @@ from models.mark.schemas import (
     MarkRequestParams,
     UpdateMarkRequest,
 )
-
 from services.base import BaseService
 
 if TYPE_CHECKING:
-    pass
+    from sqlalchemy.ext.asyncio import AsyncSession
+    from websocket.mark_socket import MarkManager
+    from crud.mark import MarkRepository
+    from crud.mark_comment import MarkCommentRepository
 
 
 class MarkService(BaseService):
     def __init__(
         self,
         session: "AsyncSession",
-        mark_repo: MarkRepository,
+        mark_repo: "MarkRepository",
         category_repo: "CategoryRepository",
         mark_comment_repo: "MarkCommentRepository",
         manager: "MarkManager",

@@ -39,9 +39,9 @@ class UserRepository(BaseRepository[User, UserCreate, UserRead, UserUpdate]):
                 and_(
                     UsersBan.user_id == user_id,
                     or_(
-                        UsersBan.is_permanent == True,
+                        UsersBan.is_permanent,
                         and_(
-                            UsersBan.is_permanent == False,
+                            not UsersBan.is_permanent,
                             UsersBan.banned_until > current_time,
                         ),
                     ),

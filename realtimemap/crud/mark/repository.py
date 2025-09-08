@@ -26,6 +26,7 @@ from services.geo.service import GeoService
 
 if TYPE_CHECKING:
     from models import User
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
