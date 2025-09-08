@@ -1,14 +1,15 @@
 from typing import Annotated, TYPE_CHECKING
 
 from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from database.helper import db_helper
 from dependencies.crud import (
     get_mark_repository,
     get_category_repository,
     get_mark_comment_repository,
     get_comment_stat_repository,
 )
-from dependencies.session import get_session
 from dependencies.websocket import get_mark_websocket_manager
 from services.mark.service import MarkService
 from services.mark_comment.service import MarkCommentService
@@ -22,6 +23,8 @@ if TYPE_CHECKING:
         MarkCommentRepository,
         CommentStatRepository,
     )
+
+get_session = Annotated[AsyncSession, Depends(db_helper.session_getter)]
 
 
 async def get_mark_service(
