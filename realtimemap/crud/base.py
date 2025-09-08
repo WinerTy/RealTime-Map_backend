@@ -1,15 +1,17 @@
 import logging
-from typing import Generic, Type, Any, Optional, List, Union, Dict
+from typing import Generic, Type, Any, Optional, List, Union, Dict, TYPE_CHECKING
 
 from fastapi import HTTPException
 from sqlalchemy import select, delete, Select
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.expression import exists as sql_exists
 from starlette.responses import Response
 
 from my_type import Model, CreateSchema, ReadSchema, UpdateSchema
+
+if TYPE_CHECKING:
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger(__name__)
 
@@ -18,11 +20,11 @@ class BaseRepository(Generic[Model, CreateSchema, ReadSchema, UpdateSchema]):
     def __init__(
         self,
         model: Type[Model],
-        session: AsyncSession,
+        session: "AsyncSession",
         id_field: str = "id",
     ):
         self.model: Type[Model] = model
-        self.session: AsyncSession = session
+        self.session: "AsyncSession" = session
         self.id_field: str = id_field
 
     async def get_by_id(
@@ -76,7 +78,7 @@ class BaseRepository(Generic[Model, CreateSchema, ReadSchema, UpdateSchema]):
                 detail=f"Error in Repository Class, please check create method. {str(e)}",
             )
 
-    async def update(self, item_id: Any, data: UpdateSchema, *kwargs) -> Model:
+    async def update(self, item_id: Any, data: UpdateSchema) -> Model:
         try:
             instance = await self.get_by_id(item_id)
 

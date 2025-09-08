@@ -10,7 +10,8 @@ from models.base import BaseSqlModel
 from models.mixins import IntIdMixin, TimeMarkMixin
 
 if TYPE_CHECKING:
-    pass
+    from models.user.model import User
+    from models.category.model import Category
 
 
 class Mark(BaseSqlModel, IntIdMixin, TimeMarkMixin):

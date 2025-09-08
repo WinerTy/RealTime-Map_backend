@@ -1,9 +1,9 @@
-from sqlalchemy import Select, select
-from sqlalchemy.orm import selectinload, joinedload
+from sqlalchemy import Select
+from sqlalchemy.orm import selectinload
 from starlette.requests import Request
 from starlette_admin.contrib.sqla import ModelView
 
-from models import UsersBan, User
+from models import UsersBan
 
 
 class AdminUsersBans(ModelView):

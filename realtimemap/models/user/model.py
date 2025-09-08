@@ -12,13 +12,14 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy_file import ImageField
 
 from auth.user_database import MySQLAlchemyUserDatabase
-from models import BaseSqlModel, Mark, Comment
+from models import BaseSqlModel
 from models.mixins import IntIdMixin
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
-
-    # from models import UsersBan
+    from models.user_ban.model import UsersBan
+    from models.mark.model import Mark
+    from models.mark_comment.model import Comment
 
 
 class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
@@ -57,10 +58,10 @@ class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
     def __str__(self):
         return self.username
 
-    async def __admin_repr__(self, request: Request):
+    async def __admin_repr__(self, _: Request):
         return self.username
 
-    async def __admin_select2_repr__(self, request: Request) -> str:
+    async def __admin_select2_repr__(self, _: Request) -> str:
         temp = Template("""<span>{{email}}</span>""", autoescape=True)
         return temp.render(email=self.email)
 

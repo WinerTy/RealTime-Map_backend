@@ -22,6 +22,7 @@ log = logging.getLogger(__name__)
 class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     reset_password_token_secret = conf.api.v1.auth.reset_password_token_secret
     verification_token_secret = conf.api.v1.auth.verification_token_secret
+    # noinspection PyTypeHints
     user_db = MyBaseUserDatabase[UP, ID]
 
     async def on_after_register(

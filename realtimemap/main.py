@@ -9,7 +9,6 @@ from starlette.responses import FileResponse, StreamingResponse
 
 from core.app import create_app
 from core.config import conf
-from exceptions import UserPermissionError
 
 app = create_app()
 

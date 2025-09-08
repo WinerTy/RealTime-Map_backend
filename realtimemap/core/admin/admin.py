@@ -8,12 +8,11 @@ from core.admin.model import (
     AdminCategory,
     AdminUser,
     AdminMark,
-    AdminUsersBans,
 )
 from core.app.lifespan import ROOT_DIR
 from core.config import conf
 from database.helper import db_helper
-from models import Category, User, Mark, UsersBan
+from models import Category, User, Mark
 
 
 def setup_admin(app: FastAPI) -> None:

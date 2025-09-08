@@ -125,7 +125,6 @@ class AdminUser(ModelView):
                 "reason_text": data.get("reason_text"),
                 "is_permanent": data.get("is_permanent", False),
             }
-            print(full_data.get("banned_until"))
             valid_data = UserBanCreate(**full_data)
             return valid_data
         except ValueError as e:

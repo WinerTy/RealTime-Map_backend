@@ -2,9 +2,7 @@
 .git
 .gitignore
 __pycache__/
-*.pyc
 *.pyo
-*.pyd
 .venv/
 venv/
 docker-compose.yml

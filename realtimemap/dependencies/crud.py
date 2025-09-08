@@ -1,16 +1,22 @@
-from typing import Annotated
+from typing import Annotated, TYPE_CHECKING
 
 from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from crud.category.repository import CategoryRepository
 from crud.mark import MarkRepository
 from crud.mark_comment.repository import MarkCommentRepository, CommentStatRepository
 from crud.request_log.repository import RequestLogRepository
 from crud.user.repository import UserRepository
-
-from dependencies.session import get_session
+from database.helper import db_helper
 from services.geo.dependency import get_geo_service
 from services.geo.service import GeoService
+
+if TYPE_CHECKING:
+    pass
+
+
+get_session = Annotated[AsyncSession, Depends(db_helper.session_getter)]
 
 
 async def get_mark_repository(

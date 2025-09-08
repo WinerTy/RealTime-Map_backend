@@ -1,5 +1,5 @@
 import logging
-from typing import Annotated, List
+from typing import List, TYPE_CHECKING
 
 from fastapi import (
     APIRouter,
@@ -10,7 +10,7 @@ from fastapi import (
     Response,
 )
 
-from api.v1.auth.fastapi_users import current_user
+from api.v1.auth.fastapi_users import Annotated, get_current_user
 from dependencies.notification import (
     get_mark_notification_service,
 )
@@ -24,6 +24,10 @@ from models.mark.schemas import (
 )
 from services.mark.service import MarkService
 from services.notification import MarkNotificationService
+
+if TYPE_CHECKING:
+    from models import User
+
 
 router = APIRouter(prefix="/marks", tags=["Marks"])
 
@@ -55,7 +59,7 @@ async def get_marks(
 async def create_mark_point(
     background: BackgroundTasks,
     mark: Annotated[CreateMarkRequest, Form(media_type="multipart/form-data")],
-    user: current_user,
+    user: Annotated["User", Depends(get_current_user)],
     service: mark_service,
     request: Request,
     notification: mark_notification_service,
@@ -84,7 +88,7 @@ async def get_mark(mark_id: int, service: mark_service, request: Request):
 async def delete_mark(
     mark_id: int,
     background: BackgroundTasks,
-    user: current_user,
+    user: Annotated["User", Depends(get_current_user)],
     service: mark_service,
     request: Request,
     notification: mark_notification_service,
@@ -105,7 +109,7 @@ async def update_mark(
     mark_id: int,
     mark: Annotated[UpdateMarkRequest, Form(media_type="multipart/form-data")],
     service: mark_service,
-    user: current_user,
+    user: Annotated["User", Depends(get_current_user)],
     request: Request,
     background: BackgroundTasks,
     notification: mark_notification_service,

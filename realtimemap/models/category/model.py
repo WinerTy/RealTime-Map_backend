@@ -22,9 +22,9 @@ class Category(BaseSqlModel, IntIdMixin):
     # Meta Fields
     is_active: Mapped[bool] = mapped_column(default=True, nullable=False)
 
-    async def __admin_repr__(self, request: Request):
+    async def __admin_repr__(self, _: Request):
         return self.category_name
 
-    async def __admin_select2_repr__(self, request: Request) -> str:
+    async def __admin_select2_repr__(self, _: Request) -> str:
         temp = Template("""<span>{{category_name}}</span>""", autoescape=True)
         return temp.render(category_name=self.category_name)

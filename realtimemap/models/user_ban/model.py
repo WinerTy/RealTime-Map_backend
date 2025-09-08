@@ -9,8 +9,7 @@ from models.mixins import IntIdMixin
 from enum import Enum as PyEnum
 
 if TYPE_CHECKING:
-    # from models import User
-    pass
+    from models import User
 
 
 class BanReason(str, PyEnum):

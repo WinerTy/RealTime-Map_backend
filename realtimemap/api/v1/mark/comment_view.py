@@ -1,25 +1,18 @@
 from typing import Annotated, TYPE_CHECKING, List
 
 from fastapi import APIRouter, status, Depends
-from fastapi_cache.decorator import cache
-from fastapi_pagination import Page, Params
-from fastapi_pagination.ext.sqlalchemy import apaginate
 
-from api.v1.auth.fastapi_users import current_user
-from crud.mark_comment import MarkCommentRepository
-from dependencies.checker import check_mark_exist, check_mark_comment_exist
-from dependencies.crud import get_mark_comment_repository
-from dependencies.service import get_mark_service, get_mark_comment_service
-from models import Comment
+from api.v1.auth.fastapi_users import get_current_user
+from dependencies.checker import check_mark_exist
+from dependencies.service import get_mark_comment_service
 from models.mark_comment.schemas import (
     CreateCommentRequest,
-    CreateComment,
     ReadComment,
 )
-from services.mark_comment.service import MarkCommentService
 
 if TYPE_CHECKING:
-    pass
+    from services.mark_comment.service import MarkCommentService
+    from models import User
 
 router = APIRouter(
     prefix="/{mark_id}",
@@ -42,16 +35,14 @@ router = APIRouter(
     },
 )
 
-comment_service = Annotated[MarkCommentService, Depends(get_mark_comment_service)]
-
 
 @router.post(
     "/comments/",
 )
 async def create_comment_endpoint(
     mark_id: int,
-    service: comment_service,
-    user: current_user,
+    service: Annotated["MarkCommentService", Depends(get_mark_comment_service)],
+    user: Annotated["User", Depends(get_current_user)],
     create_data: CreateCommentRequest,
 ):
     result = await service.create_comment(
@@ -63,7 +54,7 @@ async def create_comment_endpoint(
 @router.get("/comments/", response_model=List[ReadComment])
 async def get_comments(
     mark_id: int,
-    service: comment_service,
+    service: Annotated["MarkCommentService", Depends(get_mark_comment_service)],
 ):
     result = await service.get_comments(mark_id=mark_id)
     return result

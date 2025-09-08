@@ -16,7 +16,7 @@ router = APIRouter(prefix="/category", tags=["Category"])
 @cache(expire=3600, namespace="category-list")
 async def get_all_sql(
     repo: Annotated["CategoryRepository", Depends(get_category_repository)],
-    params: Params = Depends(),
+    params: Params = Depends(),  # noqa Need for cache builder
 ):
     result = await apaginate(repo.session, repo.get_select_all())
     return result

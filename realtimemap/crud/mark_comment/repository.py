@@ -4,7 +4,7 @@ from sqlalchemy import select, Select
 from sqlalchemy.orm import selectinload
 
 from crud import BaseRepository
-from models import User, Comment, CommentStat
+from models import Comment, CommentStat
 from models.mark_comment.schemas import (
     CreateComment,
     UpdateComment,

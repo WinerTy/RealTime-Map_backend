@@ -25,7 +25,6 @@ async def get_current_user(
     user: User = Depends(current_active_user),
 ):
     user_ban = await user_repo.user_is_banned(user.id)
-    print(user_ban)
     if user_ban:
         raise UserPermissionError(
             detail="You are banned at this time.", status_code=status.HTTP_403_FORBIDDEN

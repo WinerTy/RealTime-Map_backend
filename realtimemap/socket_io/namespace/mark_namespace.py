@@ -1,3 +1,4 @@
+import logging
 from typing import Any, Optional
 
 from socketio import AsyncNamespace
@@ -5,6 +6,8 @@ from socketio import AsyncNamespace
 from crud.mark import MarkRepository
 from database.helper import db_helper
 from models.mark.schemas import MarkRequestParams, ReadMark
+
+logger = logging.getLogger(__name__)
 
 
 class MarksNamespace(AsyncNamespace):
@@ -35,5 +38,6 @@ class MarksNamespace(AsyncNamespace):
         try:
             valid_params = MarkRequestParams(**data)
             return valid_params
-        except Exception:
+        except Exception as e:
+            logger.error(f"Error on validate params in socker.io: {e}")
             return None
