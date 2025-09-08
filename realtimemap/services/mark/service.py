@@ -49,7 +49,8 @@ class MarkService(BaseService):
         return result
 
     async def get_marks(self, params: MarkRequestParams):
-        return await self.mark_repo.get_marks(params)
+        result = await self.mark_repo.get_marks(params)
+        return result
 
     async def _before_update_mark(
         self, mark_id: int, user: User, update_data: UpdateMarkRequest

@@ -73,7 +73,6 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
         )
 
         result = await self.session.execute(query)
-
         return result.scalars().all()
 
     def preparation_data(

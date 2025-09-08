@@ -11,10 +11,12 @@ logger = logging.getLogger(__name__)
 
 
 class MarksNamespace(AsyncNamespace):
-    async def on_connect(self, sid, environ, auth):
+    @staticmethod
+    async def on_connect(sid, environ, auth):
         print(auth)
 
-    async def on_disconnect(self, sid):
+    @staticmethod
+    async def on_disconnect(sid):
         print(sid, "disconnect")
 
     async def on_marks_message(self, sid, data):
