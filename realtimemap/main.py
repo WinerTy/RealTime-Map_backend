@@ -1,5 +1,3 @@
-import time
-
 from fastapi import Request, Path
 from fastapi.responses import RedirectResponse, ORJSONResponse
 from libcloud.storage.drivers.local import LocalStorageDriver
@@ -9,6 +7,7 @@ from starlette.responses import FileResponse, StreamingResponse
 
 from core.app import create_app
 from core.config import conf
+from exceptions import HttpIntegrityError
 
 app = create_app()
 
@@ -18,13 +17,13 @@ async def redirect_root():
     return RedirectResponse(url="/docs")
 
 
-@app.middleware("http")
-async def add_process_time_header(request: Request, call_next):
-    start_time = time.perf_counter()
-    response = await call_next(request)
-    process_time = time.perf_counter() - start_time
-    response.headers["X-Process-Time"] = str(process_time)
-    return response
+@app.exception_handler(HttpIntegrityError)
+async def http_exception_handler(_: Request, exc: HttpIntegrityError):
+    return ORJSONResponse(
+        status_code=exc.status_code,
+        content=exc.detail,
+        headers=exc.headers,
+    )
 
 
 blocked_resources = [".php", ".env"]
@@ -70,9 +69,6 @@ def serve_files(storage: str = Path(...), file_id: str = Path(...)):
 
     except ObjectDoesNotExistError or RuntimeError:
         return ORJSONResponse({"detail": "Not found"}, status_code=404)
-
-
-STATIC_DIR = conf.static
 
 
 if __name__ == "__main__":
