@@ -1,12 +1,12 @@
 from datetime import datetime
-from typing import TYPE_CHECKING
+from enum import Enum as PyEnum
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import ForeignKey, String, Enum, DateTime, func, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from models import BaseSqlModel
 from models.mixins import IntIdMixin
-from enum import Enum as PyEnum
 
 if TYPE_CHECKING:
     from models import User
@@ -33,6 +33,10 @@ class UsersBan(BaseSqlModel, IntIdMixin):
     banned_until: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     is_permanent: Mapped[bool] = mapped_column(Boolean, default=False)
 
+    unbanned_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    unbanned_by: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
     # FK
     user_id: Mapped[int] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), nullable=False
