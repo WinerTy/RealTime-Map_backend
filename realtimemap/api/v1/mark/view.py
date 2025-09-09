@@ -21,6 +21,7 @@ from models.mark.schemas import (
     MarkRequestParams,
     DetailMark,
     UpdateMarkRequest,
+    ActionType,
 )
 from services.mark.service import MarkService
 from services.notification import MarkNotificationService
@@ -71,7 +72,7 @@ async def create_mark_point(
     background.add_task(
         notification.notify_mark_action,
         mark=instance,
-        action="marks_created",
+        action=ActionType.CREATE.value,
         request=request,
     )
     return ReadMark.model_validate(instance, context={"request": request})
@@ -97,13 +98,13 @@ async def delete_mark(
     background.add_task(
         notification.notify_mark_action,
         mark=instance,
-        action="marks_deleted",
+        action=ActionType.DELETE.value,
         request=request,
     )
     return Response(status_code=204)
 
 
-# Compleat this
+# TODO Блять руки отрубить надо себе за такое
 @router.patch("/{mark_id}", response_model=ReadMark, status_code=200)
 async def update_mark(
     mark_id: int,
@@ -118,7 +119,7 @@ async def update_mark(
     background.add_task(
         notification.notify_mark_action,
         mark=result,
-        action="marks_updated",
+        action=ActionType.UPDATE.value,
         request=request,
     )
     return ReadMark.model_validate(result, context={"request": request})

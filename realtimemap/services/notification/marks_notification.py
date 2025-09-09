@@ -1,14 +1,13 @@
+import logging
 from typing import List, Optional, Dict, Set
 
+from fastapi import Request
 from socketio import AsyncServer
 
 from crud.mark import MarkRepository
 from models import Mark
-from models.mark.schemas import MarkRequestParams, action_type, ReadMark
+from models.mark.schemas import MarkRequestParams, ReadMark
 from services.geo.service import GeoService
-import logging
-from fastapi import Request
-
 from .base import BaseNotificationSocketIO
 
 logger = logging.getLogger(__name__)
@@ -24,7 +23,7 @@ class MarkNotificationService(BaseNotificationSocketIO):
         self.namespace: str = "/marks"
 
     async def notify_mark_action(
-        self, mark: Mark, action: action_type, request: Optional[Request] = None
+        self, mark: Mark, action: str, request: Optional[Request] = None
     ):
         try:
             room_sids = self.get_sids(self.namespace)
@@ -69,8 +68,7 @@ class MarkNotificationService(BaseNotificationSocketIO):
         for sid, params in sessions.items():
             if not params:
                 continue
-            print(params)
-            print(mark)
+
             if not self.geo_service.check_geohash_proximity(coords=params, mark=mark):
                 continue
 
@@ -81,7 +79,7 @@ class MarkNotificationService(BaseNotificationSocketIO):
         return targets
 
     async def _send_notifications(
-        self, targets: Set[str], action: action_type, mark_data: dict
+        self, targets: Set[str], action: str, mark_data: dict
     ) -> None:
         for sid in targets:
             try:

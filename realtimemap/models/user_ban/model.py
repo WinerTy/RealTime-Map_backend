@@ -18,6 +18,7 @@ class BanReason(str, PyEnum):
     other = "other"
 
 
+# TODO ADD INDEX
 class UsersBan(BaseSqlModel, IntIdMixin):
     reason: Mapped[str] = mapped_column(
         Enum(BanReason, name="ban_reason"),
