@@ -140,7 +140,7 @@ class AdminUser(BaseModelAdmin):
         text="Unban user",
         confirmation="Are you sure you want to unban this user?",
         icon_class="fas fa-check-circle",
-        submit_btn_text="Yes, Unban",
+        submit_btn_text="Yes, approved!",
         submit_btn_class="btn-success",
         action_btn_class="btn-info",
     )
@@ -157,6 +157,5 @@ class AdminUser(BaseModelAdmin):
             raise ActionFailed("User already unbanned")
 
         unban_data = UsersBanUpdate(unbanned_at=current_time, unbanned_by=moderator.id)
-        unban = await user_ban_repo.unban_user(user_id, unban_data)
-        print(unban)
-        return f"Ban for this user is: {is_banned}"
+        _ = await user_ban_repo.unban_user(user_id, unban_data)
+        return f"User was approved!"
