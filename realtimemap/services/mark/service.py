@@ -62,7 +62,8 @@ class MarkService(BaseService):
         3. Checking for editing timeout
         If additional checks are needed, add below
         """
-        await self._check_category_exist(update_data.category_id)
+        if update_data.category_id:
+            await self._check_category_exist(update_data.category_id)
         mark = await self._check_mark_ownership(mark_id, user)
         self._check_timeout(mark)
         return mark
