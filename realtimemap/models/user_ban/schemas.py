@@ -6,7 +6,11 @@ from pydantic import Field, field_validator, model_validator, BaseModel
 from models.user_ban.model import BanReason
 
 
-class UserBanCreate(BaseModel):
+class ReasonTextException(Exception):
+    pass
+
+
+class UsersBanCreate(BaseModel):
     user_id: Annotated[int, Field(description="User ID to ban")]
     moderator_id: Annotated[int, Field(description="Moderator ID who issues the ban")]
     reason_text: Annotated[
@@ -53,6 +57,19 @@ class UserBanCreate(BaseModel):
     def validate_reason_text_for_other(self) -> "UserBanCreate":
         """Validate reason text for 'other' reason"""
         if self.reason == BanReason.other and not self.reason_text:
-            raise ValueError("For reason 'other', you must specify 'reason_text'")
+            raise ReasonTextException(
+                "For reason 'other', you must specify 'reason_text'"
+            )
 
         return self
+
+
+class UsersBanRead(BaseModel):
+    pass
+
+
+class UsersBanUpdate(BaseModel):
+    unbanned_at: Annotated[
+        Optional[datetime], Field(description="Datetime to unbanned")
+    ]
+    unbanned_by: Annotated[Optional[int], Field(description="Unbanned by")]
