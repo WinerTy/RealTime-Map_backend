@@ -8,6 +8,7 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.expression import exists as sql_exists
 from starlette.responses import Response
 
+from exceptions import HttpIntegrityError
 from my_type import Model, CreateSchema, ReadSchema, UpdateSchema
 
 if TYPE_CHECKING:
@@ -67,7 +68,7 @@ class BaseRepository(Generic[Model, CreateSchema, ReadSchema, UpdateSchema]):
                 f"Record {data} already exists in Repository: {self.model.__name__}"
             )
             await self.session.rollback()
-            raise HTTPException(status_code=400, detail="Record already exists")  # TODO
+            raise HttpIntegrityError()
         except Exception as e:
             logger.error(
                 f"Create record {data} in Repository: {self.model.__name__}", e
