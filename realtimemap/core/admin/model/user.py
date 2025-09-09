@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from typing import Dict, Any
 
 from fastapi_users.password import PasswordHelper
@@ -12,15 +13,14 @@ from starlette_admin import (
     BooleanField,
     row_action,
 )
-from starlette_admin.contrib.sqla import ModelView
 from starlette_admin.exceptions import FormValidationError, ActionFailed
 
+from core.admin.model.base import BaseModelAdmin
 from core.app.lifespan import ROOT_DIR
-from crud.user.repository import UserRepository
-from models import User, UsersBan
+from crud.user_ban.repository import UsersBanRepository
+from models import User
 from models.user_ban.model import BanReason
-
-from models.user_ban.schemas import UserBanCreate
+from models.user_ban.schemas import UsersBanCreate, ReasonTextException, UsersBanUpdate
 
 # Пиздец Maybe FIX
 template_dir = os.path.join(ROOT_DIR, "templates")
@@ -33,7 +33,7 @@ def generate_ban_form():
     return template.render(ban_reasons=ban_reasons)
 
 
-class AdminUser(ModelView):
+class AdminUser(BaseModelAdmin):
     fields = [
         User.id,
         User.username,
@@ -99,23 +99,21 @@ class AdminUser(ModelView):
 
         # Ban Checking
         session: AsyncSession = request.state.session
-        user_repo = UserRepository(session)
-        is_banned = await user_repo.user_is_banned(pk)
+        user_ban_repo = UsersBanRepository(session)
+        is_banned = await user_ban_repo.check_active_user_ban(pk)
         if is_banned:
             raise ActionFailed("User already banned")
 
         # Validate form data
         data: FormData = await request.form()
-        valid_data = self.validate_action_form_data(data, pk, current_user.id)
+        valid_data = self._validate_action_form_data(data, pk, current_user.id)
 
-        ban_data = UsersBan(**valid_data.model_dump())
-        session.add(ban_data)
-        await session.commit()
-        await session.refresh(ban_data)
+        await user_ban_repo.ban_user(valid_data)
+
         return f"User was banned: {valid_data.reason.value}"
 
     @staticmethod
-    def validate_action_form_data(data: FormData, user_id: int, moderator_id: int):
+    def _validate_action_form_data(data: FormData, user_id: int, moderator_id: int):
         try:
             full_data = {
                 "user_id": user_id,
@@ -125,9 +123,11 @@ class AdminUser(ModelView):
                 "reason_text": data.get("reason_text"),
                 "is_permanent": data.get("is_permanent", False),
             }
-            valid_data = UserBanCreate(**full_data)
+            valid_data = UsersBanCreate(**full_data)
             return valid_data
         except ValueError as e:
+            raise ActionFailed(str(e))
+        except ReasonTextException as e:
             raise ActionFailed(str(e))
 
     @staticmethod
@@ -135,7 +135,28 @@ class AdminUser(ModelView):
         if current_user_id == ban_user_id:
             raise ActionFailed("Can be ban yourself!")
 
-    @staticmethod
-    def get_current_user(request: Request) -> User:
-        user: User = request.state.user
-        return user if user is not None else None
+    @row_action(
+        name="unban_user",
+        text="Unban user",
+        confirmation="Are you sure you want to unban this user?",
+        icon_class="fas fa-check-circle",
+        submit_btn_text="Yes, Unban",
+        submit_btn_class="btn-success",
+        action_btn_class="btn-info",
+    )
+    async def unban_user_row_action(self, request: Request, pk: Any) -> str:
+        user_id = int(pk)
+        moderator = self.get_current_user(request)
+        session: AsyncSession = request.state.session
+        current_time = datetime.now()
+        user_ban_repo = UsersBanRepository(session)
+
+        is_banned = await user_ban_repo.check_active_user_ban(user_id)
+
+        if not is_banned:
+            raise ActionFailed("User already unbanned")
+
+        unban_data = UsersBanUpdate(unbanned_at=current_time, unbanned_by=moderator.id)
+        unban = await user_ban_repo.unban_user(user_id, unban_data)
+        print(unban)
+        return f"Ban for this user is: {is_banned}"
