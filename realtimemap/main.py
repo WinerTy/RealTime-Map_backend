@@ -12,11 +12,6 @@ from exceptions import HttpIntegrityError
 app = create_app()
 
 
-@app.get("/", tags=["Root"], status_code=307)
-async def redirect_root():
-    return RedirectResponse(url="/docs")
-
-
 @app.exception_handler(HttpIntegrityError)
 async def http_exception_handler(_: Request, exc: HttpIntegrityError):
     return ORJSONResponse(
@@ -26,19 +21,9 @@ async def http_exception_handler(_: Request, exc: HttpIntegrityError):
     )
 
 
-blocked_resources = [".php", ".env"]
-
-
-@app.middleware("http")
-async def secure_headers(request: Request, call_next):
-    path = request.url.path.lower()
-    for resource in blocked_resources:
-        if resource in path:
-            return ORJSONResponse(
-                status_code=403, content={"detail": "Blocked resource"}
-            )
-
-    return await call_next(request)
+@app.get("/", tags=["Root"], status_code=307)
+async def redirect_root():
+    return RedirectResponse(url="/docs")
 
 
 @app.get("/media/{storage}/{file_id}", tags=["Root"], name="get_file")
