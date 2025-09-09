@@ -8,6 +8,7 @@ from crud.mark import MarkRepository
 from crud.mark_comment.repository import MarkCommentRepository, CommentStatRepository
 from crud.request_log.repository import RequestLogRepository
 from crud.user.repository import UserRepository
+from crud.user_ban.repository import UsersBanRepository
 from database.helper import db_helper
 from services.geo.dependency import get_geo_service
 from services.geo.service import GeoService
@@ -43,3 +44,7 @@ async def get_user_repository(session: get_session) -> UserRepository:
 
 async def get_comment_stat_repository(session: get_session) -> CommentStatRepository:
     yield CommentStatRepository(session=session)
+
+
+async def get_user_ban_repository(session: get_session) -> UsersBanRepository:
+    yield UsersBanRepository(session=session)

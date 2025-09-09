@@ -13,6 +13,7 @@ from starlette.staticfiles import StaticFiles
 from api.v1 import router as v1_router
 from core.admin.admin import setup_admin
 from core.config import conf
+from middleware import ProcessTimeMiddleware
 from .lifespan import lifespan
 from .socket import sio_app
 
@@ -68,8 +69,6 @@ def create_app() -> FastAPI:
     setup_file_storage()
     setup_logging()
     app = FastAPI(lifespan=lifespan, default_response_class=ORJSONResponse)
-    # root_dit = app.state.root_dir
-    # print(root_dit)
     app.mount(
         "/static", StaticFiles(directory=ROOT_DIR.parent / conf.static), name="static"
     )
@@ -79,6 +78,7 @@ def create_app() -> FastAPI:
     mount_socket_io(app)
     setup_pagination(app)
     setup_admin(app)
+    app.add_middleware(ProcessTimeMiddleware)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
