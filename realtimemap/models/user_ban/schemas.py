@@ -43,7 +43,7 @@ class UsersBanCreate(BaseModel):
         return v
 
     @model_validator(mode="after")
-    def validate_ban_duration(self) -> "UserBanCreate":
+    def validate_ban_duration(self) -> "UsersBanCreate":
         """Validate the relationship between is_permanent and banned_until"""
         if self.is_permanent and self.banned_until is not None:
             raise ValueError("For permanent bans, banned_until must be None")
@@ -54,7 +54,7 @@ class UsersBanCreate(BaseModel):
         return self
 
     @model_validator(mode="after")
-    def validate_reason_text_for_other(self) -> "UserBanCreate":
+    def validate_reason_text_for_other(self) -> "UsersBanCreate":
         """Validate reason text for 'other' reason"""
         if self.reason == BanReason.other and not self.reason_text:
             raise ReasonTextException(
