@@ -127,9 +127,8 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
         Raises:
             HTTPException: 404 if the mark is not found
         """
-        stmt = select(self.model).where(self.model.id == mark_id)
-        result = await self.session.execute(stmt)
-        return result.scalar_one_or_none()
+        result = await self.get_by_id(mark_id, join_related=["category"])
+        return result
 
     async def delete_mark(self, mark_id: int) -> Mark:
         """
@@ -171,7 +170,8 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
         stmt = select(exp)
 
         result = await self.session.execute(stmt)
-        return result.scalar()
+        distance = result.scalar()
+        return distance <= radius
 
     async def update_mark(
         self, mark_id: int, update_data: UpdateMarkRequest, user: "User"
