@@ -21,7 +21,12 @@ if TYPE_CHECKING:
 class AdminMark(ModelView):
     fields = [
         Mark.id,
-        GeomField("geom", srid=4326, required=True),
+        GeomField(
+            "geom",
+            srid=4326,
+            required=True,
+            help_text="Latitude/Longitude. Example: 61.250, 73.3960.\nMap integrate in future!",
+        ),
         GeoHashField(
             "geohash",
             required=False,
