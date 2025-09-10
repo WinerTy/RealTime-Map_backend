@@ -52,43 +52,46 @@ class MarkService(BaseService):
         result = await self.mark_repo.get_marks(params)
         return result
 
-    async def _before_update_mark(
-        self, mark_id: int, user: User, update_data: UpdateMarkRequest
-    ) -> Mark:
-        """
-        The method is called before updating
-        1. Checks the existence of the selected category
-        2.Checking the existence of a post and the author of the post
-        3. Checking for editing timeout
-        If additional checks are needed, add below
-        """
-        if update_data.category_id:
-            await self._check_category_exist(update_data.category_id)
-        mark = await self._check_mark_ownership(mark_id, user)
-        self._check_timeout(mark)
-        return mark
+    async def delete_mark(self, mark_id: int, user: User):
+        mark = await self.get_mark_by_id(mark_id)
+        await self._check_mark_ownership(mark, user)
+        result = await self.mark_repo.delete_mark(mark.id)
+        return result
 
     async def update_mark(
         self, user: User, update_data: UpdateMarkRequest, mark_id: int
     ) -> Mark:
-        mark = await self._before_update_mark(mark_id, user, update_data)
+        mark = await self.mark_repo.get_mark_by_id(mark_id)
+        await self._before_update_mark(mark, user, update_data)
         return await self.mark_repo.update_mark(mark.id, update_data, user)
 
-    async def delete_mark(self, mark_id: int, user: User):
-        mark = await self._check_mark_ownership(mark_id, user)
-        result = await self.mark_repo.delete_mark(mark.id)
-        return result
+    async def _before_update_mark(
+        self, mark: Mark, user: User, update_data: UpdateMarkRequest
+    ) -> Mark:
+        """
+        The method is called before updating
+        1. Checks the existence of the selected category
+        2. Checking the existence of a post and the author of the post
+        3. Checking for editing timeout
+        If additional checks are needed, add below
+        """
+        await self._check_category_exist(update_data)
+        await self._check_mark_ownership(mark, user)
+        self._check_timeout(mark)
+        return mark
 
-    async def _check_mark_ownership(self, mark_id: int, user: User) -> Mark:
-        mark = await self.mark_repo.get_mark_by_id(mark_id)
+    @staticmethod
+    async def _check_mark_ownership(mark: Mark, user: User) -> None:
         if not mark:
             raise RecordNotFoundError()
         if mark.owner_id != user.id:
             raise UserPermissionError(status_code=403)
-        return mark
 
-    async def _check_category_exist(self, category_id: int) -> None:
-        category_exist = await self.category_repo.exist(category_id)
+    async def _check_category_exist(self, update_data: UpdateMarkRequest) -> None:
+        if not update_data.category_id:
+            return
+
+        category_exist = await self.category_repo.exist(update_data.category_id)
         if not category_exist:
             raise RecordNotFoundError()
 

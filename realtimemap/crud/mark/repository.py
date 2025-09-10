@@ -98,7 +98,11 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
             **mark_data,
             geom=geom,
             owner_id=user.id,
-            geohash=self.geo_service.get_geohash(mark),
+            geohash=(
+                self.geo_service.get_geohash(mark)
+                if mark.longitude and mark.latitude
+                else None
+            ),
         )
         return formated_data
 

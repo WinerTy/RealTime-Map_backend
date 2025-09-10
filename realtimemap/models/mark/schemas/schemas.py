@@ -52,7 +52,9 @@ class UpdateMark(BaseModel):
     start_at: Annotated[Optional[datetime], Field(None, description="Current date")]
     duration: Annotated[Optional[int], Field(None, description="Duration in hours.")]
     category_id: Annotated[Optional[int], Field(None, description="Category id")]
-    geohash: Annotated[str, Field(..., description="Geohash sector for this mark")]
+    geohash: Annotated[
+        Optional[str], Field(None, description="Geohash sector for this mark")
+    ]
 
 
 class ReadMark(CommonMarkFields):
@@ -61,6 +63,7 @@ class ReadMark(CommonMarkFields):
     """
 
     id: Annotated[int, Field(..., description="Mark id")]
+    mark_name: Annotated[str, Field(..., description="Mark name")]
     owner_id: Annotated[int, Field(..., description="Owner id")]
     geom: Annotated[Point, Field(..., description="Geometry of mark")]
     photo: Annotated[

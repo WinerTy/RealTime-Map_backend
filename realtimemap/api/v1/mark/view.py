@@ -104,7 +104,6 @@ async def delete_mark(
     return Response(status_code=204)
 
 
-# TODO Блять руки отрубить надо себе за такое
 @router.patch("/{mark_id}", response_model=ReadMark, status_code=200)
 async def update_mark(
     mark_id: int,
