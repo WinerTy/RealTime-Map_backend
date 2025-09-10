@@ -5,7 +5,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from crud.category.repository import CategoryRepository
 from crud.mark import MarkRepository
-from crud.mark_comment.repository import MarkCommentRepository, CommentStatRepository
+from crud.mark_comment.repository import (
+    MarkCommentRepository,
+    CommentStatRepository,
+    CommentReactionRepository,
+)
 from crud.request_log.repository import RequestLogRepository
 from crud.user.repository import UserRepository
 from crud.user_ban.repository import UsersBanRepository
@@ -44,6 +48,12 @@ async def get_user_repository(session: get_session) -> UserRepository:
 
 async def get_comment_stat_repository(session: get_session) -> CommentStatRepository:
     yield CommentStatRepository(session=session)
+
+
+async def get_comment_reaction_repository(
+    session: get_session,
+) -> CommentReactionRepository:
+    yield CommentReactionRepository(session=session)
 
 
 async def get_user_ban_repository(session: get_session) -> UsersBanRepository:

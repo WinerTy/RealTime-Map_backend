@@ -6,7 +6,6 @@ from sqlalchemy import select, delete, Select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.expression import exists as sql_exists
-from starlette.responses import Response
 
 from exceptions import HttpIntegrityError
 from my_type import Model, CreateSchema, ReadSchema, UpdateSchema
@@ -98,7 +97,7 @@ class BaseRepository(Generic[Model, CreateSchema, ReadSchema, UpdateSchema]):
             await self.session.rollback()
             raise HTTPException(status_code=500, detail=str(e))
 
-    async def delete(self, record_id: Any) -> Response:
+    async def delete(self, record_id: Any) -> Model:
         try:
             record = await self.get_by_id(record_id)
             stmt = delete(self.model).where(
@@ -109,7 +108,7 @@ class BaseRepository(Generic[Model, CreateSchema, ReadSchema, UpdateSchema]):
             )
             await self.session.execute(stmt)
             await self.session.commit()
-            return Response(status_code=204)
+            return record
         except Exception as e:
             logger.error(
                 f"Delete record {record_id} by id in Repository: {self.model.__name__}. ",

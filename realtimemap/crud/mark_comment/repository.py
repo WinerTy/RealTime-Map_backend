@@ -1,10 +1,10 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import select, Select
 from sqlalchemy.orm import selectinload
 
 from crud import BaseRepository
-from models import Comment, CommentStat
+from models import Comment, CommentStat, CommentReaction
 from models.mark_comment.schemas import (
     CreateComment,
     UpdateComment,
@@ -12,6 +12,9 @@ from models.mark_comment.schemas import (
     CreateCommentStat,
     ReadCommentStat,
     UpdateCommentStat,
+    CreateCommentReaction,
+    ReadCommentReaction,
+    UpdateCommentReaction,
 )
 
 if TYPE_CHECKING:
@@ -71,3 +74,39 @@ class CommentStatRepository(
     async def create_base_stat(self, comment_id: int) -> None:
         data = CreateCommentStat(comment_id=comment_id)
         await self.create(data=data)
+
+
+class CommentReactionRepository(
+    BaseRepository[
+        CommentReaction,
+        CreateCommentReaction,
+        ReadCommentReaction,
+        UpdateCommentReaction,
+    ]
+):
+    def __init__(self, session: "AsyncSession"):
+        super().__init__(session=session, model=CommentReaction)
+
+    async def create_comment_reaction(self, data: CreateCommentReaction):
+        result = await self.create(data=data)
+        return result
+
+    async def get_comment_reaction(
+        self, user_id: int, comment_id: int
+    ) -> Optional[CommentReaction]:
+        stmt = select(self.model).where(
+            self.model.user_id == user_id, self.model.comment_id == comment_id
+        )
+        result = await self.session.execute(stmt)
+        comment = result.scalar_one_or_none()
+        return comment
+
+    async def update_comment_reaction(
+        self, comment_reaction_id: int, data: UpdateCommentReaction
+    ):
+        result = await self.update(comment_reaction_id, data)
+        return result
+
+    async def delete_comment_reaction(self, comment_reaction_id: int):
+        result = await self.delete(comment_reaction_id)
+        return result

@@ -13,8 +13,8 @@ class Coordinates(BaseModel):
     Two fields required!
     """
 
-    longitude: Annotated[float, Field(..., ge=-180, le=180, examples=["63.201907"])]
     latitude: Annotated[float, Field(..., ge=-90, le=90, examples=["75.445675"])]
+    longitude: Annotated[float, Field(..., ge=-180, le=180, examples=["63.201907"])]
 
 
 class CoordinatesOptional(BaseModel):
@@ -23,11 +23,11 @@ class CoordinatesOptional(BaseModel):
     Two fields not required!
     """
 
-    longitude: Annotated[
-        Optional[float], Field(None, ge=-180, le=180, examples=["63.201907"])
-    ]
     latitude: Annotated[
         Optional[float], Field(None, ge=-90, le=90, examples=["75.445675"])
+    ]
+    longitude: Annotated[
+        Optional[float], Field(None, ge=-180, le=180, examples=["63.201907"])
     ]
 
 

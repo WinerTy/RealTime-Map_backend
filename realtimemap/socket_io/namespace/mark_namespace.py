@@ -10,6 +10,7 @@ from models.mark.schemas import MarkRequestParams, ReadMark
 logger = logging.getLogger(__name__)
 
 
+# TODO СДЕЛАТЬ РУМЫ ПО ГЕОХЭШУ ДЛЯ СОКРАЩЕНИЯ ЧИСЛА ЗАПРОСОВ
 class MarksNamespace(AsyncNamespace):
     @staticmethod
     async def on_connect(sid, environ, auth):

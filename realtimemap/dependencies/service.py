@@ -3,12 +3,14 @@ from typing import Annotated, TYPE_CHECKING
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from crud.mark_comment.repository import CommentReactionRepository
 from database.helper import db_helper
 from dependencies.crud import (
     get_mark_repository,
     get_category_repository,
     get_mark_comment_repository,
     get_comment_stat_repository,
+    get_comment_reaction_repository,
 )
 from dependencies.websocket import get_mark_websocket_manager
 from services.mark.service import MarkService
@@ -53,7 +55,13 @@ async def get_mark_comment_service(
     comment_stat_repo: Annotated[
         "CommentStatRepository", Depends(get_comment_stat_repository)
     ],
+    comment_reaction_repo: Annotated[
+        "CommentReactionRepository", Depends(get_comment_reaction_repository)
+    ],
 ) -> MarkCommentService:
     yield MarkCommentService(
-        session=session, comment_repo=comment_repo, comment_stat_repo=comment_stat_repo
+        session=session,
+        comment_repo=comment_repo,
+        comment_stat_repo=comment_stat_repo,
+        comment_reaction_repo=comment_reaction_repo,
     )
