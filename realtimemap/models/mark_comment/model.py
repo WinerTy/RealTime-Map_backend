@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import Enum as PyEnum
 from typing import TYPE_CHECKING, Optional, List
 
 from sqlalchemy import (
@@ -12,6 +13,7 @@ from sqlalchemy import (
     Index,
     event,
     Connection,
+    Enum,
 )
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import mapped_column, Mapped, relationship
@@ -22,6 +24,11 @@ from models.mixins import IntIdMixin, TimeMarkMixin
 if TYPE_CHECKING:
     from models.mark.model import Mark
     from models.user.model import User
+
+
+class CommentReactionType(str, PyEnum):
+    like = "like"
+    dislike = "dislike"
 
 
 class MarkComment(BaseSqlModel, IntIdMixin, TimeMarkMixin):
@@ -84,7 +91,12 @@ class CommentReaction(BaseSqlModel, IntIdMixin, TimeMarkMixin):
         ForeignKey("comments.id", ondelete="CASCADE"), nullable=False
     )
     # cols
-    is_like: Mapped[bool] = mapped_column(Boolean, default=False)
+    reaction_type: Mapped[str] = mapped_column(
+        Enum(CommentReactionType, name="comment_reaction_type"),
+        nullable=False,
+        server_default=CommentReactionType.like.value,
+        default=CommentReactionType.like,
+    )
 
     # RS
     #
