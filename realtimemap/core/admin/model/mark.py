@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Dict, Any
+from typing import Dict, Any, TYPE_CHECKING
 
 from starlette.requests import Request
 from starlette_admin import HasOne, IntegerField, DateTimeField
@@ -8,7 +8,14 @@ from starlette_admin.exceptions import FormValidationError
 
 from core.admin.fields import GeomField
 from core.admin.fields.geohash_field import GeoHashField
+from core.app.socket import sio
+from crud.mark import MarkRepository
 from models import Mark
+from models.mark.schemas import ActionType
+from services.notification import MarkNotificationService
+
+if TYPE_CHECKING:
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class AdminMark(ModelView):
@@ -61,10 +68,20 @@ class AdminMark(ModelView):
 
         return await super().validate(request, data)
 
-    # TODO integrate notify service
+    @staticmethod  # TODO Maybe rework!
+    async def send_notify_mark_action(
+        request: Request, mark: Mark, action_type: str
+    ) -> None:
+        session: "AsyncSession" = request.state.session
+        mark_repo = MarkRepository(session)
+        notify_service = MarkNotificationService(mark_repo, sio)
+        await notify_service.notify_mark_action(mark, action_type, request)
+
     async def after_create(self, request: Request, obj: Mark) -> None:
-        pass
+        await self.send_notify_mark_action(request, obj, ActionType.CREATE.value)
 
     async def after_edit(self, request: Request, obj: Mark) -> None:
-        # await notify_mark_action(action="marks_updated", request=request, mark=obj)
-        pass
+        await self.send_notify_mark_action(request, obj, ActionType.UPDATE.value)
+
+    async def after_delete(self, request: Request, obj: Any) -> None:
+        await self.send_notify_mark_action(request, obj, ActionType.DELETE.value)

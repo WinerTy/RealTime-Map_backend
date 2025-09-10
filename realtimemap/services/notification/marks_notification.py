@@ -15,7 +15,10 @@ logger = logging.getLogger(__name__)
 
 class MarkNotificationService(BaseNotificationSocketIO):
     def __init__(
-        self, mark_repo: MarkRepository, sio: AsyncServer, geo_service: GeoService
+        self,
+        mark_repo: MarkRepository,
+        sio: AsyncServer,
+        geo_service: GeoService = GeoService(),
     ):
         super().__init__(sio)
         self.mark_repo = mark_repo
@@ -68,7 +71,7 @@ class MarkNotificationService(BaseNotificationSocketIO):
         for sid, params in sessions.items():
             if not params:
                 continue
-
+            db = self.geo_service.check_geohash_proximity(coords=params, mark=mark)
             if not self.geo_service.check_geohash_proximity(coords=params, mark=mark):
                 continue
 
