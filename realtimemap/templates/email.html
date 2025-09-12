@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realtime Map - Уведомление</title>
+    <style>
+        /* Базовые стили для email */
+        body, table, td, a {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+
+        table {
+            border-collapse: collapse;
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+
+        img {
+            -ms-interpolation-mode: bicubic;
+            border: 0;
+            height: auto;
+            line-height: 100%;
+            outline: none;
+            text-decoration: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Основные стили */
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+            color: #333333;
+        }
+
+        .email-container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .header {
+            background-color: #f9f9f9;
+            padding: 25px 30px;
+            text-align: center;
+            border-bottom: 3px solid #8A2BE2;
+        }
+
+        .logo {
+            color: #8A2BE2;
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .footer {
+            background-color: #f9f9f9;
+            padding: 20px 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #777777;
+        }
+
+        h1 {
+            color: #8A2BE2;
+            font-size: 24px;
+            margin-top: 0;
+        }
+
+        p {
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #8A2BE2;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: #eeeeee;
+            margin: 25px 0;
+        }
+
+        .map-preview {
+            background-color: #f5f5f5;
+            border-radius: 6px;
+            padding: 15px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .social-links a {
+            display: inline-block;
+            margin: 0 10px;
+            color: #8A2BE2;
+            text-decoration: none;
+        }
+
+        @media screen and (max-width: 600px) {
+            .container {
+                width: 100% !important;
+            }
+
+            .content, .header, .footer {
+                padding: 20px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+<center class="container">
+    <table class="email-container" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <!-- Шапка -->
+        <tr>
+            <td class="header">
+                <a href="#" class="logo">Realtime Map</a>
+            </td>
+        </tr>
+
+        <!-- Контент -->
+        <tr>
+            <td class="content">
+                <h1>Добро пожаловать, {Username}!</h1>
+                <p>Мы рады, что вы присоединились к нашему сервису отслеживания локаций в реальном времени. Теперь вы
+                    можете отслеживать перемещения и просматривать данные о местоположении в удобном формате.</p>
+
+                <div class="map-preview">
+                    <p>📍 Ваша карта готова к использованию</p>
+                </div>
+
+                <p>Начните исследовать возможности нашей платформы:</p>
+
+                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td width="30" style="vertical-align: top;">🔹</td>
+                        <td>Отслеживайте перемещения в реальном времени</td>
+                    </tr>
+                    <tr>
+                        <td width="30" style="vertical-align: top;">🔹</td>
+                        <td>Сохраняйте историю маршрутов</td>
+                    </tr>
+                    <tr>
+                        <td width="30" style="vertical-align: top;">🔹</td>
+                        <td>Делитесь своим местоположением с друзьями</td>
+                    </tr>
+                </table>
+
+                <div class="divider"></div>
+
+                <center>
+                    <a href="#" class="button">Открыть карту</a>
+                </center>
+            </td>
+        </tr>
+
+        <!-- Футер -->
+        <tr>
+            <td class="footer">
+                <p>© 2023 Realtime Map. Все права защищены.</p>
+                <p>Вы получили это письмо, так как зарегистрировались в нашем сервисе.<br>
+                    <a href="#" style="color: #8A2BE2;">Отписаться от рассылки</a></p>
+
+                <p class="social-links">
+                    <a href="#">Twitter</a> •
+                    <a href="#">Facebook</a> •
+                    <a href="#">Instagram</a>
+                </p>
+            </td>
+        </tr>
+    </table>
+</center>
+</body>
+</html>
