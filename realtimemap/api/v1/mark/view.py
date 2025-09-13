@@ -10,7 +10,7 @@ from fastapi import (
     Response,
 )
 
-from api.v1.auth.fastapi_users import Annotated, get_current_user
+from api.v1.auth.fastapi_users import Annotated, get_current_user_without_ban
 from dependencies.notification import (
     get_mark_notification_service,
 )
@@ -60,7 +60,7 @@ async def get_marks(
 async def create_mark_point(
     background: BackgroundTasks,
     mark: Annotated[CreateMarkRequest, Form(media_type="multipart/form-data")],
-    user: Annotated["User", Depends(get_current_user)],
+    user: Annotated["User", Depends(get_current_user_without_ban)],
     service: mark_service,
     request: Request,
     notification: mark_notification_service,
@@ -89,7 +89,7 @@ async def get_mark(mark_id: int, service: mark_service, request: Request):
 async def delete_mark(
     mark_id: int,
     background: BackgroundTasks,
-    user: Annotated["User", Depends(get_current_user)],
+    user: Annotated["User", Depends(get_current_user_without_ban)],
     service: mark_service,
     request: Request,
     notification: mark_notification_service,
@@ -109,7 +109,7 @@ async def update_mark(
     mark_id: int,
     mark: Annotated[UpdateMarkRequest, Form(media_type="multipart/form-data")],
     service: mark_service,
-    user: Annotated["User", Depends(get_current_user)],
+    user: Annotated["User", Depends(get_current_user_without_ban)],
     request: Request,
     background: BackgroundTasks,
     notification: mark_notification_service,

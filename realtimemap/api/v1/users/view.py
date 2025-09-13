@@ -5,7 +5,7 @@ from fastapi_cache.decorator import cache
 from fastapi_limiter.depends import RateLimiter
 from starlette.responses import Response
 
-from api.v1.auth.fastapi_users import get_current_user
+from api.v1.auth.fastapi_users import get_current_user_without_ban
 from dependencies.crud import get_user_repository
 from models.user.schemas import UserRead, UserUpdate
 
@@ -22,7 +22,9 @@ router = APIRouter(prefix="/user", tags=["user"])
     response_model=UserRead,
 )
 @cache(expire=3600, namespace="user")
-async def me(user: Annotated["User", Depends(get_current_user)], request: Request):
+async def me(
+    user: Annotated["User", Depends(get_current_user_without_ban)], request: Request
+):
     return UserRead.model_validate(user, context={"request": request})
 
 
@@ -32,7 +34,7 @@ async def me(user: Annotated["User", Depends(get_current_user)], request: Reques
     dependencies=[Depends(RateLimiter(times=2, minutes=5))],
 )
 async def update_me(
-    user: Annotated["User", Depends(get_current_user)],
+    user: Annotated["User", Depends(get_current_user_without_ban)],
     update_data: Annotated[UserUpdate, Form(media_type="multipart/form-data")],
     repo: Annotated["UserRepository", Depends(get_user_repository)],
     request: Request,
@@ -43,7 +45,7 @@ async def update_me(
 
 @router.delete("/me", status_code=204, response_class=Response)
 async def delete_me(
-    user: Annotated["User", Depends(get_current_user)],
+    user: Annotated["User", Depends(get_current_user_without_ban)],
     repo: Annotated["UserRepository", Depends(get_user_repository)],
 ):
     return await repo.delete_user(user)
