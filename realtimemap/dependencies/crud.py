@@ -4,6 +4,7 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from crud.category.repository import CategoryRepository
+from crud.chat.repository import ChatRepository
 from crud.mark import MarkRepository
 from crud.mark_comment.repository import (
     MarkCommentRepository,
@@ -58,3 +59,7 @@ async def get_comment_reaction_repository(
 
 async def get_user_ban_repository(session: get_session) -> UsersBanRepository:
     yield UsersBanRepository(session=session)
+
+
+async def get_chat_repository(session: get_session) -> ChatRepository:
+    yield ChatRepository(session=session)
