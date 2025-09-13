@@ -16,7 +16,7 @@ from sqlalchemy import (
     Enum,
 )
 from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy.orm import mapped_column, Mapped, relationship
+from sqlalchemy.orm import mapped_column, Mapped, relationship, Session
 
 from models import BaseSqlModel
 from models.mixins import IntIdMixin, TimeMarkMixin
@@ -133,3 +133,9 @@ def create_base_stats(mapper, connection: Connection, target: Comment):
             comment_id=target.id,
         )
     )
+
+
+# TODO ивент для автоматического обновления статистики
+@event.listens_for(Session, "before_flush")
+def update_comment_stats(session: Session, flush_context, instances):
+    pass

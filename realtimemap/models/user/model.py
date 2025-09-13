@@ -20,6 +20,7 @@ if TYPE_CHECKING:
     from models.user_ban.model import UsersBan
     from models.mark.model import Mark
     from models.mark_comment.model import Comment
+    from models.message.model import Chat
 
 
 class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
@@ -49,6 +50,9 @@ class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
     )
     given_bans: Mapped[List["UsersBan"]] = relationship(
         back_populates="moderator", foreign_keys="UsersBan.moderator_id"
+    )
+    chats: Mapped[List["Chat"]] = relationship(
+        secondary="chat_participants", back_populates="participants"
     )
 
     @classmethod
