@@ -1,8 +1,10 @@
 from typing import Annotated, TYPE_CHECKING, List
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, BackgroundTasks
 
 from api.v1.auth.fastapi_users import get_current_user_without_ban
+from core.app.socket import sio
+from core.config import conf
 from dependencies.checker import check_message_exist
 from dependencies.service import get_chat_service
 from models import User
@@ -38,8 +40,16 @@ async def send_message(
     user: current_user,
     service: chat_service,
     message: CreateMessageRequest,
+    background: BackgroundTasks,
 ):
     result = await service.send_message(user=user, message=message)
+    background.add_task(
+        sio.emit,
+        event="new_message",
+        room=str(result.chat_id),
+        data=result.content,
+        namespace=conf.socket.prefix.chat,
+    )
     return result
 
 

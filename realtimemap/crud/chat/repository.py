@@ -48,7 +48,9 @@ class ChatRepository(BaseRepository[Chat, CreateChat, ReadChat, UpdateChat]):
         result = await self.session.scalar(stmt)
         return result is not None
 
-    async def find_or_create_private_chat(self, user1_id: int, user2_id: int) -> Chat:
+    async def find_or_create_private_chat(
+        self, user1_id: int, user2_id: int
+    ) -> Tuple[bool, Chat]:
         if user1_id > user2_id:
             user1_id, user2_id = user2_id, user1_id
 
@@ -69,7 +71,7 @@ class ChatRepository(BaseRepository[Chat, CreateChat, ReadChat, UpdateChat]):
         existing_chat = result.scalar_one_or_none()
 
         if existing_chat:
-            return existing_chat
+            return False, existing_chat
 
         user1 = await self.session.get(User, user1_id)
         user2 = await self.session.get(User, user2_id)
@@ -81,4 +83,4 @@ class ChatRepository(BaseRepository[Chat, CreateChat, ReadChat, UpdateChat]):
         self.session.add(new_chat)
         await self.session.flush()
         await self.session.refresh(new_chat)
-        return new_chat
+        return True, new_chat

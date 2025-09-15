@@ -43,7 +43,7 @@ class ChatService(BaseService):
         return result
 
     async def send_message(self, user: "User", message: CreateMessageRequest):
-        chat = await self.chat_repo.find_or_create_private_chat(
+        is_new, chat = await self.chat_repo.find_or_create_private_chat(
             user1_id=user.id, user2_id=message.recipient_id
         )
         await self._before_send_message(chat.id, user_id=user.id)
