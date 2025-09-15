@@ -72,7 +72,7 @@ async def create_mark_point(
     background.add_task(
         notification.notify_mark_action,
         mark=instance,
-        action=ActionType.CREATE.value,
+        event=ActionType.CREATE.value,
         request=request,
     )
     return ReadMark.model_validate(instance, context={"request": request})
@@ -98,7 +98,7 @@ async def delete_mark(
     background.add_task(
         notification.notify_mark_action,
         mark=instance,
-        action=ActionType.DELETE.value,
+        event=ActionType.DELETE.value,
         request=request,
     )
     return Response(status_code=204)
@@ -118,7 +118,7 @@ async def update_mark(
     background.add_task(
         notification.notify_mark_action,
         mark=result,
-        action=ActionType.UPDATE.value,
+        event=ActionType.UPDATE.value,
         request=request,
     )
     return ReadMark.model_validate(result, context={"request": request})
