@@ -5,16 +5,12 @@ from pydantic import Field, BaseModel, ConfigDict
 
 
 class BaseMessage(BaseModel):
-    content: str = Field(
-        ..., description="Message content", max_length=256, min_length=1
-    )
-    sender_id: int = Field(..., description="Owner ID")
+    content: Annotated[str, Field(..., description="Message content")]
+    sender_id: Annotated[int, Field(..., description="Owner ID")]
 
 
 class CreateMessage(BaseMessage):
-    sender_id: Annotated[int, Field(..., description="Owner ID")]
     chat_id: Annotated[int, Field(description="Chat ID")]
-    content: Annotated[str, Field(..., description="Message content")]
 
 
 class UpdateMessage(BaseMessage):
