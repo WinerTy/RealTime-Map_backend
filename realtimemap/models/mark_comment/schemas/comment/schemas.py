@@ -32,6 +32,7 @@ class UpdateComment(BaseComment):
 
     model_config = ConfigDict(from_attributes=True)
 
+
 class ReadCommentReply(BaseReadComment):
     pass
 

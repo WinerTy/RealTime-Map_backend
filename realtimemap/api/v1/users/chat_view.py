@@ -3,10 +3,11 @@ from typing import Annotated, TYPE_CHECKING, List
 from fastapi import APIRouter, Depends
 
 from api.v1.auth.fastapi_users import get_current_user_without_ban
+from dependencies.checker import check_message_exist
 from dependencies.service import get_chat_service
 from models import User
 from models.chat.schemas import ReadChat
-from models.message.schemas import CreateMessageRequest
+from models.message.schemas import CreateMessageRequest, UpdateMessageRequest
 from services.chat.service import ChatService
 
 if TYPE_CHECKING:
@@ -40,3 +41,24 @@ async def send_message(
 ):
     result = await service.send_message(user=user, message=message)
     return result
+
+
+@router.patch("/message/{message_id}", dependencies=[Depends(check_message_exist)])
+async def update_message(
+    message_id: int,
+    user: current_user,
+    service: chat_service,
+    message: UpdateMessageRequest,
+):
+    message = await service.update_message(message_id, message, user)
+    return message
+
+
+@router.delete("/message/{message_id}", dependencies=[Depends(check_message_exist)])
+async def delete_message(
+    message_id: int,
+    user: current_user,
+    service: chat_service,
+):
+    message = await service.delete_message(message_id, user)
+    return message

@@ -2,10 +2,12 @@ from typing import Annotated, TYPE_CHECKING
 
 from fastapi import Depends
 
+from crud.message.repository import MessageRepository
 from dependencies.crud import (
     get_mark_repository,
     get_mark_comment_repository,
     get_chat_repository,
+    get_message_repository,
 )
 from exceptions import RecordNotFoundError
 
@@ -37,5 +39,14 @@ async def check_chat_exist(
     repo: Annotated["ChatRepository", Depends(get_chat_repository)],
 ) -> None:
     is_exist = await repo.exist(chat_id)
+    if not is_exist:
+        raise RecordNotFoundError()
+
+
+async def check_message_exist(
+    message_id: int,
+    repo: Annotated["MessageRepository", Depends(get_message_repository)],
+):
+    is_exist = await repo.exist(message_id)
     if not is_exist:
         raise RecordNotFoundError()

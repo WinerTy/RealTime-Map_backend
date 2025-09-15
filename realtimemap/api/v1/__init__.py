@@ -7,7 +7,7 @@ from .auth import router as auth_router
 from .category.view import router as category_router
 from .docs.view import router as docs_router
 from .mark import router as mark_router
-from .users.chats import router as users_chat_router
+from .users.chat_view import router as users_chat_router
 from .users.view import router as users_router
 
 user_router = APIRouter(prefix="/user", tags=["user"])

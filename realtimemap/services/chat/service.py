@@ -2,7 +2,11 @@ from typing import TYPE_CHECKING
 
 from exceptions import UserPermissionError
 from models.chat.schemas import ReadChat
-from models.message.schemas import CreateMessageRequest, CreateMessage
+from models.message.schemas import (
+    CreateMessageRequest,
+    CreateMessage,
+    UpdateMessageRequest,
+)
 from services.base import BaseService
 
 if TYPE_CHECKING:
@@ -67,3 +71,20 @@ class ChatService(BaseService):
 
     async def _after_send_message(self):
         pass
+
+    async def update_message(
+        self, message_id: int, message: UpdateMessageRequest, user: "User"
+    ):
+        instance = await self.message_repo.get_by_id(message_id)
+        if instance.sender_id != user.id:
+            raise UserPermissionError()
+
+        instance = await self.message_repo.update(message_id, message)
+        return instance
+
+    async def delete_message(self, message_id: int, user: "User"):
+        instance = await self.message_repo.get_by_id(message_id)
+        if instance.sender_id != user.id:
+            raise UserPermissionError()
+        instance = await self.message_repo.delete(message_id)
+        return instance
