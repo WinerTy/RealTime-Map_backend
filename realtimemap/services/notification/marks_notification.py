@@ -4,6 +4,7 @@ from typing import List, Optional, Dict, Set
 from fastapi import Request
 from socketio import AsyncServer
 
+from core.config import conf
 from crud.mark import MarkRepository
 from models import Mark
 from models.mark.schemas import MarkRequestParams, ReadMark
@@ -19,14 +20,14 @@ class MarkNotificationService(BaseNotificationSocketIO):
         mark_repo: MarkRepository,
         sio: AsyncServer,
         geo_service: GeoService = GeoService(),
+        namespace: str = conf.socket.prefix.marks,
     ):
-        super().__init__(sio)
+        super().__init__(sio, namespace)
         self.mark_repo = mark_repo
         self.geo_service = geo_service
-        self.namespace: str = "/marks"
 
     async def notify_mark_action(
-        self, mark: Mark, action: str, request: Optional[Request] = None
+        self, mark: Mark, event: str, request: Optional[Request] = None
     ):
         try:
             room_sids = self.get_sids(self.namespace)
@@ -44,7 +45,7 @@ class MarkNotificationService(BaseNotificationSocketIO):
                 mark, context={"request": request}
             ).model_dump(mode="json")
 
-            await self._send_notifications(targets, action, mark_data)
+            await self._send_notifications(targets, event, mark_data)
 
         except Exception as e:
             logger.error(e)
@@ -80,17 +81,3 @@ class MarkNotificationService(BaseNotificationSocketIO):
                 targets.add(sid)
 
         return targets
-
-    async def _send_notifications(
-        self, targets: Set[str], action: str, mark_data: dict
-    ) -> None:
-        for sid in targets:
-            try:
-                await self.sio.emit(
-                    action,
-                    to=sid,
-                    namespace=self.namespace,
-                    data=mark_data,
-                )
-            except Exception as e:
-                logger.error(e)
