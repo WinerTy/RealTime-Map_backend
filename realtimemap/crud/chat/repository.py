@@ -47,7 +47,7 @@ class ChatRepository(BaseRepository[Chat, CreateChat, ReadChat, UpdateChat]):
             .where(User.id == user_id)
         )
         result = await self.session.execute(stmt)
-        return result.all()
+        return result.scalars().all()
 
     async def check_user_in_chat(self, chat_id: int, user_id: int) -> bool:
         stmt = select(self.model.id).where(

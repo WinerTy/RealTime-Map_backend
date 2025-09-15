@@ -26,12 +26,3 @@ class ReadMessage(BaseMessage):
     created_at: Annotated[datetime, Field(..., description="Creation time")]
 
     model_config = ConfigDict(from_attributes=True)
-
-
-class CreateMessageRequest(BaseModel):
-    recipient_id: Annotated[int, Field(..., description="Recipient ID", ge=0)]
-    content: Annotated[str, Field(..., description="Message content")]
-
-
-class UpdateMessageRequest(BaseModel):
-    content: Annotated[str, Field(..., description="Message content")]
