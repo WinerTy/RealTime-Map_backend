@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from crud.user.repository import UserRepository
 
 
-router = APIRouter(prefix="/user", tags=["user"])
+router = APIRouter(prefix="", tags=["user"])
 
 
 @router.get(

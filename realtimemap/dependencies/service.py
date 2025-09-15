@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from crud.chat.repository import ChatRepository
 from crud.mark_comment.repository import CommentReactionRepository
+from crud.message.repository import MessageRepository
 from database.helper import db_helper
 from dependencies.crud import (
     get_mark_repository,
@@ -13,6 +14,7 @@ from dependencies.crud import (
     get_comment_stat_repository,
     get_comment_reaction_repository,
     get_chat_repository,
+    get_message_repository,
 )
 from dependencies.websocket import get_mark_websocket_manager
 from services.chat.service import ChatService
@@ -73,5 +75,6 @@ async def get_mark_comment_service(
 async def get_chat_service(
     session: get_session,
     chat_repo: Annotated["ChatRepository", Depends(get_chat_repository)],
+    message_repo: Annotated["MessageRepository", Depends(get_message_repository)],
 ) -> ChatService:
-    yield ChatService(session, chat_repo)
+    yield ChatService(session, chat_repo, message_repo)

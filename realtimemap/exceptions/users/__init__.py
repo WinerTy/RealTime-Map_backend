@@ -1,6 +1,7 @@
-__all__ = ["ClientError", "UserPermissionError", "TimeOutError"]
+__all__ = ["ClientError", "UserPermissionError", "TimeOutError", "MessageSendingError"]
 
 
+from .chat import MessageSendingError
 from .client import ClientError
-from .timeout import TimeOutError
 from .permission import UserPermissionError
+from .timeout import TimeOutError

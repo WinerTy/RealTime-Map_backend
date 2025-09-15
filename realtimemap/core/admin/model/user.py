@@ -158,4 +158,4 @@ class AdminUser(BaseModelAdmin):
 
         unban_data = UsersBanUpdate(unbanned_at=current_time, unbanned_by=moderator.id)
         _ = await user_ban_repo.unban_user(user_id, unban_data)
-        return f"User was approved!"
+        return "User was approved!"

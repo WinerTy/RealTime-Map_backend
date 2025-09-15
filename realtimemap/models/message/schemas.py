@@ -12,7 +12,9 @@ class BaseMessage(BaseModel):
 
 
 class CreateMessage(BaseMessage):
-    pass
+    sender_id: Annotated[int, Field(..., description="Owner ID")]
+    chat_id: Annotated[int, Field(description="Chat ID")]
+    content: Annotated[str, Field(..., description="Message content")]
 
 
 class UpdateMessage(BaseMessage):
@@ -27,6 +29,5 @@ class ReadMessage(BaseMessage):
 
 
 class CreateMessageRequest(BaseModel):
-    content: str = Field(
-        ..., description="Message content", max_length=256, min_length=1
-    )
+    recipient_id: Annotated[int, Field(..., description="Recipient ID", ge=0)]
+    content: Annotated[str, Field(..., description="Message content")]

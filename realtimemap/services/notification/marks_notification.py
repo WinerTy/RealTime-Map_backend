@@ -71,7 +71,7 @@ class MarkNotificationService(BaseNotificationSocketIO):
         for sid, params in sessions.items():
             if not params:
                 continue
-            db = self.geo_service.check_geohash_proximity(coords=params, mark=mark)
+
             if not self.geo_service.check_geohash_proximity(coords=params, mark=mark):
                 continue
 

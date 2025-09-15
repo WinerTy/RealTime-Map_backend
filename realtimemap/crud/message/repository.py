@@ -14,7 +14,6 @@ class MessageRepository(
     def __init__(self, session: "AsyncSession"):
         super().__init__(model=Message, session=session)
 
-    async def create_message(
-        self,
-    ):
-        pass
+    async def create_message(self, data: CreateMessage):
+        result = await self.create(data)
+        return result

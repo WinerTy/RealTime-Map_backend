@@ -1,13 +1,14 @@
 from typing import Optional, Dict
 
-from .client import ClientError
 from fastapi import status
+
+from .client import ClientError
 
 
 class UserPermissionError(ClientError):
     def __init__(
         self,
-        status_code: int = status.HTTP_401_UNAUTHORIZED,
+        status_code: int = status.HTTP_403_FORBIDDEN,
         detail: str = "Permission denied",
         headers: Optional[Dict[str, str]] = None,
     ):

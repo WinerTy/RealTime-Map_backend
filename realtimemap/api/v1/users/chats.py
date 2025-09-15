@@ -6,6 +6,7 @@ from api.v1.auth.fastapi_users import get_current_user_without_ban
 from dependencies.service import get_chat_service
 from models import User
 from models.chat.schemas import ReadChat
+from models.message.schemas import CreateMessageRequest
 from services.chat.service import ChatService
 
 if TYPE_CHECKING:
@@ -29,6 +30,13 @@ async def get_chats(
     return result
 
 
-@router.post("/{chat_id}/")
-async def send_message(chat_id: int, user: current_user):
-    pass
+@router.post(
+    "/message/",
+)
+async def send_message(
+    user: current_user,
+    service: chat_service,
+    message: CreateMessageRequest,
+):
+    result = await service.send_message(user=user, message=message)
+    return result

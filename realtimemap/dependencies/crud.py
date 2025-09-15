@@ -11,6 +11,7 @@ from crud.mark_comment.repository import (
     CommentStatRepository,
     CommentReactionRepository,
 )
+from crud.message.repository import MessageRepository
 from crud.request_log.repository import RequestLogRepository
 from crud.user.repository import UserRepository
 from crud.user_ban.repository import UsersBanRepository
@@ -63,3 +64,7 @@ async def get_user_ban_repository(session: get_session) -> UsersBanRepository:
 
 async def get_chat_repository(session: get_session) -> ChatRepository:
     yield ChatRepository(session=session)
+
+
+async def get_message_repository(session: get_session) -> MessageRepository:
+    yield MessageRepository(session=session)
