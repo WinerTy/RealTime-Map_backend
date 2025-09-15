@@ -14,11 +14,11 @@ logger = logging.getLogger(__name__)
 class MarksNamespace(AsyncNamespace):
     @staticmethod
     async def on_connect(sid, environ, auth):
-        print(auth)
+        pass
 
     @staticmethod
     async def on_disconnect(sid):
-        print(sid, "disconnect")
+        pass
 
     async def on_marks_message(self, sid, data):
         params = self._validate_params(data)

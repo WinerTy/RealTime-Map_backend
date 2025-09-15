@@ -85,6 +85,4 @@ class AccessToken(BaseSqlModel, SQLAlchemyBaseAccessTokenTable[int]):
 # For Testing sync events in async projects
 @event.listens_for(User, "before_insert")
 def before_insert_listener(mapper, connection, target: User):
-    print("before_insert")
-    print("-" * 50)
-    print(target.username)
+    pass

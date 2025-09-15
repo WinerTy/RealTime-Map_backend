@@ -29,10 +29,7 @@ class ChatNamespace(AsyncNamespace):
 
         async with get_chat_service() as chat_service:
             chats_ids = await chat_service.get_user_chats_ids(user.id)
-            print(type(chats_ids))
-            print("Присоединился к: ", chats_ids)
             for chat_id in chats_ids:
-                print(type(chat_id))
                 await self.enter_room(sid, room=str(chat_id))
 
     async def on_message(self, sid, data):

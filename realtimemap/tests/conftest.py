@@ -15,7 +15,6 @@ async def async_client():
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
     ) as client:
-        print("Client is ready")
         yield client
 
 
