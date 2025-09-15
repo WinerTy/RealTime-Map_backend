@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 from exceptions import UserPermissionError
 from models.chat.schemas import ReadChat
@@ -41,6 +41,9 @@ class ChatService(BaseService):
                 )
             )
         return result
+
+    async def get_user_chats_ids(self, user_id: int) -> List[int]:
+        return await self.chat_repo.get_user_chats_ids(user_id)
 
     async def send_message(self, user: "User", message: CreateMessageRequest):
         is_new, chat = await self.chat_repo.find_or_create_private_chat(

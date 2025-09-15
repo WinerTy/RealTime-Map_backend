@@ -40,6 +40,15 @@ class ChatRepository(BaseRepository[Chat, CreateChat, ReadChat, UpdateChat]):
         result = await self.session.execute(stmt)
         return result.unique().all()
 
+    async def get_user_chats_ids(self, user_id: int) -> List[int]:
+        stmt = (
+            select(self.model.id)
+            .join(self.model.participants)
+            .where(User.id == user_id)
+        )
+        result = await self.session.execute(stmt)
+        return result.all()
+
     async def check_user_in_chat(self, chat_id: int, user_id: int) -> bool:
         stmt = select(self.model.id).where(
             self.model.id == chat_id,

@@ -28,9 +28,9 @@ class ChatNamespace(AsyncNamespace):
             raise ConnectionRefusedError("Authentication required")
 
         async with get_chat_service() as chat_service:
-            chats = await chat_service.get_chats_for_user(user)
-            for chat in chats:
-                await self.enter_room(sid, room=str(chat.id))
+            chats_ids = await chat_service.get_user_chats_ids(user)
+            for chat_id in chats_ids:
+                await self.enter_room(sid, room=str(chat_id))
 
     async def on_message(self, sid, data):
         pass
