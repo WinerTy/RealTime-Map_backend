@@ -5,9 +5,14 @@ __all__ = [
     "UpdateMessage",
     "ReadMessage",
     "ChatEventName",
+    "MessageParamsRequest",
 ]
 
 
 from .enums import ChatEventName
 from .schemas import CreateMessage, UpdateMessage, ReadMessage
-from .schemas_request import CreateMessageRequest, UpdateMessageRequest
+from .schemas_request import (
+    CreateMessageRequest,
+    UpdateMessageRequest,
+    MessageParamsRequest,
+)

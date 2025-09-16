@@ -9,6 +9,7 @@ from models.message import CreateMessage, ReadMessage, UpdateMessage
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
+    from models.message.schemas import MessageParamsRequest
 
 logger = logging.getLogger(__name__)
 
@@ -23,13 +24,19 @@ class MessageRepository(
         result = await self.create(data)
         return result
 
-    async def get_chat_messages(self, chat_id: int) -> List[Message]:
+    async def get_chat_messages(
+        self, chat_id: int, params: "MessageParamsRequest"
+    ) -> List[Message]:
         try:
             stmt = (
                 select(self.model)
                 .where(self.model.chat_id == chat_id)
-                .order_by(self.model.created_at.desc())
+                .order_by(self.model.created_at.desc(), self.model.id.desc())
             )
+            if params.before:
+                stmt = stmt.where(self.model.created_at < params.before)
+
+            stmt = stmt.limit(params.limit)
             result = await self.session.execute(stmt)
             return result.scalars().all()
         except Exception as e:

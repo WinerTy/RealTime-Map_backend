@@ -13,6 +13,7 @@ from models.message.schemas import (
     CreateMessageRequest,
     UpdateMessageRequest,
     ChatEventName,
+    MessageParamsRequest,
 )
 from services.chat.service import ChatService
 from services.notification import ChatNotificationService
@@ -105,6 +106,7 @@ async def get_chat_history(
     chat_id: int,
     user: current_user,
     service: chat_service,
+    params: MessageParamsRequest = Depends(),
 ):
-    messages = await service.get_chat_message_history(chat_id, user)
+    messages = await service.get_chat_message_history(chat_id, user, params)
     return messages

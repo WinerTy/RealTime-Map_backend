@@ -7,6 +7,7 @@ from models.message.schemas import (
     CreateMessage,
     UpdateMessageRequest,
 )
+from models.message.schemas import MessageParamsRequest
 from services.base import BaseService
 
 if TYPE_CHECKING:
@@ -51,10 +52,10 @@ class ChatService(BaseService):
             raise UserPermissionError()
 
     async def get_chat_message_history(
-        self, chat_id: int, user: "User"
+        self, chat_id: int, user: "User", params: "MessageParamsRequest"
     ) -> List["Message"]:
         await self.check_user_in_chat(chat_id, user.id)
-        messages = await self.message_repo.get_chat_messages(chat_id)
+        messages = await self.message_repo.get_chat_messages(chat_id, params)
         return messages
 
     # TODO Сделать авто подключение к чату если тот новый
