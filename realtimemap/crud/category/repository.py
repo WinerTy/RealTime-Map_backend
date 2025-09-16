@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Optional
 
 from sqlalchemy import select
 
@@ -23,3 +23,7 @@ class CategoryRepository(
 
     def get_select_all(self):
         return select(self.model).order_by(self.model.id.desc())
+
+    async def create_category(self, data: CreateCategory) -> Optional[Category]:
+        result = await self.create(data)
+        return result

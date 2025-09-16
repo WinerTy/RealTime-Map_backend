@@ -7,6 +7,7 @@ from fastapi_pagination.ext.sqlalchemy import apaginate
 
 from crud.category.repository import CategoryRepository
 from dependencies.crud import get_category_repository
+from exceptions.database.integrity import HttpIntegrityError
 from models.category.schemas import ReadCategory, CreateCategory
 
 router = APIRouter(prefix="/category", tags=["Category"])
@@ -27,5 +28,7 @@ async def create_category(
     category_data: Annotated[CreateCategory, Form(media_type="multipart/form-data")],
     repo: Annotated["CategoryRepository", Depends(get_category_repository)],
 ):
-    result = await repo.create(category_data)
+    result = await repo.create_category(category_data)
+    if not result:
+        raise HttpIntegrityError()
     return result

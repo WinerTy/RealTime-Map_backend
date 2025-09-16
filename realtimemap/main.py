@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import Request, Path
 from fastapi.responses import RedirectResponse, ORJSONResponse
 from libcloud.storage.drivers.local import LocalStorageDriver
@@ -9,11 +11,16 @@ from core.app import create_app
 from core.config import conf
 from exceptions import HttpIntegrityError
 
+logger = logging.getLogger(__name__)
+
 app = create_app()
 
 
 @app.exception_handler(HttpIntegrityError)
-async def http_exception_handler(_: Request, exc: HttpIntegrityError):
+async def http_exception_handler(request: Request, exc: HttpIntegrityError):
+    logger.exception(
+        f"DataBase Integrity Error. Request: {request.url.path}", exc_info=exc
+    )
     return ORJSONResponse(
         status_code=exc.status_code,
         content=exc.detail,
@@ -23,11 +30,15 @@ async def http_exception_handler(_: Request, exc: HttpIntegrityError):
 
 @app.get("/", tags=["Root"], status_code=307)
 async def redirect_root():
+    logger.info("Redirecting to /docs")
     return RedirectResponse(url="/docs")
 
 
 @app.get("/media/{storage}/{file_id}", tags=["Root"], name="get_file")
-def serve_files(storage: str = Path(...), file_id: str = Path(...)):
+def serve_files(
+    storage: str = Path(...),
+    file_id: str = Path(...),
+):
     try:
         file = StorageManager.get_file(f"{storage}/{file_id}")
 
@@ -52,7 +63,8 @@ def serve_files(storage: str = Path(...), file_id: str = Path(...)):
             headers={"Content-Disposition": "inline"},
         )
 
-    except ObjectDoesNotExistError or RuntimeError:
+    except (ObjectDoesNotExistError, RuntimeError):
+        logger.exception(f"File does not exist: {storage}/{file_id}")
         return ORJSONResponse({"detail": "Not found"}, status_code=404)
 
 

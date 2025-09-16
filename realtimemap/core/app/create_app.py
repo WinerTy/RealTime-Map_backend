@@ -1,4 +1,6 @@
+import logging
 import os
+import sys
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -17,6 +19,7 @@ from middleware import ProcessTimeMiddleware
 from .lifespan import lifespan
 from .socket import sio_app
 
+logger = logging.getLogger(__name__)
 ROOT_DIR = Path(__file__).parent.parent
 
 
@@ -27,7 +30,28 @@ def setup_pagination(app: FastAPI) -> None:
 
 # Функция для настрйоки логов
 def setup_logging() -> None:
-    os.makedirs("logs", exist_ok=True)
+    LOG_DIR = ROOT_DIR.parent / "logs"
+    os.makedirs(LOG_DIR, exist_ok=True)
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.DEBUG)
+
+    formatter = logging.Formatter(fmt=conf.log.log_format, datefmt=conf.log.date_format)
+
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setLevel(conf.log.log_level)
+    console_handler.setFormatter(formatter)
+
+    error_file_handler = logging.FileHandler(
+        str(LOG_DIR / conf.log.error_log_filename), mode="a", encoding="utf-8"
+    )
+    error_file_handler.setLevel(logging.ERROR)
+    error_file_handler.setFormatter(formatter)
+
+    if root_logger.hasHandlers():
+        root_logger.handlers.clear()
+
+    root_logger.addHandler(console_handler)
+    root_logger.addHandler(error_file_handler)
 
 
 # Настройки Хэдеров
