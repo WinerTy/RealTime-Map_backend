@@ -3,11 +3,12 @@ from typing import Annotated, TYPE_CHECKING, List
 from fastapi import APIRouter, Depends, BackgroundTasks
 
 from api.v1.auth.fastapi_users import get_current_user_without_ban
-from dependencies.checker import check_message_exist
+from dependencies.checker import check_message_exist, check_chat_exist
 from dependencies.notification import get_chat_notification_service
 from dependencies.service import get_chat_service
 from models import User
 from models.chat.schemas import ReadChat
+from models.message import ReadMessage
 from models.message.schemas import (
     CreateMessageRequest,
     UpdateMessageRequest,
@@ -92,3 +93,18 @@ async def delete_message(
         message=message,
     )
     return message
+
+
+# TODO Сделать пагинацию по дням
+@router.get(
+    "/message/history/{chat_id}/",
+    dependencies=[Depends(check_chat_exist)],
+    response_model=List[ReadMessage],
+)
+async def get_chat_history(
+    chat_id: int,
+    user: current_user,
+    service: chat_service,
+):
+    messages = await service.get_chat_message_history(chat_id, user)
+    return messages

@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, List, Tuple
+from typing import TYPE_CHECKING, List, Tuple, Union
 
 from sqlalchemy import func, select, and_
 from sqlalchemy.orm import aliased
@@ -10,6 +10,7 @@ from models.chat.schemas import CreateChat, ReadChat, UpdateChat
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
+    from sqlalchemy import Select
 
 
 class ChatRepository(BaseRepository[Chat, CreateChat, ReadChat, UpdateChat]):
@@ -49,11 +50,15 @@ class ChatRepository(BaseRepository[Chat, CreateChat, ReadChat, UpdateChat]):
         result = await self.session.execute(stmt)
         return result.scalars().all()
 
-    async def check_user_in_chat(self, chat_id: int, user_id: int) -> bool:
+    async def check_user_in_chat(
+        self, chat_id: int, user_id: int, get_stmt: bool = False
+    ) -> Union[bool, "Select"]:
         stmt = select(self.model.id).where(
             self.model.id == chat_id,
             self.model.participants.any(User.id == user_id),
         )
+        if get_stmt:
+            return stmt
         result = await self.session.scalar(stmt)
         return result is not None
 

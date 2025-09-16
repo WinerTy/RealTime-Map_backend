@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from crud.chat.repository import ChatRepository
     from crud.message.repository import MessageRepository
     from sqlalchemy.ext.asyncio import AsyncSession
-    from models import User
+    from models import User, Message
 
 
 class ChatService(BaseService):
@@ -44,6 +44,18 @@ class ChatService(BaseService):
 
     async def get_user_chats_ids(self, user_id: int) -> List[int]:
         return await self.chat_repo.get_user_chats_ids(user_id)
+
+    async def check_user_in_chat(self, chat_id: int, user_id: int) -> None:
+        in_chat = await self.chat_repo.check_user_in_chat(chat_id, user_id)
+        if not in_chat:
+            raise UserPermissionError()
+
+    async def get_chat_message_history(
+        self, chat_id: int, user: "User"
+    ) -> List["Message"]:
+        await self.check_user_in_chat(chat_id, user.id)
+        messages = await self.message_repo.get_chat_messages(chat_id)
+        return messages
 
     # TODO Сделать авто подключение к чату если тот новый
     async def send_message(self, user: "User", message: CreateMessageRequest):

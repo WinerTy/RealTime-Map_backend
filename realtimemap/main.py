@@ -64,7 +64,7 @@ def serve_files(
         )
 
     except (ObjectDoesNotExistError, RuntimeError):
-        logger.exception(f"File does not exist: {storage}/{file_id}")
+        logger.info(f"File does not exist: {storage}/{file_id}")
         return ORJSONResponse({"detail": "Not found"}, status_code=404)
 
 
