@@ -11,7 +11,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Create .env
+        run: echo
 
       - name: Set up Docker Compose
         run: |
+          docker system prune -f
           docker compose up --build -d

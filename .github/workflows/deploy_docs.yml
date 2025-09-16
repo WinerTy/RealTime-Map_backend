@@ -1,0 +1,29 @@
+name: Deploy AsyncAPI Docs to GitHub Pages
+
+on:
+  push:
+    branches: [ main ] # Запускать при пуше в main
+
+jobs:
+  generate-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Скачиваем код из репозитория
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      # 2. Генерируем HTML-сайт из YAML-файла
+      - name: Generate AsyncAPI HTML documentation
+        uses: asyncapi/cli@v2.16.0
+        with:
+          template: '@asyncapi/html-template'
+          filepath: docs/api/asyncapi.yml # Путь к вашему файлу
+          output: public # Назовем выходную папку 'public'
+          parameters: -p baseHref=/RealTime-Map_backend/ sidebarOrganization=byTags
+
+      # 3. Публикуем сгенерированный сайт на GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages # Ветка для публикации
+          folder: public # Папка, которую публикуем (должна совпадать с output выше)
