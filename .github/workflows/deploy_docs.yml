@@ -1,29 +1,39 @@
-name: Deploy AsyncAPI Docs to GitHub Pages
+name: AsyncAPI documents processing
 
 on:
   push:
-    branches: [ main ] # Запускать при пуше в main
+    branches: [ master ]
 
 jobs:
-  generate-and-deploy:
+  generate:
     runs-on: ubuntu-latest
     steps:
-      # 1. Скачиваем код из репозитория
+      #"standard step" where repo needs to be checked-out first
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
-      # 2. Генерируем HTML-сайт из YAML-файла
-      - name: Generate AsyncAPI HTML documentation
-        uses: asyncapi/cli@v2.16.0
+      #In case you do not want to use defaults, you for example want to use different template
+      - name: Generating HTML from my AsyncAPI document
+        uses: asyncapi/cli@v2.16.0 # You can use any version you want
         with:
-          template: '@asyncapi/html-template'
-          filepath: docs/api/asyncapi.yml # Путь к вашему файлу
-          output: public # Назовем выходную папку 'public'
-          parameters: -p baseHref=/RealTime-Map_backend/ sidebarOrganization=byTags
+          template: '@asyncapi/html-template@0.9.0'  #In case of template from npm, because of @ it must be in quotes
+          filepath: docs/api/my-asyncapi.yml
+          parameters: -p baseHref=/RealTime-Map_backend/ sidebarOrganization=byTags #space separated list of key/values
 
-      # 3. Публикуем сгенерированный сайт на GitHub Pages
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
+          output: generated-html
+
+
+
+      #Using another action that takes generated HTML and pushes it to GH Pages
+
+      - name: Deploy GH page
+
+        uses: JamesIves/github-pages-deploy-action@3.4.2
+
         with:
-          branch: gh-pages # Ветка для публикации
-          folder: public # Папка, которую публикуем (должна совпадать с output выше)
+
+          ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          BRANCH: gh-pages
+
+          FOLDER: generated-html
