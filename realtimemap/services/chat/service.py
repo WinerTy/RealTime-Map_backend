@@ -45,6 +45,7 @@ class ChatService(BaseService):
     async def get_user_chats_ids(self, user_id: int) -> List[int]:
         return await self.chat_repo.get_user_chats_ids(user_id)
 
+    # TODO Сделать авто подключение к чату если тот новый
     async def send_message(self, user: "User", message: CreateMessageRequest):
         is_new, chat = await self.chat_repo.find_or_create_private_chat(
             user1_id=user.id, user2_id=message.recipient_id

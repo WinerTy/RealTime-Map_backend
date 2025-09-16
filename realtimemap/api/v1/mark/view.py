@@ -23,6 +23,7 @@ from models.mark.schemas import (
     UpdateMarkRequest,
     ActionType,
 )
+from models.mark.schemas.schemas import allowed_duration
 from services.mark.service import MarkService
 from services.notification import MarkNotificationService
 
@@ -79,7 +80,7 @@ async def create_mark_point(
 
 
 @router.get("/{mark_id}/", response_model=DetailMark, status_code=200)
-# @cache(expire=3600)
+# @cache(expire=3600) TODO Fix
 async def get_mark(mark_id: int, service: mark_service, request: Request):
     result = await service.get_mark_by_id(mark_id)
     return DetailMark.model_validate(result, context={"request": request})
@@ -122,3 +123,8 @@ async def update_mark(
         request=request,
     )
     return ReadMark.model_validate(result, context={"request": request})
+
+
+@router.get("/allowed-duration/", response_model=List[int], status_code=200)
+async def get_allowed_duration():
+    return allowed_duration
