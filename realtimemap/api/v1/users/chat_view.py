@@ -6,6 +6,8 @@ from api.v1.auth.fastapi_users import get_current_user_without_ban
 from dependencies.checker import check_message_exist, check_chat_exist
 from dependencies.notification import get_chat_notification_service
 from dependencies.service import get_chat_service
+from exceptions import UserPermissionError, RecordNotFoundError
+from exceptions.utils import http_error_response_generator
 from models import User
 from models.chat.schemas import ReadChat
 from models.message import ReadMessage
@@ -21,10 +23,9 @@ from services.notification import ChatNotificationService
 if TYPE_CHECKING:
     pass
 
-router = APIRouter(
-    prefix="/chats",
-    tags=["chats"],
-)
+GENERAL_ERROR_RESPONSES = http_error_response_generator(UserPermissionError, RecordNotFoundError)
+
+router = APIRouter(prefix="/chats", tags=["chats"], responses=GENERAL_ERROR_RESPONSES)
 
 current_user = Annotated[User, Depends(get_current_user_without_ban)]
 chat_service = Annotated[ChatService, Depends(get_chat_service)]

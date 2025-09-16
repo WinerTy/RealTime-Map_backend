@@ -1,9 +1,11 @@
 from typing import Dict, Optional
 
-from fastapi import HTTPException, status
+from fastapi import status
+
+from .base import BaseRealTimeMapException
 
 
-class RecordNotFoundError(HTTPException):
+class RecordNotFoundError(BaseRealTimeMapException):
     def __init__(
         self,
         status_code: int = status.HTTP_404_NOT_FOUND,
@@ -13,7 +15,7 @@ class RecordNotFoundError(HTTPException):
         super().__init__(status_code=status_code, detail=detail, headers=headers)
 
 
-class NestingLevelExceededError(HTTPException):
+class NestingLevelExceededError(BaseRealTimeMapException):
     def __init__(
         self,
         status_code: int = status.HTTP_400_BAD_REQUEST,

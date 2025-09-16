@@ -15,6 +15,8 @@ from dependencies.notification import (
     get_mark_notification_service,
 )
 from dependencies.service import get_mark_service
+from exceptions import RecordNotFoundError, UserPermissionError, TimeOutError
+from exceptions.utils import http_error_response_generator
 from models.mark.schemas import (
     CreateMarkRequest,
     ReadMark,
@@ -30,8 +32,14 @@ from services.notification import MarkNotificationService
 if TYPE_CHECKING:
     from models import User
 
+GENERAL_ERROR_RESPONSES = http_error_response_generator(RecordNotFoundError)
+POST_ERROR_RESPONSES = http_error_response_generator(UserPermissionError)
+UPDATE_ERROR_RESPONSES = http_error_response_generator(
+    UserPermissionError, TimeOutError
+)
 
-router = APIRouter(prefix="/marks", tags=["Marks"])
+
+router = APIRouter(prefix="/marks", tags=["Marks"], responses=GENERAL_ERROR_RESPONSES)
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +65,9 @@ async def get_marks(
     ]
 
 
-@router.post("/", response_model=ReadMark, status_code=201)
+@router.post(
+    "/", response_model=ReadMark, status_code=201, responses=POST_ERROR_RESPONSES
+)
 async def create_mark_point(
     background: BackgroundTasks,
     mark: Annotated[CreateMarkRequest, Form(media_type="multipart/form-data")],
@@ -86,7 +96,7 @@ async def get_mark(mark_id: int, service: mark_service, request: Request):
     return DetailMark.model_validate(result, context={"request": request})
 
 
-@router.delete("/{mark_id}/", status_code=204)
+@router.delete("/{mark_id}/", status_code=204, responses=POST_ERROR_RESPONSES)
 async def delete_mark(
     mark_id: int,
     background: BackgroundTasks,
@@ -105,7 +115,12 @@ async def delete_mark(
     return Response(status_code=204)
 
 
-@router.patch("/{mark_id}", response_model=ReadMark, status_code=200)
+@router.patch(
+    "/{mark_id}",
+    response_model=ReadMark,
+    status_code=200,
+    responses=UPDATE_ERROR_RESPONSES,
+)
 async def update_mark(
     mark_id: int,
     mark: Annotated[UpdateMarkRequest, Form(media_type="multipart/form-data")],

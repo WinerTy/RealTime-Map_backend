@@ -2,10 +2,10 @@ from typing import Optional, Dict
 
 from fastapi import status
 
-from .client import ClientError
+from exceptions.base import BaseRealTimeMapException
 
 
-class UserPermissionError(ClientError):
+class UserPermissionError(BaseRealTimeMapException):
     def __init__(
         self,
         status_code: int = status.HTTP_403_FORBIDDEN,

@@ -1,9 +1,11 @@
 from typing import Optional, Dict
 
-from fastapi import HTTPException, status
+from fastapi import status
+
+from exceptions.base import BaseRealTimeMapException
 
 
-class HttpIntegrityError(HTTPException):
+class HttpIntegrityError(BaseRealTimeMapException):
     def __init__(
         self,
         status_code: int = status.HTTP_400_BAD_REQUEST,

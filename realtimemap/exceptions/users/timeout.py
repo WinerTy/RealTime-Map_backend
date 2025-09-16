@@ -1,9 +1,11 @@
 from typing import Optional, Dict
+
 from fastapi import status
-from .client import ClientError
+
+from exceptions.base import BaseRealTimeMapException
 
 
-class TimeOutError(ClientError):
+class TimeOutError(BaseRealTimeMapException):
     def __init__(
         self,
         detail: str = "Timeout expired",
