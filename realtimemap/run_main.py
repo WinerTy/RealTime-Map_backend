@@ -11,7 +11,7 @@ def main():
             bind=conf.server.bind,
             workers=conf.server.workers,
             timeout=conf.server.timeout,
-            log_level=conf.log.log_level,
+            log_level=conf.log.log_level_name,
             domains=conf.server.domains,
         ),
     )
