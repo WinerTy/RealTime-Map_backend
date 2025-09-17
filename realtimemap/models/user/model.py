@@ -7,7 +7,7 @@ from fastapi_users_db_sqlalchemy.access_token import (
     SQLAlchemyBaseAccessTokenTable,
 )
 from jinja2 import Template
-from sqlalchemy import String, Integer, ForeignKey, event
+from sqlalchemy import String, Integer, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy_file import ImageField
 
@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
     from models.user_ban.model import UsersBan
     from models.mark.model import Mark
-    from models.mark_comment.model import Comment
+    from models.mark_comment.model import Comment, CommentReaction
     from models.message.model import Chat
 
 
@@ -54,6 +54,9 @@ class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
     chats: Mapped[List["Chat"]] = relationship(
         secondary="chat_participants", back_populates="participants"
     )
+    reactions: Mapped[List["CommentReaction"]] = relationship(
+        back_populates="user", foreign_keys="CommentReaction.user_id"
+    )
 
     @classmethod
     def get_db(cls, session: "AsyncSession"):
@@ -80,9 +83,3 @@ class AccessToken(BaseSqlModel, SQLAlchemyBaseAccessTokenTable[int]):
     @classmethod
     def get_db(cls, session: "AsyncSession"):
         return SQLAlchemyAccessTokenDatabase(session, cls)
-
-
-# For Testing sync events in async projects
-@event.listens_for(User, "before_insert")
-def before_insert_listener(mapper, connection, target: User):
-    pass

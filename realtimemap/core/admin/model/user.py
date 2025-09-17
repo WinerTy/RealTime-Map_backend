@@ -62,7 +62,6 @@ class AdminUser(BaseModelAdmin):
 
     exclude_fields_from_detail = [User.hashed_password]
     exclude_fields_from_edit = [User.hashed_password]
-    # exclude_fields_from_create = [User.hashed_password]
     exclude_fields_from_list = [User.hashed_password]
 
     async def before_create(

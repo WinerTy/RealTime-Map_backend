@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from enum import Enum as PyEnum
 from typing import TYPE_CHECKING, Optional, List
@@ -24,11 +25,15 @@ from models.mixins import IntIdMixin, TimeMarkMixin
 if TYPE_CHECKING:
     from models.mark.model import Mark
     from models.user.model import User
+    from fastapi import Request
 
 
 class CommentReactionType(str, PyEnum):
     like = "like"
     dislike = "dislike"
+
+
+logger = logging.getLogger(__name__)
 
 
 class MarkComment(BaseSqlModel, IntIdMixin, TimeMarkMixin):
@@ -75,11 +80,20 @@ class Comment(BaseSqlModel, IntIdMixin, TimeMarkMixin):
         back_populates="replies",
     )
     replies: Mapped[List["Comment"]] = relationship(back_populates="parent")
+    mark: Mapped["Mark"] = relationship(
+        back_populates="comments", foreign_keys=[mark_id]
+    )
     owner: Mapped["User"] = relationship(back_populates="comments")
     stats: Mapped["CommentStat"] = relationship(back_populates="comment")
+    reactions: Mapped[List["CommentReaction"]] = relationship(
+        back_populates="comment", foreign_keys="CommentReaction.comment_id"
+    )
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+    async def __admin_repr__(self, _: "Request"):
+        return f"Comment №{self.id}: {self.content[:25]}"
 
 
 class CommentReaction(BaseSqlModel, IntIdMixin, TimeMarkMixin):
@@ -99,7 +113,13 @@ class CommentReaction(BaseSqlModel, IntIdMixin, TimeMarkMixin):
     )
 
     # RS
-    #
+    user: Mapped["User"] = relationship(
+        back_populates="reactions", foreign_keys=[user_id]
+    )
+    comment: Mapped["Comment"] = relationship(
+        back_populates="reactions", foreign_keys=[comment_id]
+    )
+
     __table_args__ = (
         UniqueConstraint("user_id", "comment_id", name="uq_user_comment_reaction"),
     )
@@ -125,9 +145,13 @@ class CommentStat(BaseSqlModel, IntIdMixin):
         Index("ix_comment_stats_activity", "last_activity"),
     )
 
+    async def __admin_repr__(self, _: "Request"):
+        return f"Likes: {self.likes_count}. Dislikes: {self.dislikes_count}"
+
 
 @event.listens_for(Comment, "after_insert")
 def create_base_stats(mapper, connection: Connection, target: Comment):
+    logger.info("Create base stats")
     connection.execute(
         insert(CommentStat).values(
             comment_id=target.id,

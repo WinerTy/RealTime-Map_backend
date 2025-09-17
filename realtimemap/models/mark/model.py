@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 from geoalchemy2 import Geometry
 from sqlalchemy import ForeignKey, String, Index, DateTime, Integer, Boolean
@@ -12,6 +12,8 @@ from models.mixins import IntIdMixin, TimeMarkMixin
 if TYPE_CHECKING:
     from models.user.model import User
     from models.category.model import Category
+    from models.mark_comment.model import Comment
+    from fastapi import Request
 
 
 class Mark(BaseSqlModel, IntIdMixin, TimeMarkMixin):
@@ -46,6 +48,8 @@ class Mark(BaseSqlModel, IntIdMixin, TimeMarkMixin):
     )
     geohash: Mapped[str] = mapped_column(String(64), nullable=False)
 
+    # RS
+    comments: Mapped[List["Comment"]] = relationship(back_populates="mark")
     __table_args__ = (Index("idx_locations_geom", geom, postgresql_using="gist"),)
 
     @property
@@ -67,3 +71,6 @@ class Mark(BaseSqlModel, IntIdMixin, TimeMarkMixin):
 
     def __str__(self):
         return f"{self.mark_name}: {self.id}"
+
+    def __admin_repr__(self, _: "Request") -> str:
+        return f"Mark #{self.id}: {self.mark_name}"
