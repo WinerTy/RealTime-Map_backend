@@ -10,14 +10,18 @@ __all__ = [
     "CommentStat",
     "CommentReaction",
     "UsersBan",
+    "SubscriptionPlan",
+    "Chat",
 ]
 
 
 from .base import BaseSqlModel
 from .category.model import Category
+from .chat.model import Chat
 from .mark.model import Mark
 from .mark_comment.model import Comment, CommentStat, CommentReaction
 from .message import Message
 from .request_log.model import RequestLog
+from .subscription.model import SubscriptionPlan
 from .user.model import User, AccessToken
 from .user_ban.model import UsersBan

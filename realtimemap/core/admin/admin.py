@@ -13,11 +13,21 @@ from core.admin.model import (
     AdminCommentStat,
     AdminUsersBans,
     AdminCommentReaction,
+    AdminSubscriptionPlan,
 )
 from core.app.lifespan import ROOT_DIR
 from core.config import conf
 from database.helper import db_helper
-from models import Category, User, Mark, Comment, CommentStat, UsersBan, CommentReaction
+from models import (
+    Category,
+    User,
+    Mark,
+    Comment,
+    CommentStat,
+    UsersBan,
+    CommentReaction,
+    SubscriptionPlan,
+)
 
 
 def setup_admin(app: FastAPI) -> None:
@@ -52,4 +62,5 @@ def setup_admin(app: FastAPI) -> None:
             ],
         )
     )
+    admin.add_view(AdminSubscriptionPlan(SubscriptionPlan))
     admin.mount_to(app)

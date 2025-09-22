@@ -13,6 +13,7 @@ from crud.mark_comment.repository import (
 )
 from crud.message.repository import MessageRepository
 from crud.request_log.repository import RequestLogRepository
+from crud.subcription.repository import SubscriptionPlanRepository
 from crud.user.repository import UserRepository
 from crud.user_ban.repository import UsersBanRepository
 from database.helper import db_helper
@@ -68,3 +69,9 @@ async def get_chat_repository(session: get_session) -> ChatRepository:
 
 async def get_message_repository(session: get_session) -> MessageRepository:
     yield MessageRepository(session=session)
+
+
+async def get_subscription_plan_repository(
+    session: get_session,
+) -> SubscriptionPlanRepository:
+    yield SubscriptionPlanRepository(session=session)
