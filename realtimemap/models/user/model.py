@@ -43,13 +43,16 @@ class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
     )
     comments: Mapped[List["Comment"]] = relationship(back_populates="owner")
     bans: Mapped[List["UsersBan"]] = relationship(
+        "UsersBan",
         back_populates="user",
-        cascade="all, delete-orphan",
         foreign_keys="UsersBan.user_id",
-        lazy="joined",
+        cascade="all, delete-orphan",
     )
-    given_bans: Mapped[List["UsersBan"]] = relationship(
-        back_populates="moderator", foreign_keys="UsersBan.moderator_id"
+    issued_bans: Mapped[List["UsersBan"]] = relationship(
+        "UsersBan",
+        back_populates="moderator",
+        foreign_keys="UsersBan.moderator_id",
+        cascade="all, delete-orphan",
     )
     chats: Mapped[List["Chat"]] = relationship(
         secondary="chat_participants", back_populates="participants"
