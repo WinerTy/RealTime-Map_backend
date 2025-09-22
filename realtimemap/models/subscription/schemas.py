@@ -7,6 +7,10 @@ from .model import SubPlanType
 
 
 class PremiumSubscriptionPlan(BaseModel):
+    """
+    Class for Premium Subscription Plan
+    """
+
     plan_type: Annotated[
         Literal[SubPlanType.premium],
         Field(default=SubPlanType.premium, description="Premium subscription plan"),
@@ -15,6 +19,10 @@ class PremiumSubscriptionPlan(BaseModel):
 
 
 class PremiumPlusSubscriptionPlan(BaseModel):
+    """
+    Class for Premium+ Subscription Plan
+    """
+
     plan_type: Annotated[
         Literal[SubPlanType.premium_plus],
         Field(
@@ -25,6 +33,10 @@ class PremiumPlusSubscriptionPlan(BaseModel):
 
 
 class UltraSubscriptionPlan(BaseModel):
+    """
+    Class for Ultra Subscription Plan
+    """
+
     plan_type: Annotated[
         Literal[SubPlanType.ultra],
         Field(default=SubPlanType.ultra, description="Premium subscription plan"),
@@ -68,29 +80,18 @@ class ReadSubscriptionPlan(BaseSubscriptionPlan):
 
     @model_validator(mode="before")
     def _inject_plan_type_into_features(cls, data: Any) -> Any:
-        """
-        Этот валидатор "внедряет" plan_type из корневого объекта
-        внутрь словаря features перед его валидацией.
-        Это позволяет дискриминатору Union найти нужный тег.
-        """
-        # Проверяем, что работаем со словарем (или объектом с атрибутами)
         if isinstance(data, dict):
             plan_type = data.get("plan_type")
             features = data.get("features")
 
-            # Если features - это словарь и в нем нет plan_type, добавляем его
             if plan_type and isinstance(features, dict) and "plan_type" not in features:
                 features["plan_type"] = plan_type
 
-        # Если data - это ORM-объект (при from_attributes=True)
         elif hasattr(data, "plan_type") and hasattr(data, "features"):
             plan_type = getattr(data, "plan_type")
             features = getattr(data, "features")
 
             if plan_type and isinstance(features, dict) and "plan_type" not in features:
-                # Важно! Не изменяем исходный ORM-объект.
-                # Создаем копию словаря и работаем с ней.
-                # Pydantic v2 достаточно умен, чтобы обработать это правильно.
                 data.features = {**features, "plan_type": plan_type}
 
         return data
