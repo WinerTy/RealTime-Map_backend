@@ -8,13 +8,21 @@ from crud.subcription.repository import SubscriptionPlanRepository
 from dependencies.crud import get_subscription_plan_repository
 from dependencies.payment import get_yookassa_client
 from dependencies.service import get_subscription_service
-from integrations.payment.yookassa import YookassaClient
+from exceptions import RecordNotFoundError
+from exceptions.users import HaveActiveSubscriptionException
+from exceptions.utils import http_error_response_generator
+from integrations.payment.yookassa import YookassaClient, GatewayException
 from models.subscription.schemas import ReadSubscriptionPlan
 from models.user_subscription.schemas import CreateSubscriptionRequest
 from services.subscription.service import SubscriptionService
 
 if TYPE_CHECKING:
     from models import User
+
+
+PAYMENT_ERROR_RESPONSES = http_error_response_generator(
+    RecordNotFoundError, GatewayException, HaveActiveSubscriptionException
+)
 
 router = APIRouter(
     prefix="/subscription",
@@ -32,7 +40,12 @@ async def get_subscription_plans(repo: get_sub_repo):
     return result
 
 
-@router.post("/")
+@router.post(
+    "/",
+    response_class=RedirectResponse,
+    status_code=307,
+    responses=PAYMENT_ERROR_RESPONSES,
+)
 async def purchase_subscription(
     data: CreateSubscriptionRequest,
     user: Annotated["User", Depends(get_current_user_without_ban)],

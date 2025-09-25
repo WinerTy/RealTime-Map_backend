@@ -1,10 +1,10 @@
 from typing import Dict, Optional
 
-from fastapi import HTTPException
+from exceptions.base import BaseRealTimeMapException
 
 
 # TODO Maybe Rename
-class GatewayException(HTTPException):
+class GatewayException(BaseRealTimeMapException):
     def __init__(
         self,
         status_code: int = 502,
