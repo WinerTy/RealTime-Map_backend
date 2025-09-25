@@ -35,6 +35,9 @@ dependencies = [
     "pygeohash>=3.2.0",
     "itsdangerous>=2.2.0",
     "black>=25.1.0",
+    #    "psycopg2>=2.9.10",
+    #    "psycopg2>=2.9.10",
+    "yookassa>=3.7.0",
 ]
 
 [dependency-groups]
