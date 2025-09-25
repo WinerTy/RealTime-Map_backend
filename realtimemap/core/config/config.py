@@ -6,6 +6,7 @@ from .api_prefix import ApiPrefix
 from .celery import CeleryConfig
 from .database import DatabaseConfig
 from .logging import LoggingConfig
+from .payment import YooKassaPayment
 from .redis import RedisConfig
 from .server import ServerConfig
 from .socket import SocketIOConfig
@@ -20,6 +21,8 @@ class AppConfig(BaseSettings):
     api: ApiPrefix = ApiPrefix()
     static: Path = Path("static")
     log: LoggingConfig = LoggingConfig()
+    payment: YooKassaPayment
+    
     model_config = SettingsConfigDict(
         env_file=".env",
         case_sensitive=False,
