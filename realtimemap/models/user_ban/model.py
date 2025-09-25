@@ -47,7 +47,11 @@ class UsersBan(BaseSqlModel, IntIdMixin):
     )
 
     # RS
-    user: Mapped["User"] = relationship(back_populates="bans", foreign_keys=[user_id])
+    user: Mapped["User"] = relationship(
+        "User", back_populates="bans", foreign_keys=[user_id]
+    )
     moderator: Mapped["User"] = relationship(
-        back_populates="given_bans", foreign_keys=[moderator_id]
+        "User",
+        back_populates="issued_bans",
+        foreign_keys=[moderator_id],
     )

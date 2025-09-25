@@ -49,3 +49,10 @@ async def delete_me(
     repo: Annotated["UserRepository", Depends(get_user_repository)],
 ):
     return await repo.delete_user(user)
+
+
+@router.get("/me/subscriptions")
+async def get_my_subscriptions(
+    user: Annotated["User", Depends(get_current_user_without_ban)],
+):
+    return user.subscriptions

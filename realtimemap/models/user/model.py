@@ -21,6 +21,7 @@ if TYPE_CHECKING:
     from models.mark.model import Mark
     from models.mark_comment.model import Comment, CommentReaction
     from models.message.model import Chat
+    from models.user_subscription.model import UserSubscription
 
 
 class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
@@ -43,19 +44,25 @@ class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
     )
     comments: Mapped[List["Comment"]] = relationship(back_populates="owner")
     bans: Mapped[List["UsersBan"]] = relationship(
+        "UsersBan",
         back_populates="user",
-        cascade="all, delete-orphan",
         foreign_keys="UsersBan.user_id",
-        lazy="joined",
+        cascade="all, delete-orphan",
     )
-    given_bans: Mapped[List["UsersBan"]] = relationship(
-        back_populates="moderator", foreign_keys="UsersBan.moderator_id"
+    issued_bans: Mapped[List["UsersBan"]] = relationship(
+        "UsersBan",
+        back_populates="moderator",
+        foreign_keys="UsersBan.moderator_id",
+        cascade="all, delete-orphan",
     )
     chats: Mapped[List["Chat"]] = relationship(
         secondary="chat_participants", back_populates="participants"
     )
     reactions: Mapped[List["CommentReaction"]] = relationship(
         back_populates="user", foreign_keys="CommentReaction.user_id"
+    )
+    subscriptions: Mapped[List["UserSubscription"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan", lazy="joined"
     )
 
     @classmethod
