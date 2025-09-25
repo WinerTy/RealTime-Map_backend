@@ -21,6 +21,7 @@ if TYPE_CHECKING:
     from models.mark.model import Mark
     from models.mark_comment.model import Comment, CommentReaction
     from models.message.model import Chat
+    from models.user_subscription.model import UserSubscription
 
 
 class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
@@ -59,6 +60,9 @@ class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
     )
     reactions: Mapped[List["CommentReaction"]] = relationship(
         back_populates="user", foreign_keys="CommentReaction.user_id"
+    )
+    subscriptions: Mapped[List["UserSubscription"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan", lazy="joined"
     )
 
     @classmethod

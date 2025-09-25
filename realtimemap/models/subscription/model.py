@@ -1,13 +1,17 @@
+from datetime import datetime, timedelta
 from decimal import Decimal
 from enum import Enum as PyEnum
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List, TYPE_CHECKING
 
-from sqlalchemy import String, DECIMAL, Boolean, Enum
+from sqlalchemy import String, DECIMAL, Boolean, Enum, Integer
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from models import BaseSqlModel
 from models.mixins import TimeMarkMixin, IntIdMixin
+
+if TYPE_CHECKING:
+    from models.user_subscription.model import UserSubscription
 
 
 class SubPlanType(str, PyEnum):
@@ -22,12 +26,12 @@ class SubscriptionPlan(BaseSqlModel, IntIdMixin, TimeMarkMixin):
     price: Mapped[Decimal] = mapped_column(
         DECIMAL(precision=10, scale=2), nullable=False
     )
+    duration_days: Mapped[int] = mapped_column(Integer, nullable=False)
     plan_type: Mapped[str] = mapped_column(
         Enum(SubPlanType, name="plan_type_enum"),
         nullable=False,
         default=SubPlanType.premium.value,
         server_default=SubPlanType.premium.value,
-        unique=True,
         index=True,
     )
 
@@ -38,3 +42,12 @@ class SubscriptionPlan(BaseSqlModel, IntIdMixin, TimeMarkMixin):
 
     # MetaFields
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+
+    # RS
+    user_subscriptions: Mapped[List["UserSubscription"]] = relationship(
+        back_populates="plan"
+    )
+
+    def calculate_expires_at(self) -> datetime:
+        expires_at = datetime.now() + timedelta(days=self.duration_days)
+        return expires_at
