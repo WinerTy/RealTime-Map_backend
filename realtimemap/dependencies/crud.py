@@ -16,6 +16,7 @@ from crud.request_log.repository import RequestLogRepository
 from crud.subcription.repository import SubscriptionPlanRepository
 from crud.user.repository import UserRepository
 from crud.user_ban.repository import UsersBanRepository
+from crud.user_subscription import UserSubscriptionRepository
 from database.helper import db_helper
 from services.geo.dependency import get_geo_service
 from services.geo.service import GeoService
@@ -75,3 +76,9 @@ async def get_subscription_plan_repository(
     session: get_session,
 ) -> SubscriptionPlanRepository:
     yield SubscriptionPlanRepository(session=session)
+
+
+async def get_user_subscription_repository(
+    session: get_session,
+) -> UserSubscriptionRepository:
+    yield UserSubscriptionRepository(session=session)

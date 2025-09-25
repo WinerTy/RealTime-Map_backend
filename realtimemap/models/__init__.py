@@ -12,6 +12,7 @@ __all__ = [
     "UsersBan",
     "SubscriptionPlan",
     "Chat",
+    "UserSubscription",
 ]
 
 
@@ -25,3 +26,4 @@ from .request_log.model import RequestLog
 from .subscription.model import SubscriptionPlan
 from .user.model import User, AccessToken
 from .user_ban.model import UsersBan
+from .user_subscription.model import UserSubscription

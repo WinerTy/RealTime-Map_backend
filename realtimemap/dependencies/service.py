@@ -15,11 +15,14 @@ from dependencies.crud import (
     get_comment_reaction_repository,
     get_chat_repository,
     get_message_repository,
+    get_user_subscription_repository,
+    get_subscription_plan_repository,
 )
 from dependencies.websocket import get_mark_websocket_manager
 from services.chat.service import ChatService
 from services.mark.service import MarkService
 from services.mark_comment.service import MarkCommentService
+from services.subscription.service import SubscriptionService
 
 if TYPE_CHECKING:
     from crud.category import CategoryRepository
@@ -30,6 +33,8 @@ if TYPE_CHECKING:
         MarkCommentRepository,
         CommentStatRepository,
     )
+    from crud.user_subscription import UserSubscriptionRepository
+    from crud.subcription.repository import SubscriptionPlanRepository
 
 get_session = Annotated[AsyncSession, Depends(db_helper.session_getter)]
 
@@ -78,3 +83,15 @@ async def get_chat_service(
     message_repo: Annotated["MessageRepository", Depends(get_message_repository)],
 ) -> ChatService:
     yield ChatService(session, chat_repo, message_repo)
+
+
+async def get_subscription_service(
+    session: get_session,
+    user_subscription_repo: Annotated[
+        "UserSubscriptionRepository", Depends(get_user_subscription_repository)
+    ],
+    subscription_repo: Annotated[
+        "SubscriptionPlanRepository", Depends(get_subscription_plan_repository)
+    ],
+) -> SubscriptionService:
+    yield SubscriptionService(session, user_subscription_repo, subscription_repo)
