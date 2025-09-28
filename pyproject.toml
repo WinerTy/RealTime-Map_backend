@@ -36,8 +36,8 @@ dependencies = [
     "itsdangerous>=2.2.0",
     "black>=25.1.0",
     #    "psycopg2>=2.9.10",
-    #    "psycopg2>=2.9.10",
     "yookassa>=3.7.0",
+    "fastadmin[fastapi,sqlalchemy]",
 ]
 
 [dependency-groups]
@@ -52,6 +52,10 @@ dev = [
     "ruff>=0.11.10",
     "trio>=0.30.0",
 ]
+
+[tool.uv.sources]
+fastadmin = { git = "https://github.com/WinerTy/fastadmin.git" }
+
 #windows = [
 #    "psycopg2>=2.9.10",
 #]

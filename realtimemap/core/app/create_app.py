@@ -13,11 +13,11 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 from starlette.staticfiles import StaticFiles
 
 from api.v1 import router as v1_router
-from core.admin.admin import setup_admin
 from core.config import conf
 from middleware import ProcessTimeMiddleware
 from .lifespan import lifespan
 from .socket import sio_app
+from ..admin.admin import setup_admin
 
 logger = logging.getLogger(__name__)
 ROOT_DIR = Path(__file__).parent.parent
@@ -102,6 +102,7 @@ def create_app() -> FastAPI:
     mount_socket_io(app)
     setup_pagination(app)
     setup_admin(app)
+    # app.mount("/admin", fastadmin_app)
     app.add_middleware(ProcessTimeMiddleware)
     app.add_middleware(
         CORSMiddleware,
