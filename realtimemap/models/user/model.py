@@ -48,12 +48,14 @@ class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
         back_populates="user",
         foreign_keys="UsersBan.user_id",
         cascade="all, delete-orphan",
+        lazy="selectin",
     )
     issued_bans: Mapped[List["UsersBan"]] = relationship(
         "UsersBan",
         back_populates="moderator",
         foreign_keys="UsersBan.moderator_id",
         cascade="all, delete-orphan",
+        lazy="selectin",
     )
     chats: Mapped[List["Chat"]] = relationship(
         secondary="chat_participants", back_populates="participants"
@@ -62,7 +64,7 @@ class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
         back_populates="user", foreign_keys="CommentReaction.user_id"
     )
     subscriptions: Mapped[List["UserSubscription"]] = relationship(
-        back_populates="user", cascade="all, delete-orphan", lazy="joined"
+        "UserSubscription", back_populates="user", cascade="all, delete-orphan"
     )
 
     @classmethod
@@ -72,7 +74,7 @@ class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
     def __str__(self):
         return self.username
 
-    async def __admin_repr__(self, _: Request):
+    async def __admin_repr__(self, _: Request) -> str:
         return self.username
 
     async def __admin_select2_repr__(self, _: Request) -> str:

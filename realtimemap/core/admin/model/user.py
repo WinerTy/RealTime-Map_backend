@@ -10,7 +10,6 @@ from starlette.datastructures import FormData
 from starlette.requests import Request
 from starlette_admin import (
     PasswordField,
-    BooleanField,
     row_action,
 )
 from starlette_admin.exceptions import FormValidationError, ActionFailed
@@ -51,13 +50,7 @@ class AdminUser(BaseModelAdmin):
         User.is_active,
         User.is_superuser,
         User.is_verified,
-        BooleanField(
-            "bans",
-            label="is_banned",
-            read_only=True,
-            exclude_from_edit=True,
-            exclude_from_create=True,
-        ),
+        User.bans,
     ]
 
     exclude_fields_from_detail = [User.hashed_password]
