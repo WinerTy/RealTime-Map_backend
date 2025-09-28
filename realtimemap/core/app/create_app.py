@@ -13,7 +13,7 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 from starlette.staticfiles import StaticFiles
 
 from api.v1 import router as v1_router
-from core.admin.admin import setup_admin
+from core.admin import setup_admin
 from core.config import conf
 from middleware import ProcessTimeMiddleware
 from .lifespan import lifespan

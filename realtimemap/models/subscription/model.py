@@ -3,9 +3,11 @@ from decimal import Decimal
 from enum import Enum as PyEnum
 from typing import Optional, Dict, Any, List, TYPE_CHECKING
 
+from jinja2 import Template
 from sqlalchemy import String, DECIMAL, Boolean, Enum, Integer
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from starlette.requests import Request
 
 from models import BaseSqlModel
 from models.mixins import TimeMarkMixin, IntIdMixin
@@ -20,6 +22,7 @@ class SubPlanType(str, PyEnum):
     ultra = "ultra"
 
 
+# TODO Unique constraint to plan_type + duration_days
 class SubscriptionPlan(BaseSqlModel, IntIdMixin, TimeMarkMixin):
     # Main fields
     name: Mapped[str] = mapped_column(String(length=128), nullable=False)
@@ -51,3 +54,13 @@ class SubscriptionPlan(BaseSqlModel, IntIdMixin, TimeMarkMixin):
     def calculate_expires_at(self) -> datetime:
         expires_at = datetime.now() + timedelta(days=self.duration_days)
         return expires_at
+
+    async def __admin_repr__(self, _: Request) -> str:
+        return f"{self.name}, {self.duration_days} days"
+
+    async def __admin_select2_repr__(self, _: Request) -> str:
+        temp = Template(
+            """<h3>{{plan_name}}. {{duration}} days.</h3>""",
+            autoescape=True,
+        )
+        return temp.render(plan_name=self.name, duration=self.duration_days)

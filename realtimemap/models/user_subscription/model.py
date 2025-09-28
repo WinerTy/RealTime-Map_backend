@@ -9,7 +9,7 @@ from models import BaseSqlModel
 from models.mixins import IntIdMixin, TimeMarkMixin
 
 if TYPE_CHECKING:
-    from models import User, SubscriptionPlan
+    from models import SubscriptionPlan, User
 
 
 class PaymentStatus(str, PyEnum):
@@ -44,6 +44,4 @@ class UserSubscription(BaseSqlModel, IntIdMixin, TimeMarkMixin):
     )
     # RS
     user: Mapped["User"] = relationship("User", back_populates="subscriptions")
-    plan: Mapped["SubscriptionPlan"] = relationship(
-        back_populates="user_subscriptions", lazy="joined"
-    )
+    plan: Mapped["SubscriptionPlan"] = relationship(back_populates="user_subscriptions")
