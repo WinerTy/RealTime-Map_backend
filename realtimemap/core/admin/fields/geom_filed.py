@@ -26,15 +26,15 @@ class GeomField(StringField):
         result = serialization_geom(value)
         coords = result.coordinates._asdict()
 
-        return f"{coords.get('latitude')}, {coords.get('longitude')}"
+        return f"{coords.get('longitude')}, {coords.get('latitude')}"
 
     @staticmethod
     def _validate_coords(data: str) -> str:
         try:
-            lat, lon = data.split(",")
+            lon, lat = data.split(", ")
 
-            lat = float(lat)
             lon = float(lon)
+            lat = float(lat)
 
             if lat < -90 or lat > 90:
                 raise ValueError
