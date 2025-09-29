@@ -68,7 +68,16 @@ class AdminAuthProvider(AuthProvider):
 
     def get_admin_user(self, request: Request) -> AdminUser:
         user = request.state.user  # Retrieve current user
-        return AdminUser(username=user.username)
+        photo_url = None
+        if user.avatar:
+            photo_url = str(
+                request.url_for(
+                    "get_file",
+                    storage=user.avatar.upload_storage,
+                    file_id=user.avatar.file_id,
+                )
+            )
+        return AdminUser(username=user.username, photo_url=photo_url)
 
     async def logout(self, request: Request, response: Response) -> Response:
         request.session.clear()

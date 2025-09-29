@@ -10,6 +10,7 @@ from starlette.requests import Request
 from starlette_admin import (
     PasswordField,
     row_action,
+    RowActionsDisplayType,
 )
 from starlette_admin.exceptions import FormValidationError, ActionFailed
 
@@ -53,6 +54,8 @@ class AdminUser(BaseModelAdmin):
     exclude_fields_from_detail = [User.hashed_password]
     exclude_fields_from_edit = [User.hashed_password]
     exclude_fields_from_list = [User.hashed_password]
+
+    row_actions_display_type = RowActionsDisplayType.DROPDOWN
 
     async def before_create(
         self, request: Request, data: Dict[str, Any], obj: Any
