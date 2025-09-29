@@ -1,7 +1,10 @@
 from fastapi import FastAPI
+from starlette.middleware import Middleware
+from starlette.middleware.sessions import SessionMiddleware
 from starlette_admin import DropDown
 from starlette_admin.contrib.sqla import Admin
 
+from core.admin.auth.provider import AdminAuthProvider
 from core.admin.model import (
     AdminCategory,
     AdminUser,
@@ -13,7 +16,8 @@ from core.admin.model import (
     AdminSubscriptionPlan,
     AdminUserSubscription,
 )
-from core.app.lifespan import ROOT_DIR
+from core.admin.view.home import HomeView
+from core.config import conf
 from database.helper import db_helper
 from models import (
     Category,
@@ -32,13 +36,14 @@ def setup_admin(app: FastAPI) -> None:
     admin = Admin(
         engine=db_helper.engine,
         title="RealTime-Map",
-        # auth_provider=AdminAuthProvider(),
-        # middlewares=[
-        #     Middleware(
-        #         SessionMiddleware, secret_key=conf.api.v1.auth.verification_token_secret
-        #     )
-        # ],
-        templates_dir=ROOT_DIR / "templates",
+        index_view=HomeView(label="Home", icon="fa fa-home"),
+        auth_provider=AdminAuthProvider(),
+        middlewares=[
+            Middleware(
+                SessionMiddleware, secret_key=conf.api.v1.auth.verification_token_secret
+            )
+        ],
+        templates_dir=conf.template_dir / "admin",
     )
     admin.add_view(
         DropDown(

@@ -1,4 +1,3 @@
-import os
 from datetime import datetime
 from typing import Dict, Any
 
@@ -15,15 +14,13 @@ from starlette_admin import (
 from starlette_admin.exceptions import FormValidationError, ActionFailed
 
 from core.admin.model.base import BaseModelAdmin
-from core.app.lifespan import ROOT_DIR
+from core.config import conf
 from crud.user_ban.repository import UsersBanRepository
 from models import User
 from models.user_ban.model import BanReason
 from models.user_ban.schemas import UsersBanCreate, ReasonTextException, UsersBanUpdate
 
-# Пиздец Maybe FIX
-template_dir = os.path.join(ROOT_DIR, "templates")
-env = Environment(loader=FileSystemLoader(template_dir))
+env = Environment(loader=FileSystemLoader(conf.template_dir))
 
 
 def generate_ban_form():

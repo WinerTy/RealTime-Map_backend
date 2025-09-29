@@ -10,5 +10,5 @@ async def get_socket_io_docs(request: Request):
     templates: Jinja2Templates = request.app.state.templates
     return templates.TemplateResponse(
         "docs/socket/index.html",
-        context={"request": request, "dir": request.app.state.root_dir},
+        context={"request": request},
     )
