@@ -1,5 +1,4 @@
 from contextlib import asynccontextmanager
-from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi_cache import FastAPICache
@@ -14,18 +13,13 @@ from database.helper import db_helper
 from integrations.payment.yookassa import YookassaClient
 from utils.cache import OrJsonEncoder, custom_key_builder
 
-# Говнокод ON
-ROOT_DIR = Path(__file__).parent.parent.parent
-# Говнокод OFF
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     redis = asyncredis.from_url(str(conf.redis.url))
     await FastAPILimiter.init(redis=redis)
     app.state.redis = redis
-    app.state.root_dir = ROOT_DIR
-    app.state.templates = Jinja2Templates(directory=ROOT_DIR / "templates")
+    app.state.templates = Jinja2Templates(directory=conf.template_dir)
     FastAPICache.init(
         RedisBackend(redis),
         prefix=conf.redis.prefix,

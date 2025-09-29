@@ -1,7 +1,6 @@
 import logging
 import os
 import sys
-from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
@@ -20,7 +19,6 @@ from .lifespan import lifespan
 from .socket import sio_app
 
 logger = logging.getLogger(__name__)
-ROOT_DIR = Path(__file__).parent.parent
 
 
 # Интеграция и настройка пагинации
@@ -30,7 +28,7 @@ def setup_pagination(app: FastAPI) -> None:
 
 # Функция для настрйоки логов
 def setup_logging() -> None:
-    LOG_DIR = ROOT_DIR.parent / "logs"
+    LOG_DIR = conf.root_dir / "logs"
     os.makedirs(LOG_DIR, exist_ok=True)
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG)
@@ -94,7 +92,7 @@ def create_app() -> FastAPI:
     setup_logging()
     app = FastAPI(lifespan=lifespan, default_response_class=ORJSONResponse)
     app.mount(
-        "/static", StaticFiles(directory=ROOT_DIR.parent / conf.static), name="static"
+        "/static", StaticFiles(directory=conf.root_dir / conf.static), name="static"
     )
 
     add_header_middleware(app)
