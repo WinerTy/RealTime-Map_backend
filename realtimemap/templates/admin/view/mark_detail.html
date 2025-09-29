@@ -381,6 +381,7 @@
         </main>
     </div>
 
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             initMap();
@@ -394,13 +395,20 @@
             }
 
             const coords = geomString.split(', ').map(Number);
+
             await ymaps3.ready;
 
             const {YMap, YMapDefaultSchemeLayer, YMapDefaultFeaturesLayer, YMapMarker} = ymaps3;
 
             const map = new YMap(
                 document.getElementById('map'),
-                {location: {center: coords, zoom: 15}}
+                {
+                    location: {
+                        center: coords,
+                        zoom: 15
+                    },
+                    behaviors: ['pinchZoom', 'scrollZoom', 'dblClick']
+                }
             );
             map.addChild(new YMapDefaultSchemeLayer());
             map.addChild(new YMapDefaultFeaturesLayer());
@@ -428,10 +436,12 @@
                     markText.classList.replace('visible', 'hidden');
                 };
 
-                return new YMapMarker({coordinates: coords, mapFollowsOnDrag: true}, markerContainer);
+                return new YMapMarker({coordinates: coords}, markerContainer);
             }
 
             map.addChild(createCustomMarker(coords));
         }
     </script>
+
+
 {% endblock %}
