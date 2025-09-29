@@ -1,7 +1,7 @@
 [project]
 name = "realtimemap"
 version = "0.1.0"
-description = "Add your description here"
+description = "RealTime-map backend"
 requires-python = ">=3.13"
 dependencies = [
     "alembic>=1.15.2",
@@ -35,7 +35,6 @@ dependencies = [
     "pygeohash>=3.2.0",
     "itsdangerous>=2.2.0",
     "black>=25.1.0",
-    #    "psycopg2>=2.9.10",
     "yookassa>=3.7.0",
 ]
 
@@ -52,6 +51,3 @@ dev = [
     "trio>=0.30.0",
 ]
 
-#windows = [
-#    "psycopg2>=2.9.10",
-#]

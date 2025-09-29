@@ -46,6 +46,7 @@ class AdminMark(ModelView):
         Mark.is_ended,
     ]
     exclude_fields_from_create = [Mark.is_ended]
+    detail_template = "view/mark_detail.html"
 
     async def before_create(
         self, request: Request, data: Dict[str, Any], obj: Mark

@@ -1,0 +1,14 @@
+
+
+{% if model.can_delete(request) %}
+    <button
+            id="delete-btn"
+            type="button"
+            class="btn btn-danger btn-block"
+            data-bs-toggle="modal"
+            data-bs-target="#modal-delete"
+    >
+        <i class="bi bi-pencil-square"></i>
+        Delete
+    </button>
+{% endif %}
