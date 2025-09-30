@@ -1,0 +1,114 @@
+{% macro map_component(geom, obj_id, marker_text) %}
+    <script src="https://api-maps.yandex.ru/v3/?apikey=9811b22a-e004-49b4-ac9a-4103a26f10ee&lang=en_US"></script>
+
+    <style>
+        .map-display {
+            width: 100%;
+            height: 500px;
+        }
+
+        .marker-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .marker-text {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            white-space: nowrap;
+            margin-bottom: 5px;
+        }
+
+        .marker-text.hidden {
+            display: none;
+        }
+
+        .marker-text.visible {
+            display: block;
+        }
+
+        .marker-container img {
+            width: 32px;
+            height: 32px;
+        }
+    </style>
+
+    <div id="map-{{ obj_id }}"
+         class="map-display"
+         data-geom="{{ geom }}"
+         data-marker-text="{{ marker_text }}">
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Получаем все элементы карт на странице
+            const mapElements = document.querySelectorAll('[id^="map-"]');
+
+            mapElements.forEach(function (mapElement) {
+                const geomString = mapElement.dataset.geom;
+                const objId = mapElement.id.split('-')[1];
+                const markerText = mapElement.dataset.markerText;
+
+                initMap(geomString, objId, markerText, mapElement);
+            });
+        });
+
+        async function initMap(geomString, objId, markerText, mapElement) {
+            if (!geomString || geomString.indexOf(',') === -1) {
+                mapElement.innerHTML = '<p style="text-align:center; padding-top: 50px;">Invalid coordinates to display map.</p>';
+                return;
+            }
+
+            const coords = geomString.split(', ').map(Number);
+            await ymaps3.ready;
+
+            const {YMap, YMapDefaultSchemeLayer, YMapDefaultFeaturesLayer, YMapMarker} = ymaps3;
+
+            const map = new YMap(
+                mapElement,
+                {
+                    location: {
+                        center: coords,
+                        zoom: 15
+                    },
+                    behaviors: ['pinchZoom', 'scrollZoom', 'dblClick']
+                }
+            );
+            map.addChild(new YMapDefaultSchemeLayer());
+            map.addChild(new YMapDefaultFeaturesLayer());
+
+            const createCustomMarker = (coordinates) => {
+                const markerContainer = document.createElement("div");
+                markerContainer.className = "marker-container";
+
+                const markText = document.createElement("div");
+                markText.className = "marker-text hidden";
+                markText.innerText = markerText;
+
+                const markerImage = document.createElement("img");
+                markerImage.src = "https://cdn-icons-png.flaticon.com/128/684/684908.png";
+                markerImage.className = "image";
+
+                markerContainer.appendChild(markText);
+                markerContainer.appendChild(markerImage);
+
+                markerContainer.onmouseover = () => {
+                    markText.classList.replace('hidden', 'visible');
+                };
+                markerContainer.onmouseout = () => {
+                    markText.classList.replace('visible', 'hidden');
+                };
+
+                return new YMapMarker({coordinates}, markerContainer);
+            }
+
+            map.addChild(createCustomMarker(coords));
+        }
+    </script>
+{% endmacro %}

@@ -1,18 +1,9 @@
 {% extends "detail.html" %}
+{% from "components/map.html" import map_component %}
+{% from "components/card.html" import card %}
+
 {% block content %}
     <style>
-        /*
-          Custom styles for the detail page.
-          CSS variables from :root have been removed and replaced with direct values as requested.
-        */
-        body {
-            background-color: #f8f9fa;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            color: #212529;
-            margin: 0;
-        }
-
-        /* --- Main Page Layout (Full Screen) --- */
         .detail-page {
             padding: 2rem;
             box-sizing: border-box;
@@ -59,38 +50,6 @@
             display: flex;
             flex-direction: column;
             gap: 2rem;
-        }
-
-        /* --- Component: Card --- */
-        .content-card {
-            background-color: #ffffff;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-            overflow: hidden;
-        }
-
-        .content-card__header {
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid #dee2e6;
-            font-size: 1.15rem;
-            font-weight: 600;
-            margin: 0;
-        }
-
-        .content-card__header .bi {
-            margin-right: 0.5rem;
-            color: #0d6efd;
-        }
-
-        .content-card__body {
-            padding: 1.5rem;
-            font-size: 1.05rem;
-        }
-
-        /* --- Specific Element Styles --- */
-        .map-display {
-            width: 100%;
-            height: 500px;
         }
 
         .photo-grid {
@@ -174,77 +133,12 @@
             text-decoration: none;
         }
 
-        .action-button {
-            display: inline-block;
-            font-weight: 500;
-            text-align: center;
-            vertical-align: middle;
-            cursor: pointer;
-            border: 1px solid transparent;
-            padding: 0.5rem 1rem;
-            font-size: 1rem;
-            border-radius: 0.375rem;
-            text-decoration: none;
-            transition: all 0.2s ease-in-out;
-        }
-
-        .action-button--primary {
-            color: #fff;
-            background-color: #0d6efd;
-            border-color: #0d6efd;
-        }
-
-        .action-button--primary:hover {
-            background-color: #0b5ed7;
-            border-color: #0a58ca;
-        }
-
-        .action-button--danger {
-            color: #fff;
-            background-color: #dc3545;
-            border-color: #dc3545;
-        }
-
-        .action-button--danger:hover {
-            background-color: #bb2d3b;
-            border-color: #b02a37;
-        }
-
-        /* --- Map Marker Styles --- */
-        .marker-container {
-            position: relative;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .marker-text {
-            position: absolute;
-            bottom: 110%;
-            background-color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            white-space: nowrap;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
         .marker-container .image {
             width: 32px;
             height: 32px;
         }
 
-        .hidden {
-            display: none;
-        }
 
-        .visible {
-            display: block;
-        }
-
-        /* --- Responsiveness --- */
         @media (max-width: 1024px) {
             .detail-page__content {
                 flex-direction: column;
@@ -256,7 +150,6 @@
         }
     </style>
 
-    <script src="https://api-maps.yandex.ru/v3/?apikey=9811b22a-e004-49b4-ac9a-4103a26f10ee&lang=en_US"></script>
 
     <div class="detail-page">
         <header class="detail-page__header">
@@ -275,7 +168,7 @@
                 <div class="content-card">
                     <h3 class="content-card__header"><i class="bi bi-geo-alt-fill"></i>Location</h3>
                     <div class="content-card__body" style="padding: 0;">
-                        <div id="map" class="map-display"></div>
+                        {{ map_component(geom=obj.geom, obj_id=obj.id, marker_text=obj.mark_name) }}
                     </div>
                 </div>
 
@@ -297,151 +190,76 @@
 
             <!-- RIGHT COLUMN -->
             <aside class="detail-page__sidebar-column">
-                <div class="content-card">
-                    <h3 class="content-card__header"><i class="bi bi-info-circle-fill"></i>Main Information</h3>
-                    <!-- MODIFIED: Added inline style to increase font size -->
-                    <div class="content-card__body" style="font-size: 1.15rem;">
-                        <div class="info-row">
-                            <strong>Title</strong>
-                            <span>{{ obj.mark_name | safe }}</span>
-                        </div>
-                        <div class="info-row">
-                            <strong>Category</strong>
-                            <span class="status-badge status-badge--category">
+                {% call card(icon="bi-info-circle-fill", title="Main Information", extra_classes="content-card--compact") %}
+                    <div class="info-row">
+                        <strong>Title</strong>
+                        <span>{{ obj.mark_name | safe }}</span>
+                    </div>
+                    <div class="info-row">
+                        <strong>Category</strong>
+                        <span class="status-badge status-badge--category">
                             <a href="{{ url_for(__name__ ~ ':detail', identity='category', pk=raw_obj.category.id) }}">
                                 {{ raw_obj.category.category_name }}
                             </a>
                         </span>
-                        </div>
-                        <div class="info-row">
-                            <strong>Status</strong>
-                            {% if obj.is_ended %}
-                                <span class="status-badge status-badge--ended">Ended</span>
-                            {% else %}
-                                <span class="status-badge status-badge--active">Active</span>
-                            {% endif %}
-                        </div>
-                        <div class="pt-3">
-                            <strong style="display: block; margin-top: 1rem;">Additional Information:</strong>
-                            <p style="color: #6c757d; margin-top: 0.5rem;">{{ obj.additional_info | safe }}</p>
-                        </div>
                     </div>
-                </div>
-
-                <div class="content-card">
-                    <h3 class="content-card__header"><i class="bi bi-clock-fill"></i>Time Data</h3>
-                    <div class="content-card__body">
-                        <div class="info-row">
-                            <strong>Start</strong>
-                            <span>{{ obj.start_at }}</span>
-                        </div>
-                        <div class="info-row">
-                            <strong>Duration</strong>
-                            <span>{{ obj.duration }} hours</span>
-                        </div>
-                        <div class="info-row">
-                            <strong>Completion (estimated)</strong>
-                            <span>{{ obj.end_at }}</span>
-                        </div>
+                    <div class="info-row">
+                        <strong>Status</strong>
+                        {% if obj.is_ended %}
+                            <span class="status-badge status-badge--ended">Ended</span>
+                        {% else %}
+                            <span class="status-badge status-badge--active">Active</span>
+                        {% endif %}
                     </div>
-                </div>
-
-                <div class="content-card">
-                    <h3 class="content-card__header"><i class="bi bi-gear-fill"></i>Technical Information</h3>
-                    <div class="content-card__body">
-                        <div class="info-row">
-                            <strong>Mark ID</strong>
-                            <span>{{ obj.id }}</span>
-                        </div>
-                        <div class="info-row">
-                            <strong>Owner</strong>
-                            <a href="{{ url_for(__name__ ~ ':detail', identity='user', pk=raw_obj.owner.id) }}">
-                                {{ raw_obj.owner.username }}
-                            </a>
-                        </div>
-                        <div class="info-row">
-                            <strong>Coordinates</strong>
-                            <span>{{ obj.geom }}</span>
-                        </div>
-                        <div class="info-row">
-                            <strong>Geohash</strong>
-                            <span style="font-family: monospace;">{{ obj.geohash }}</span>
-                        </div>
-                        <div class="info-row">
-                            <strong>Created at</strong>
-                            <span>{{ obj.created_at }}</span>
-                        </div>
-                        <div class="info-row">
-                            <strong>Updated at</strong>
-                            <span>{{ obj.updated_at }}</span>
-                        </div>
+                    <div class="pt-3">
+                        <strong style="display: block; margin-top: 1rem;">Additional Information:</strong>
+                        <p style="color: #6c757d; margin-top: 0.5rem;">{{ obj.additional_info | safe }}</p>
                     </div>
-                </div>
+                {% endcall %}
+                {% call card(icon="bi-info-circle-fill", title="Time Data", extra_classes="content-card--compact") %}
+                    <div class="info-row">
+                        <strong>Start</strong>
+                        <span>{{ obj.start_at }}</span>
+                    </div>
+                    <div class="info-row">
+                        <strong>Duration</strong>
+                        <span>{{ obj.duration }} hours</span>
+                    </div>
+                    <div class="info-row">
+                        <strong>Completion (estimated)</strong>
+                        <span>{{ obj.end_at }}</span>
+                    </div>
+                {% endcall %}
+                {% call card(icon="bi-info-circle-fill", title="Technical Information", extra_classes="content-card--compact") %}
+                    <div class="info-row">
+                        <strong>Mark ID</strong>
+                        <span>{{ obj.id }}</span>
+                    </div>
+                    <div class="info-row">
+                        <strong>Owner</strong>
+                        <a href="{{ url_for(__name__ ~ ':detail', identity='user', pk=raw_obj.owner.id) }}">
+                            {{ raw_obj.owner.username }}
+                        </a>
+                    </div>
+                    <div class="info-row">
+                        <strong>Coordinates</strong>
+                        <span>{{ obj.geom }}</span>
+                    </div>
+                    <div class="info-row">
+                        <strong>Geohash</strong>
+                        <span style="font-family: monospace;">{{ obj.geohash }}</span>
+                    </div>
+                    <div class="info-row">
+                        <strong>Created at</strong>
+                        <span>{{ obj.created_at }}</span>
+                    </div>
+                    <div class="info-row">
+                        <strong>Updated at</strong>
+                        <span>{{ obj.updated_at }}</span>
+                    </div>
+                {% endcall %}
             </aside>
         </main>
     </div>
-
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            initMap();
-        });
-
-        async function initMap() {
-            const geomString = "{{ obj.geom }}";
-            if (!geomString || geomString.indexOf(',') === -1) {
-                document.getElementById('map').innerHTML = '<p style="text-align:center; padding-top: 50px;">Invalid coordinates to display map.</p>';
-                return;
-            }
-
-            const coords = geomString.split(', ').map(Number);
-
-            await ymaps3.ready;
-
-            const {YMap, YMapDefaultSchemeLayer, YMapDefaultFeaturesLayer, YMapMarker} = ymaps3;
-
-            const map = new YMap(
-                document.getElementById('map'),
-                {
-                    location: {
-                        center: coords,
-                        zoom: 15
-                    },
-                    behaviors: ['pinchZoom', 'scrollZoom', 'dblClick']
-                }
-            );
-            map.addChild(new YMapDefaultSchemeLayer());
-            map.addChild(new YMapDefaultFeaturesLayer());
-
-            const createCustomMarker = (coords) => {
-                const markerContainer = document.createElement("div");
-                markerContainer.className = "marker-container";
-
-                const markText = document.createElement("div");
-                markText.id = "marker-text-{{ obj.id }}";
-                markText.className = "marker-text hidden";
-                markText.innerText = "{{ obj.mark_name | e }}";
-
-                const markerImage = document.createElement("img");
-                markerImage.src = "https://cdn-icons-png.flaticon.com/128/684/684908.png";
-                markerImage.className = "image";
-
-                markerContainer.appendChild(markText);
-                markerContainer.appendChild(markerImage);
-
-                markerContainer.onmouseover = () => {
-                    markText.classList.replace('hidden', 'visible');
-                };
-                markerContainer.onmouseout = () => {
-                    markText.classList.replace('visible', 'hidden');
-                };
-
-                return new YMapMarker({coordinates: coords}, markerContainer);
-            }
-
-            map.addChild(createCustomMarker(coords));
-        }
-    </script>
-
 
 {% endblock %}
