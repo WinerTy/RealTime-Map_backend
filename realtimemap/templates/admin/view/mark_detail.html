@@ -165,27 +165,22 @@
         <main class="detail-page__content">
             <!-- LEFT COLUMN -->
             <section class="detail-page__main-column">
-                <div class="content-card">
-                    <h3 class="content-card__header"><i class="bi bi-geo-alt-fill"></i>Location</h3>
+                {% call card(title="Location") %}
                     <div class="content-card__body" style="padding: 0;">
                         {{ map_component(geom=obj.geom, obj_id=obj.id, marker_text=obj.mark_name) }}
                     </div>
-                </div>
-
-                <div class="content-card">
-                    <h3 class="content-card__header"><i class="bi bi-images"></i>Photos</h3>
-                    <div class="content-card__body">
-                        {% if obj.photo %}
-                            <div class="photo-grid">
-                                {% for photo in obj.photo %}
-                                    <img src="{{ photo.url }}" alt="Mark photo" class="photo-grid__image">
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            <p style="color: #6c757d;">No photos uploaded.</p>
-                        {% endif %}
-                    </div>
-                </div>
+                {% endcall %}
+                {% call card(title="Photos") %}
+                    {% if obj.photo %}
+                        <div class="photo-grid">
+                            {% for photo in obj.photo %}
+                                <img src="{{ photo.url }}" alt="Mark photo" class="photo-grid__image">
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p style="color: #6c757d;">No photos uploaded.</p>
+                    {% endif %}
+                {% endcall %}
             </section>
 
             <!-- RIGHT COLUMN -->

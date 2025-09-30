@@ -15,6 +15,7 @@ class AdminSubscriptionPlan(BaseModelAdmin):
         SubscriptionPlan.features,
         SubscriptionPlan.is_active,
     ]
+    detail_template = "view/subscription_plan_detail.html"
 
 
 class AdminUserSubscription(BaseModelAdmin):
