@@ -44,6 +44,7 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
     async def get_marks(self, params: MarkRequestParams) -> List[Mark]:
         current_point = self.geo_service.create_point(params, params.srid)
 
+        print(self.geo_service.get_geohash(params))
         # Preparation geohash sectors
         neighbors = self.geo_service.get_neighbors(
             self.geo_service.get_geohash(params), True
@@ -54,12 +55,12 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
         max_end = params.date + timedelta(hours=params.duration)
         # Условия фильтрации
         conditions = [
-            self.model.geohash.in_(neighbors),
             ST_DWithin(
                 ST_Transform(self.model.geom, 3857),
                 ST_Transform(current_point, 3857),
                 params.radius,
             ),
+            # self.model.geohash.in_(neighbors), # TODO Сделать более мягче
             self.model.start_at <= max_end,
             # self.model.start_at + timedelta(hours=params.duration) >= min_start, TODO поменять!
         ]
