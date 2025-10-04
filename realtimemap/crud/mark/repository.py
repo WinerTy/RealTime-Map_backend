@@ -61,7 +61,7 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
                 params.radius,
             ),
             self.model.start_at <= max_end,
-            self.model.start_at + timedelta(hours=params.duration) >= min_start,
+            # self.model.start_at + timedelta(hours=params.duration) >= min_start, TODO поменять!
         ]
         if not params.show_ended:
             conditions.append(self.model.is_ended == params.show_ended)
