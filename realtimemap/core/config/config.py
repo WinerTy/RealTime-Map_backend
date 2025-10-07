@@ -38,5 +38,8 @@ class AppConfig(BaseSettings):
     def template_dir(self) -> Path:
         return self.root_dir / "templates"
 
+    @property
+    def static_dir(self) -> Path:
+        return self.root_dir / "static"
 
 conf = AppConfig()  # noqa

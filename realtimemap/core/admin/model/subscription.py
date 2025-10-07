@@ -18,6 +18,10 @@ class AdminSubscriptionPlan(BaseModelAdmin):
         SubscriptionPlan.created_at,
         SubscriptionPlan.updated_at,
     ]
+    exclude_fields_from_create = [
+        SubscriptionPlan.created_at,
+        SubscriptionPlan.updated_at,
+    ]
     detail_template = "view/subscription_plan_detail.html"
 
     def get_details_query(self, request: Request) -> Select:
