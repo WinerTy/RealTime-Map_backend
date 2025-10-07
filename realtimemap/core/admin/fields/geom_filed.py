@@ -31,10 +31,10 @@ class GeomField(StringField):
     @staticmethod
     def _validate_coords(data: str) -> str:
         try:
-            lon, lat = data.split(", ")
+            lat, lon = data.split(", ")
 
-            lon = float(lon)
             lat = float(lat)
+            lon = float(lon)
 
             if lat < -90 or lat > 90:
                 raise ValueError

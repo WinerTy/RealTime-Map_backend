@@ -1,14 +1,15 @@
 from __future__ import annotations
+
 from typing import List
 
 from geoalchemy2 import Geometry
-from pydantic import BaseModel
-from pygeohash import encode, get_adjacent
 from geoalchemy2.functions import (
     ST_SetSRID,
     ST_MakePoint,
     ST_DistanceSphere,
 )
+from pydantic import BaseModel
+from pygeohash import encode, get_adjacent
 
 from models import Mark
 from models.mark.schemas import Coordinates
