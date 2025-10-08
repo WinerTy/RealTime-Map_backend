@@ -1,0 +1,89 @@
+
+:root {
+    --bg-page: #f8f9fa;
+    --bg-card: #ffffff;
+    --text-primary: #343a40;
+    --text-secondary: #6c757d;
+    --border-color: #e9ecef;
+    --accent-primary: #7aafeb;
+    --accent-primary-deep: #4a8ad4;
+    --accent-danger: #ff3b30;
+    --accent-succses: #82f00d;
+    --shadow-color: rgba(29, 33, 41, 0.07);
+}
+
+[data-theme="dark"] {
+    --bg-page: #1a1d21;
+    --bg-card: #2c3035;
+    --text-primary: #e9ecef;
+    --text-secondary: #adb5bd;
+    --border-color: #495057;
+    --accent-primary: #7aafeb;
+    --accent-primary-deep: #8bc0f7;
+    --accent-danger: #ff4d4f;
+    --accent-succses: #82f00d;
+    --shadow-color: rgba(0, 0, 0, 0.2);
+}
+
+body, header {
+    background-color: var(--bg-page) !important;
+    color: var(--text-primary) !important;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+table {
+    border-collapse: collapse;
+    background-color: var(--bg-page) !important;
+    color: var(--text-primary) !important;
+}
+
+.card-header, .card-body, .card-footer, .card {
+    background-color: var(--bg-card) !important;
+}
+
+h1, h2, h3, h4, h5, h6, .card-title, .modal-title, label, strong {
+    color: var(--text-primary) !important;
+}
+
+p, small, .text-muted {
+    color: var(--text-secondary) !important;
+}
+
+
+.form-control {
+    background-color: var(--bg-page) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+}
+
+.form-control:focus {
+    background-color: var(--bg-card) !important;
+    border-color: var(--accent-primary) !important;
+}
+
+
+.form-check-input {
+    --tblr-form-check-bg: var(--bg-page) !important;
+    color: var(--bg-page) !important;
+}
+
+.alert {
+    color: var(--accent-danger) !important;
+    border-color: var(--accent-danger) !important;
+}
+
+
+.btn-primary {
+    color: var(--text-secondary) !important;
+    border-color: var(--accent-primary) !important;
+}
+
+.btn {
+    background: transparent !important;
+    position: relative; /* Основа для позиционирования дочерних элементов */
+    overflow: hidden;
+    transition: color 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    border-width: 2px !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+}
