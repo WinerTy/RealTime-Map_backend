@@ -20,6 +20,8 @@ from .socket import sio_app
 
 logger = logging.getLogger(__name__)
 
+LOG_DIR = conf.root_dir / "logs"
+
 
 # Интеграция и настройка пагинации
 def setup_pagination(app: FastAPI) -> None:
@@ -28,7 +30,6 @@ def setup_pagination(app: FastAPI) -> None:
 
 # Функция для настрйоки логов
 def setup_logging() -> None:
-    LOG_DIR = conf.root_dir / "logs"
     os.makedirs(LOG_DIR, exist_ok=True)
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG)

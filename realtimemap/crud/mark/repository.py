@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from datetime import timedelta
 from typing import List, TYPE_CHECKING, Union, Type, Optional
 
@@ -28,6 +29,8 @@ if TYPE_CHECKING:
     from models import User
     from sqlalchemy.ext.asyncio import AsyncSession
 
+logger = logging.getLogger(__name__)
+
 
 class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
     """
@@ -43,26 +46,23 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
 
     async def get_marks(self, params: MarkRequestParams) -> List[Mark]:
         current_point = self.geo_service.create_point(params, params.srid)
-
-        print(self.geo_service.get_geohash(params))
         # Preparation geohash sectors
         neighbors = self.geo_service.get_neighbors(
             self.geo_service.get_geohash(params), True
         )
-
         # Time
         min_start = params.date - timedelta(hours=params.duration)
         max_end = params.date + timedelta(hours=params.duration)
         # Условия фильтрации
         conditions = [
+            self.model.geohash.in_(neighbors),
             ST_DWithin(
                 ST_Transform(self.model.geom, 3857),
                 ST_Transform(current_point, 3857),
                 params.radius,
             ),
-            # self.model.geohash.in_(neighbors), # TODO Сделать более мягче
             self.model.start_at <= max_end,
-            # self.model.start_at + timedelta(hours=params.duration) >= min_start, TODO поменять!
+            self.model.start_at + timedelta(hours=params.duration) >= min_start,
         ]
         if not params.show_ended:
             conditions.append(self.model.is_ended == params.show_ended)

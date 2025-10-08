@@ -19,8 +19,8 @@ class YookassaClient:
         metadata: Optional[Dict[str, Any]] = None,
     ):
         valid_data = CreatePayment(
-            amount=AmountPayment(value=value),
-            confirmation=ConfirmationPayment(return_url=redirect_url),
+            amount=AmountPayment.model_validate(value=value),
+            confirmation=ConfirmationPayment.model_validate(redirect_url=redirect_url),
             description=description,
             metadata=metadata,
         )
