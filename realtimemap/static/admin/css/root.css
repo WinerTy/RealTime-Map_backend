@@ -73,17 +73,67 @@ p, small, .text-muted {
 }
 
 
-.btn-primary {
-    color: var(--text-secondary) !important;
-    border-color: var(--accent-primary) !important;
-}
-
 .btn {
     background: transparent !important;
-    position: relative; /* Основа для позиционирования дочерних элементов */
+    position: relative;
     overflow: hidden;
-    transition: color 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
     border-width: 2px !important;
     border-radius: 10px !important;
     font-weight: 600 !important;
+    transition: color 0.4s ease-out !important;
+}
+
+
+.btn .icon,
+.btn span {
+    position: relative;
+    z-index: 2;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    transform: translateX(-101%);
+    transition: transform 0.4s cubic-bezier(0.7, 0, 0.3, 1);
+}
+
+
+.btn:hover {
+    color: white !important;
+}
+
+.btn:hover::before {
+    transform: translateX(0);
+}
+
+.btn-primary {
+    color: var(--accent-primary) !important;
+    border-color: var(--accent-primary) !important;
+}
+
+.btn-primary::before {
+    background-color: var(--accent-primary);
+}
+
+.btn-danger {
+    color: var(--accent-danger) !important;
+    border-color: var(--accent-danger) !important;
+}
+
+.btn-danger::before {
+    background-color: var(--accent-danger);
+}
+
+.btn-secondary {
+    color: var(--text-secondary) !important;
+    border-color: var(--text-secondary) !important;
+}
+
+.btn-secondary::before {
+    background-color: var(--text-secondary);
 }
