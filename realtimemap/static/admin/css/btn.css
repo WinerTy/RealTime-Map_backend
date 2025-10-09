@@ -103,3 +103,71 @@
 .btn-success::before {
     background-color: var(--accent-succses) !important;
 }
+
+/* пагинация */
+.pagination {
+    display: flex;
+    padding-left: 0;
+    list-style: none;
+    margin: 2rem 0 1rem 0 !important;
+}
+
+.pagination .page-item {
+    margin: 0 4px;
+}
+
+.pagination .page-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 0.75rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-secondary) !important;
+    background-color: transparent !important;
+    border: 2px solid var(--border-color) !important;
+    border-radius: 10px !important;
+    transition: all 0.2s ease-in-out;
+    user-select: none;
+}
+
+
+.pagination .page-item:not(.active):not(.disabled) .page-link:hover {
+    border-color: var(--accent-primary) !important;
+    background-color: var(--accent-primary) !important;
+    color: var(--bg-card) !important;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--accent-primary) !important;
+    border-color: var(--accent-primary) !important;
+    color: var(--bg-card) !important;
+    cursor: default;
+    box-shadow: 0 0 10px color-mix(in srgb, var(--accent-primary) 30%, transparent);
+}
+
+
+.pagination .page-item.disabled .page-link {
+    color: var(--text-secondary) !important;
+    background-color: var(--bg-page) !important;
+    border-color: var(--border-color) !important;
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.pagination .page-item.first a,
+.pagination .page-item.last a,
+.pagination .page-item.previous a,
+.pagination .page-item.next a {
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+
+.pagination .page-item#dt_ellipsis .page-link {
+    border-color: transparent !important;
+}
