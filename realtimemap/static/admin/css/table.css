@@ -1,0 +1,98 @@
+
+.table {
+    width: 100% !important;
+    border-collapse: collapse !important; /* Убираем двойные рамки */
+    background-color: var(--bg-card) !important;
+}
+
+/* --- Заголовок таблицы (thead) --- */
+.table thead th {
+    color: var(--text-secondary) !important;
+    background-color: var(--bg-card) !important;
+    font-weight: 600 !important;
+    font-size: 0.8rem !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 1rem 0.75rem !important;
+    border-bottom: 2px solid var(--border-color) !important;
+    border-top: none !important;
+    white-space: nowrap;
+}
+
+/* --- Стили для ячеек и строк (tbody) --- */
+.table tbody td {
+    padding: 0.85rem 0.75rem !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    vertical-align: middle !important;
+    transition: background-color 0.2s ease-in-out;
+}
+
+/* Убираем рамку у последней строки для чистого вида */
+.table tbody tr:last-child td {
+    border-bottom: none !important;
+}
+
+
+.table tbody tr.even {
+    background-color: var(--bg-page) !important;
+}
+
+/* Эффект при наведении на любую строку */
+.table tbody tr:hover {
+    /* Используем полупрозрачный цвет для универсальности */
+    background-color: color-mix(in srgb, var(--accent-primary) 10%, transparent) !important;
+    cursor: pointer;
+}
+
+/* Выделение отсортированного столбца */
+.table tbody td.sorting_1 {
+    background-color: color-mix(in srgb, var(--accent-primary) 15%, transparent) !important;
+    color: var(--text-primary) !important;
+    font-weight: 500;
+}
+
+.table tbody tr:hover td.sorting_1 {
+    background-color: color-mix(in srgb, var(--accent-primary) 25%, transparent) !important;
+}
+
+
+/* --- Стрелки сортировки --- */
+.table thead .sorting,
+.table thead .sorting_asc,
+.table thead .sorting_desc {
+    position: relative;
+    padding-right: 25px !important; /* Место для стрелки */
+}
+
+.table thead .sorting::after,
+.table thead .sorting_asc::after,
+.table thead .sorting_desc::after {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    opacity: 0.4;
+}
+
+.table thead .sorting_asc::after,
+.table thead .sorting_desc::after {
+    opacity: 1;
+    color: var(--accent-primary);
+}
+
+.table thead .sorting::after {
+    content: "▲▼";
+}
+
+.table thead .sorting_asc::after {
+    content: "▲";
+}
+
+.table thead .sorting_desc::after {
+    content: "▼";
+}
+
+td {
+    color: var(--text-secondary) !important;
+}

@@ -1,0 +1,105 @@
+
+.btn {
+    background: transparent !important;
+    position: relative;
+    overflow: hidden;
+    border-width: 2px !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    transition: color 0.4s ease-out !important;
+    color: var(--text-primary) !important;
+}
+
+
+.btn .icon,
+.btn span {
+    position: relative;
+    z-index: 2;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform: translateX(-101%);
+    transition: transform 0.4s cubic-bezier(0.7, 0, 0.3, 1);
+    z-index: -1;
+}
+
+
+.btn:hover {
+    color: white !important;
+    z-index: 2;
+}
+
+.btn:hover::before {
+    transform: translateX(0);
+}
+
+.btn.btn-primary {
+    color: var(--text-secondary) !important;
+    border-color: var(--accent-primary) !important;
+}
+
+.btn.btn-primary::before {
+    background-color: var(--accent-primary);
+}
+
+
+.btn.btn-primary:hover {
+    color: white !important;
+}
+
+.btn-secondary {
+    color: var(--text-primary) !important;
+    border-color: var(--text-secondary) !important;
+}
+
+.btn-secondary::before {
+    background-color: var(--text-secondary);
+}
+
+/* Выпадающие списки кнопки */
+.buttons-collection {
+    color: var(--text-secondary) !important;
+}
+
+
+.dropdown-toggle {
+    color: var(--text-secondary) !important;
+}
+
+.dt-buttons {
+    gap: 10px
+}
+
+.dt-button-collection, .dropdown-menu {
+    background-color: var(--bg-card) !important;
+}
+
+.dt-button-collection, .dropdown-menu, span {
+    color: var(--text-secondary) !important;
+}
+
+
+/* Утилитарные кнопки */
+.btn-danger {
+    color: var(--accent-danger) !important;
+    border-color: var(--accent-danger) !important;
+}
+
+.btn-danger::before {
+    background-color: var(--accent-danger);
+}
+
+.btn-success {
+    color: var(--accent-succses) !important;
+    border-color: var(--accent-succses) !important;
+}
+
+.btn-success::before {
+    background-color: var(--accent-succses) !important;
+}
