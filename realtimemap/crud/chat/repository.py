@@ -20,7 +20,7 @@ class ChatRepository(BaseRepository[Chat, CreateChat, ReadChat, UpdateChat]):
     async def get_user_chats_with_details(
         self, current_user_id: int
     ) -> List[Tuple[Chat, User, Message]]:
-        OtherParticipant = aliased(User)
+        other_participant = aliased(User)
 
         last_message_subq = (
             select(Message.chat_id, func.max(Message.id).label("max_message_id"))
@@ -29,10 +29,10 @@ class ChatRepository(BaseRepository[Chat, CreateChat, ReadChat, UpdateChat]):
         )
 
         stmt = (
-            select(self.model, OtherParticipant, Message)
+            select(self.model, other_participant, Message)
             .join(self.model.participants.and_(User.id == current_user_id))
-            .join(self.model.participants.of_type(OtherParticipant))
-            .where(OtherParticipant.id != current_user_id)
+            .join(self.model.participants.of_type(other_participant))
+            .where(other_participant.id != current_user_id)
             .join(last_message_subq, self.model.id == last_message_subq.c.chat_id)
             .join(Message, Message.id == last_message_subq.c.max_message_id)
             .order_by(Message.created_at.desc())

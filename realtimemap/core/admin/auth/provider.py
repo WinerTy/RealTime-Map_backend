@@ -1,5 +1,5 @@
 import contextlib
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
 from fastapi import Request, Response
 from starlette_admin.auth import AuthProvider, AdminConfig, AdminUser
@@ -10,6 +10,10 @@ from dependencies.auth.manager import get_user_manager
 from dependencies.auth.users import get_users_db
 from models import User
 from models.user.schemas import UserLogin
+
+if TYPE_CHECKING:
+    pass
+
 
 get_users_db_context = contextlib.asynccontextmanager(get_users_db)
 get_user_manager_context = contextlib.asynccontextmanager(get_user_manager)

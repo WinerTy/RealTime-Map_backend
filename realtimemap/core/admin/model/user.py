@@ -25,7 +25,7 @@ env = Environment(loader=FileSystemLoader(conf.template_dir))
 
 
 def generate_ban_form():
-    template = env.get_template("admin/form/ban_form.html")
+    template = env.get_template("admin/forms/ban_form.html")
     ban_reasons = list(BanReason)
     return template.render(ban_reasons=ban_reasons)
 

@@ -1,0 +1,15 @@
+{% extends "@starlette-admin/login.html" %}
+
+{% block content %}
+    <style>
+        .page-body {
+            justify-content: center;
+        }
+
+        .card {
+            background-color: var(--bg-card) !important;
+        }
+    </style>
+    {% include "components/theme_switcher.html" %}
+    {{ super() }}
+{% endblock %}
