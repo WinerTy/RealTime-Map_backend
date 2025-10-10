@@ -1,0 +1,16 @@
+.form-control {
+    background-color: var(--bg-page) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+}
+
+.form-control:focus {
+    background-color: var(--bg-card) !important;
+    border-color: var(--accent-primary) !important;
+}
+
+
+.form-check-input {
+    --tblr-form-check-bg: var(--bg-page) !important;
+    color: var(--bg-page) !important;
+}
