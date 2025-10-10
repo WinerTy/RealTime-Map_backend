@@ -15,7 +15,6 @@ from services.geo.service import GeoService
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
-    from websocket.mark_socket import MarkManager
     from crud.mark import MarkRepository
     from crud.mark_comment import MarkCommentRepository
 
@@ -28,14 +27,12 @@ class MarkService(BaseService):
         category_repo: "CategoryRepository",
         mark_comment_repo: "MarkCommentRepository",
         geo_service: "GeoService",
-        manager: "MarkManager",
     ):
         super().__init__(session)
         self.mark_repo = mark_repo
         self.category_repo = category_repo
         self.mark_comment_repo = mark_comment_repo
         self.geo_service = geo_service
-        self.manager = manager
 
     async def create_mark(self, mark_data: CreateMarkRequest, user: User) -> Mark:
         category_exist = await self.category_repo.exist(mark_data.category_id)

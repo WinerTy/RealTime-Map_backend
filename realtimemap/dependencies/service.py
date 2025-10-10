@@ -18,7 +18,6 @@ from dependencies.crud import (
     get_user_subscription_repository,
     get_subscription_plan_repository,
 )
-from dependencies.websocket import get_mark_websocket_manager
 from services.chat.service import ChatService
 from services.geo.dependency import get_geo_service
 from services.geo.service import GeoService
@@ -30,7 +29,6 @@ if TYPE_CHECKING:
     from crud.category import CategoryRepository
     from crud.mark import MarkRepository
 
-    from websocket.mark_socket import MarkManager
     from crud.mark_comment.repository import (
         MarkCommentRepository,
         CommentStatRepository,
@@ -47,7 +45,6 @@ async def get_mark_service(
     mark_comment_repo: Annotated[
         "MarkCommentRepository", Depends(get_mark_comment_repository)
     ],
-    manager: Annotated["MarkManager", Depends(get_mark_websocket_manager)],
     geo_service: Annotated[GeoService, Depends(get_geo_service)],
     session: get_session,
 ):
@@ -57,7 +54,6 @@ async def get_mark_service(
         category_repo=category_repo,
         mark_comment_repo=mark_comment_repo,
         geo_service=geo_service,
-        manager=manager,
     )
 
 
