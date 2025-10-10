@@ -20,6 +20,8 @@ from dependencies.crud import (
 )
 from dependencies.websocket import get_mark_websocket_manager
 from services.chat.service import ChatService
+from services.geo.dependency import get_geo_service
+from services.geo.service import GeoService
 from services.mark.service import MarkService
 from services.mark_comment.service import MarkCommentService
 from services.subscription.service import SubscriptionService
@@ -46,6 +48,7 @@ async def get_mark_service(
         "MarkCommentRepository", Depends(get_mark_comment_repository)
     ],
     manager: Annotated["MarkManager", Depends(get_mark_websocket_manager)],
+    geo_service: Annotated[GeoService, Depends(get_geo_service)],
     session: get_session,
 ):
     yield MarkService(
@@ -53,6 +56,7 @@ async def get_mark_service(
         mark_repo=mark_repo,
         category_repo=category_repo,
         mark_comment_repo=mark_comment_repo,
+        geo_service=geo_service,
         manager=manager,
     )
 

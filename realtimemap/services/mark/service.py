@@ -8,8 +8,10 @@ from models.mark.schemas import (
     CreateMarkRequest,
     MarkRequestParams,
     UpdateMarkRequest,
+    MarkFilter,
 )
 from services.base import BaseService
+from services.geo.service import GeoService
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -25,12 +27,14 @@ class MarkService(BaseService):
         mark_repo: "MarkRepository",
         category_repo: "CategoryRepository",
         mark_comment_repo: "MarkCommentRepository",
+        geo_service: "GeoService",
         manager: "MarkManager",
     ):
         super().__init__(session)
         self.mark_repo = mark_repo
         self.category_repo = category_repo
         self.mark_comment_repo = mark_comment_repo
+        self.geo_service = geo_service
         self.manager = manager
 
     async def create_mark(self, mark_data: CreateMarkRequest, user: User) -> Mark:
@@ -49,7 +53,8 @@ class MarkService(BaseService):
         return result
 
     async def get_marks(self, params: MarkRequestParams):
-        result = await self.mark_repo.get_marks(params)
+        filters = MarkFilter.from_request(params, self.geo_service)
+        result = await self.mark_repo.get_marks(filters)
         return result
 
     async def delete_mark(self, mark_id: int, user: User):

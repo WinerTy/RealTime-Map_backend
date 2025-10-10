@@ -5,13 +5,18 @@ from socketio import AsyncNamespace
 
 from crud.mark import MarkRepository
 from database.helper import db_helper
-from models.mark.schemas import MarkRequestParams, ReadMark
+from models.mark.schemas import MarkRequestParams, ReadMark, MarkFilter
+from services.geo.service import GeoService
 
 logger = logging.getLogger(__name__)
 
 
 # TODO СДЕЛАТЬ РУМЫ ПО ГЕОХЭШУ ДЛЯ СОКРАЩЕНИЯ ЧИСЛА ЗАПРОСОВ
 class MarksNamespace(AsyncNamespace):
+    def __init__(self, namespace=None):
+        super().__init__(namespace)
+        self.geo_service = GeoService()
+
     @staticmethod
     async def on_connect(sid, environ, auth):
         pass
@@ -36,11 +41,11 @@ class MarksNamespace(AsyncNamespace):
     async def on_message(self, sid, data):
         pass
 
-    @staticmethod
-    def _validate_params(data: Any) -> Optional[MarkRequestParams]:
+    def _validate_params(self, data: Any) -> Optional[MarkFilter]:
         try:
-            valid_params = MarkRequestParams(**data)
-            return valid_params
+            req = MarkRequestParams(**data)
+            filters = MarkFilter.from_request(req, self.geo_service)
+            return filters
         except Exception as e:
             logger.error(f"Error on validate params in socker.io: {e}")
             return None

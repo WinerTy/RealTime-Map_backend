@@ -22,6 +22,7 @@ from models.mark.schemas import (
     CreateMarkRequest,
     MarkRequestParams,
     UpdateMarkRequest,
+    MarkFilter,
 )
 from services.geo.service import GeoService
 
@@ -44,28 +45,21 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
         self.upload_dir = "upload_marks"
         self.geo_service = geo_service if geo_service is not None else GeoService()
 
-    async def get_marks(self, params: MarkRequestParams) -> List[Mark]:
-        current_point = self.geo_service.create_point(params, params.srid)
-        # Preparation geohash sectors
-        neighbors = self.geo_service.get_neighbors(
-            self.geo_service.get_geohash(params), True
-        )
-        # Time
-        min_start = params.date - timedelta(hours=params.duration)
-        max_end = params.date + timedelta(hours=params.duration)
+    async def get_marks(self, filters: MarkFilter) -> List[Mark]:
         # Условия фильтрации
         conditions = [
-            self.model.geohash.in_(neighbors),
+            self.model.geohash.in_(filters.geohash_neighbors),
             ST_DWithin(
                 ST_Transform(self.model.geom, 3857),
-                ST_Transform(current_point, 3857),
-                params.radius,
+                ST_Transform(filters.current_point, 3857),
+                filters.radius,
             ),
-            self.model.start_at <= max_end,
-            self.model.start_at + timedelta(hours=params.duration) >= min_start,
+            self.model.start_at <= filters.max_end,
+            self.model.start_at + timedelta(hours=filters.duration)
+            >= filters.min_start,
         ]
-        if not params.show_ended:
-            conditions.append(self.model.is_ended == params.show_ended)
+        if not filters.show_ended:
+            conditions.append(self.model.is_ended == filters.show_ended)
 
         query = (
             select(self.model, ST_AsGeoJSON(self.model.geom).label("geom"))
