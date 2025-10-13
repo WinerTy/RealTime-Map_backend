@@ -6,8 +6,8 @@ from api.v1.auth.fastapi_users import get_current_user_without_ban
 from dependencies.checker import check_message_exist, check_chat_exist
 from dependencies.notification import get_chat_notification_service
 from dependencies.service import get_chat_service
-from exceptions import UserPermissionError, RecordNotFoundError
-from exceptions.utils import http_error_response_generator
+from errors import UserPermissionError, RecordNotFoundError
+from errors.utils import http_error_response_generator
 from models import User
 from models.chat.schemas import ReadChat
 from models.message import ReadMessage

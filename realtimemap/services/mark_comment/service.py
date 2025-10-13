@@ -2,7 +2,7 @@ from typing import Optional, List
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from exceptions import RecordNotFoundError, NestingLevelExceededError
+from errors import RecordNotFoundError, NestingLevelExceededError
 from interfaces import (
     IMarkCommentRepository,
     ICommentStatRepository,

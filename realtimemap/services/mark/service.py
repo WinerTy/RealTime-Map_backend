@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
-from exceptions import RecordNotFoundError, UserPermissionError, TimeOutError
+from errors import RecordNotFoundError, UserPermissionError, TimeOutError
 from models import User, Mark
 from models.mark.schemas import (
     CreateMarkRequest,

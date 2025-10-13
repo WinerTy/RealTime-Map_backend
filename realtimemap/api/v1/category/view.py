@@ -7,7 +7,7 @@ from fastapi_pagination.ext.sqlalchemy import apaginate
 
 from crud.category.repository import CategoryRepository
 from dependencies.crud import get_category_repository
-from exceptions.database.integrity import HttpIntegrityError
+from errors.database.integrity import HttpIntegrityError
 from models.category.schemas import ReadCategory, CreateCategory
 
 router = APIRouter(prefix="/category", tags=["Category"])

@@ -1,6 +1,6 @@
 from typing import Dict, Optional
 
-from exceptions.base import BaseRealTimeMapException
+from errors.base import BaseRealTimeMapException
 
 
 class MessageSendingError(BaseRealTimeMapException):

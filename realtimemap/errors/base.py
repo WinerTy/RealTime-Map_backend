@@ -2,7 +2,7 @@ from typing import Dict, Optional, TYPE_CHECKING
 
 from fastapi import HTTPException
 
-from exceptions.schemas import HTTPErrorDetail
+from errors.schemas import HTTPErrorDetail
 
 if TYPE_CHECKING:
     from pydantic import BaseModel

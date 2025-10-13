@@ -9,7 +9,7 @@ from starlette.responses import FileResponse, StreamingResponse
 
 from core.app import create_app
 from core.config import conf
-from exceptions import HttpIntegrityError
+from errors import HttpIntegrityError
 
 logger = logging.getLogger(__name__)
 

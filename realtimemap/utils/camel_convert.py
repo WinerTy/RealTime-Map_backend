@@ -11,7 +11,3 @@ def camel_case_to_snake_case(input_str: str) -> str:
                 chars.append("_")
         chars.append(char.lower())
     return "".join(chars)
-
-
-def function():
-    pass

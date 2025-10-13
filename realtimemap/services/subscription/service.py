@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING
 
 from fastapi import HTTPException
 
-from exceptions import RecordNotFoundError
-from exceptions.users import HaveActiveSubscriptionException
+from errors import RecordNotFoundError
+from errors.users import HaveActiveSubscriptionException
 from integrations.payment.yookassa.exception import GatewayException
 from models.user_subscription.schemas import CreateUserSubscription
 from services.base import BaseService
@@ -34,7 +34,7 @@ class SubscriptionService(BaseService):
             await self.user_subscription_repo.check_active_subscription(user_id)
         )
         if have_active_subscription:
-            from exceptions.users import HaveActiveSubscriptionException
+            from errors.users import HaveActiveSubscriptionException
 
             raise HaveActiveSubscriptionException()
 

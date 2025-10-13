@@ -5,12 +5,12 @@ from fastapi import APIRouter, Depends
 from api.v1.auth.fastapi_users import get_current_user_without_ban
 from dependencies.checker import check_mark_exist, check_mark_comment_exist
 from dependencies.service import get_mark_comment_service
-from exceptions import (
+from errors import (
     RecordNotFoundError,
     UserPermissionError,
     NestingLevelExceededError,
 )
-from exceptions.utils import http_error_response_generator
+from errors.utils import http_error_response_generator
 from models.mark_comment.schemas import (
     CreateCommentRequest,
     ReadComment,

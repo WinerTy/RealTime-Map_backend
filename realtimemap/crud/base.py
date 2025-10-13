@@ -16,7 +16,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.expression import exists as sql_exists
 
-from exceptions import HttpIntegrityError
+from errors import HttpIntegrityError
 from my_type import Model, CreateSchema, UpdateSchema
 
 if TYPE_CHECKING:

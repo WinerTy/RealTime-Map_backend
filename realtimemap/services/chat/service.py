@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING, List
 
-from exceptions import UserPermissionError
+from errors import UserPermissionError
 from models.chat.schemas import ReadChat
 from models.message.schemas import (
     CreateMessageRequest,
