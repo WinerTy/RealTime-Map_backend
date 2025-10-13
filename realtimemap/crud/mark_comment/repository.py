@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, List
 
 from sqlalchemy import select, Select
 from sqlalchemy.orm import selectinload
@@ -8,12 +8,9 @@ from models import Comment, CommentStat, CommentReaction
 from models.mark_comment.schemas import (
     CreateComment,
     UpdateComment,
-    ReadComment,
     CreateCommentStat,
-    ReadCommentStat,
     UpdateCommentStat,
     CreateCommentReaction,
-    ReadCommentReaction,
     UpdateCommentReaction,
 )
 
@@ -21,13 +18,11 @@ if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
 
 
-class MarkCommentRepository(
-    BaseRepository[Comment, CreateComment, ReadComment, UpdateComment]
-):
+class MarkCommentRepository(BaseRepository[Comment, CreateComment, UpdateComment]):
     def __init__(self, session: "AsyncSession"):
         super().__init__(session=session, model=Comment)
 
-    async def create_comment(self, data: CreateComment):
+    async def create_comment(self, data: CreateComment) -> Comment:
         result = await self.create(data=data)
         return result
 
@@ -52,7 +47,7 @@ class MarkCommentRepository(
         ).order_by(self.model.created_at.desc())
         return stmt
 
-    async def get_comments(self, mark_id: int):
+    async def get_comments(self, mark_id: int) -> List[Comment]:
         stmt = self.get_comment_for_mark(mark_id=mark_id)
         result = await self.session.execute(stmt)
         comments = result.scalars().unique().all()
@@ -66,7 +61,7 @@ class MarkCommentRepository(
 
 
 class CommentStatRepository(
-    BaseRepository[CommentStat, CreateCommentStat, ReadCommentStat, UpdateCommentStat]
+    BaseRepository[CommentStat, CreateCommentStat, UpdateCommentStat]
 ):
     def __init__(self, session: "AsyncSession"):
         super().__init__(session=session, model=CommentStat)
@@ -80,14 +75,15 @@ class CommentReactionRepository(
     BaseRepository[
         CommentReaction,
         CreateCommentReaction,
-        ReadCommentReaction,
         UpdateCommentReaction,
     ]
 ):
     def __init__(self, session: "AsyncSession"):
         super().__init__(session=session, model=CommentReaction)
 
-    async def create_comment_reaction(self, data: CreateCommentReaction):
+    async def create_comment_reaction(
+        self, data: CreateCommentReaction
+    ) -> CommentReaction:
         result = await self.create(data=data)
         return result
 

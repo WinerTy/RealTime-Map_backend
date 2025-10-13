@@ -6,14 +6,14 @@ from sqlalchemy.orm import aliased
 from crud import BaseRepository
 from models import User, Message
 from models.chat.model import Chat
-from models.chat.schemas import CreateChat, ReadChat, UpdateChat
+from models.chat.schemas import CreateChat, UpdateChat
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
     from sqlalchemy import Select
 
 
-class ChatRepository(BaseRepository[Chat, CreateChat, ReadChat, UpdateChat]):
+class ChatRepository(BaseRepository[Chat, CreateChat, UpdateChat]):
     def __init__(self, session: "AsyncSession"):
         super().__init__(session=session, model=Chat)
 

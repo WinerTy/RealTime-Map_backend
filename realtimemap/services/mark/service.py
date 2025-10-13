@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
-from crud.category import CategoryRepository
 from exceptions import RecordNotFoundError, UserPermissionError, TimeOutError
 from models import User, Mark
 from models.mark.schemas import (
@@ -15,17 +14,17 @@ from services.geo.service import GeoService
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
-    from crud.mark import MarkRepository
-    from crud.mark_comment import MarkCommentRepository
+
+    from interfaces import IMarkRepository, ICategoryRepository, IMarkCommentRepository
 
 
 class MarkService(BaseService):
     def __init__(
         self,
         session: "AsyncSession",
-        mark_repo: "MarkRepository",
-        category_repo: "CategoryRepository",
-        mark_comment_repo: "MarkCommentRepository",
+        mark_repo: "IMarkRepository",
+        category_repo: "ICategoryRepository",
+        mark_comment_repo: "IMarkCommentRepository",
         geo_service: "GeoService",
     ):
         super().__init__(session)

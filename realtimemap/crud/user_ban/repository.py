@@ -5,15 +5,13 @@ from sqlalchemy import select, and_, or_, Select
 
 from crud import BaseRepository
 from models import UsersBan
-from models.user_ban.schemas import UsersBanCreate, UsersBanRead, UsersBanUpdate
+from models.user_ban.schemas import UsersBanCreate, UsersBanUpdate
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
 
 
-class UsersBanRepository(
-    BaseRepository[UsersBan, UsersBanCreate, UsersBanRead, UsersBanUpdate]
-):
+class UsersBanRepository(BaseRepository[UsersBan, UsersBanCreate, UsersBanUpdate]):
     def __init__(self, session: "AsyncSession"):
         super().__init__(session=session, model=UsersBan)
 

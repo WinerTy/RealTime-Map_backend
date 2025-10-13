@@ -1,5 +1,14 @@
 import logging
-from typing import Generic, Type, Any, Optional, List, Union, Dict, TYPE_CHECKING
+from typing import (
+    Generic,
+    Type,
+    Any,
+    Optional,
+    List,
+    Union,
+    Dict,
+    TYPE_CHECKING,
+)
 
 from fastapi import HTTPException
 from sqlalchemy import select, delete, Select
@@ -8,7 +17,7 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.expression import exists as sql_exists
 
 from exceptions import HttpIntegrityError
-from my_type import Model, CreateSchema, ReadSchema, UpdateSchema
+from my_type import Model, CreateSchema, UpdateSchema
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -16,7 +25,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class BaseRepository(Generic[Model, CreateSchema, ReadSchema, UpdateSchema]):
+class BaseRepository(Generic[Model, CreateSchema, UpdateSchema]):
     def __init__(
         self,
         model: Type[Model],

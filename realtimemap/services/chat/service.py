@@ -11,8 +11,7 @@ from models.message.schemas import MessageParamsRequest
 from services.base import BaseService
 
 if TYPE_CHECKING:
-    from crud.chat.repository import ChatRepository
-    from crud.message.repository import MessageRepository
+    from interfaces import IMessageRepository, IChatRepository
     from sqlalchemy.ext.asyncio import AsyncSession
     from models import User, Message
 
@@ -21,8 +20,8 @@ class ChatService(BaseService):
     def __init__(
         self,
         session: "AsyncSession",
-        chat_repo: "ChatRepository",
-        message_repo: "MessageRepository",
+        chat_repo: "IChatRepository",
+        message_repo: "IMessageRepository",
     ):
         super().__init__(session)
         self.chat_repo = chat_repo

@@ -5,7 +5,7 @@ from sqlalchemy import select
 
 from crud import BaseRepository
 from models import Message
-from models.message import CreateMessage, ReadMessage, UpdateMessage
+from models.message import CreateMessage, UpdateMessage
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -14,16 +14,15 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class MessageRepository(
-    BaseRepository[Message, CreateMessage, ReadMessage, UpdateMessage]
-):
+class MessageRepository(BaseRepository[Message, CreateMessage, UpdateMessage]):
     def __init__(self, session: "AsyncSession"):
         super().__init__(model=Message, session=session)
 
-    async def create_message(self, data: CreateMessage):
+    async def create_message(self, data: CreateMessage) -> Message:
         result = await self.create(data)
         return result
 
+    # TODO Переделать фильтр на dataclass
     async def get_chat_messages(
         self, chat_id: int, params: "MessageParamsRequest"
     ) -> List[Message]:

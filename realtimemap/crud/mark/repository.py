@@ -17,7 +17,6 @@ from crud import BaseRepository
 from models import Mark
 from models.mark.schemas import (
     CreateMark,
-    ReadMark,
     UpdateMark,
     CreateMarkRequest,
     MarkRequestParams,
@@ -33,7 +32,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
+class MarkRepository(BaseRepository[Mark, CreateMark, UpdateMark]):
     """
     Repository for the Mark model.
     """
@@ -141,6 +140,7 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
         await super().delete(mark_id)
         return mark
 
+    # TODO переписать на GEO SERVICE
     async def check_distance(
         self, current_location: MarkRequestParams, mark: Mark, radius: int = 500
     ) -> bool:

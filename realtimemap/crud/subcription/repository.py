@@ -6,7 +6,6 @@ from crud import BaseRepository
 from models import SubscriptionPlan
 from models.subscription.schemas import (
     CreateSubscriptionPlan,
-    ReadSubscriptionPlan,
     UpdateSubscriptionPlan,
 )
 
@@ -18,7 +17,6 @@ class SubscriptionPlanRepository(
     BaseRepository[
         SubscriptionPlan,
         CreateSubscriptionPlan,
-        ReadSubscriptionPlan,
         UpdateSubscriptionPlan,
     ]
 ):

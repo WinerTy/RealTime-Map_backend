@@ -2,12 +2,12 @@ from typing import Optional, List
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from crud.mark_comment import MarkCommentRepository
-from crud.mark_comment.repository import (
-    CommentStatRepository,
-    CommentReactionRepository,
-)
 from exceptions import RecordNotFoundError, NestingLevelExceededError
+from interfaces import (
+    IMarkCommentRepository,
+    ICommentStatRepository,
+    ICommentReactionRepository,
+)
 from models import Comment, User
 from models.mark_comment.schemas import (
     CreateComment,
@@ -22,9 +22,9 @@ class MarkCommentService(BaseService):
     def __init__(
         self,
         session: AsyncSession,
-        comment_repo: MarkCommentRepository,
-        comment_stat_repo: CommentStatRepository,
-        comment_reaction_repo: CommentReactionRepository,
+        comment_repo: "IMarkCommentRepository",
+        comment_stat_repo: "ICommentStatRepository",
+        comment_reaction_repo: "ICommentReactionRepository",
     ):
         super().__init__(session)
         self.comment_repo = comment_repo

@@ -11,8 +11,7 @@ from services.base import BaseService
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
-    from crud.user_subscription.repository import UserSubscriptionRepository
-    from crud.subcription.repository import SubscriptionPlanRepository
+    from interfaces import IUserSubscriptionRepository, ISubscriptionPlanRepository
     from models import User
     from integrations.payment.yookassa import YookassaClient
 
@@ -23,8 +22,8 @@ class SubscriptionService(BaseService):
     def __init__(
         self,
         session: "AsyncSession",
-        user_subscription_repo: "UserSubscriptionRepository",
-        subscription_repo: "SubscriptionPlanRepository",
+        user_subscription_repo: "IUserSubscriptionRepository",
+        subscription_repo: "ISubscriptionPlanRepository",
     ):
         self.user_subscription_repo = user_subscription_repo
         self.subscription_repo = subscription_repo

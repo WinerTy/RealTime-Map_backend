@@ -2,24 +2,23 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from sqlalchemy import select, and_, or_
-from starlette.responses import Response
 
 from crud import BaseRepository
 from models import User, UsersBan
-from models.user.schemas import UserCreate, UserRead, UserUpdate
+from models.user.schemas import UserCreate, UserUpdate
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
 
 
-class UserRepository(BaseRepository[User, UserCreate, UserRead, UserUpdate]):
+class UserRepository(BaseRepository[User, UserCreate, UserUpdate]):
     def __init__(self, session: "AsyncSession"):
         super().__init__(User, session)
 
     async def update_user(self, user: User, update_data: UserUpdate) -> User:
         return await self.update(user.id, update_data)
 
-    async def delete_user(self, user: User) -> Response:
+    async def delete_user(self, user: User) -> User:
         return await self.delete(user.id)
 
     async def user_is_banned(self, user_id: int) -> bool:
