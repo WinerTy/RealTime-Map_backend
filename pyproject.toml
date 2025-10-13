@@ -36,7 +36,6 @@ dependencies = [
     "itsdangerous>=2.2.0",
     "black>=25.1.0",
     "yookassa>=3.7.0",
-    "mypy>=1.11",
 ]
 
 [dependency-groups]
