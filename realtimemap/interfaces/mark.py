@@ -32,7 +32,6 @@ class IMarkRepository(IBaseRepository[Mark, CreateMark, UpdateMark], Protocol):
 
     async def get_mark_by_id(self, mark_id: int) -> Optional[Mark]: ...
 
-    # TODO Убрать в GEO SERVICE
     async def check_distance(
         self, current_location: MarkRequestParams, mark: Mark, radius: int = 500
     ) -> bool: ...

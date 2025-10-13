@@ -7,7 +7,7 @@ from socketio import AsyncServer
 from core.config import conf
 from crud.mark import MarkRepository
 from models import Mark
-from models.mark.schemas import MarkRequestParams, ReadMark
+from models.mark.schemas import MarkRequestParams, ReadMark, MarkFilter
 from services.geo.service import GeoService
 from .base import BaseNotificationSocketIO
 
@@ -76,7 +76,9 @@ class MarkNotificationService(BaseNotificationSocketIO):
             if not self.geo_service.check_geohash_proximity(coords=params, mark=mark):
                 continue
 
-            in_range = await self.mark_repo.check_distance(params, mark)
+            in_range = await self.mark_repo.check_distance(
+                MarkFilter.from_request(params), mark
+            )
             if in_range:
                 targets.add(sid)
 

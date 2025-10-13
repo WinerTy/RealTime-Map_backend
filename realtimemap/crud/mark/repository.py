@@ -19,7 +19,6 @@ from models.mark.schemas import (
     CreateMark,
     UpdateMark,
     CreateMarkRequest,
-    MarkRequestParams,
     UpdateMarkRequest,
     MarkFilter,
 )
@@ -140,31 +139,14 @@ class MarkRepository(BaseRepository[Mark, CreateMark, UpdateMark]):
         await super().delete(mark_id)
         return mark
 
-    # TODO переписать на GEO SERVICE
-    async def check_distance(
-        self, current_location: MarkRequestParams, mark: Mark, radius: int = 500
-    ) -> bool:
-        """
-        Method for checking if the given location is within the given radius.
-
-        Args:
-            current_location (MarkRequestParams): Current location
-            mark (Mark): Mark to check
-            radius (int): Radius to check. Need for SQL expression
-
-        Returns:
-            bool: True or False
-        """
-        # Проверка вложена ли метка в зону
-        geohash = self.geo_service.get_geohash(current_location)
-        neighbors = self.geo_service.get_neighbors(geohash, need_include=True)
-
-        if mark.geohash not in neighbors:
+    async def check_distance(self, filters: MarkFilter, mark: Mark) -> bool:
+        if mark.geohash not in filters.geohash_neighbors:
             return False
 
         # Проверка вложена ли метка в радиус пользователя
-        user_point = self.geo_service.create_point(current_location)
-        exp = self.geo_service.distance_sphere(user_point, mark.geom, radius)
+        exp = self.geo_service.distance_sphere(
+            filters.current_point, mark.geom, filters.radius
+        )
 
         stmt = select(exp)
 
