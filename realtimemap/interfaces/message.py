@@ -4,10 +4,10 @@ from interfaces import IBaseRepository
 from models import Message, Chat, User
 from models.chat.schemas import UpdateChat, CreateChat
 from models.message import CreateMessage, UpdateMessage
-from models.message.schemas import MessageParamsRequest
 
 if TYPE_CHECKING:
     from sqlalchemy import Select
+    from models.message.schemas import MessageFilter
 
 
 class IMessageRepository(
@@ -16,9 +16,8 @@ class IMessageRepository(
 
     async def create_message(self, data: CreateMessage) -> Message: ...
 
-    # TODO Переделать фильтр на dataclass
     async def get_chat_messages(
-        self, chat_id: int, params: "MessageParamsRequest"
+        self, chat_id: int, params: "MessageFilter"
     ) -> List[Message]: ...
 
 

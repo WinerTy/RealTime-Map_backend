@@ -9,7 +9,7 @@ from models.message import CreateMessage, UpdateMessage
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
-    from models.message.schemas import MessageParamsRequest
+    from models.message.schemas import MessageFilter
 
 logger = logging.getLogger(__name__)
 
@@ -22,9 +22,8 @@ class MessageRepository(BaseRepository[Message, CreateMessage, UpdateMessage]):
         result = await self.create(data)
         return result
 
-    # TODO Переделать фильтр на dataclass
     async def get_chat_messages(
-        self, chat_id: int, params: "MessageParamsRequest"
+        self, chat_id: int, params: "MessageFilter"
     ) -> List[Message]:
         try:
             stmt = (

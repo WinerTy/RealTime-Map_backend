@@ -1,4 +1,4 @@
-from typing import Annotated, TYPE_CHECKING, List
+from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, BackgroundTasks
 
@@ -20,10 +20,9 @@ from models.message.schemas import (
 from services.chat.service import ChatService
 from services.notification import ChatNotificationService
 
-if TYPE_CHECKING:
-    pass
-
-GENERAL_ERROR_RESPONSES = http_error_response_generator(UserPermissionError, RecordNotFoundError)
+GENERAL_ERROR_RESPONSES = http_error_response_generator(
+    UserPermissionError, RecordNotFoundError
+)
 
 router = APIRouter(prefix="/chats", tags=["chats"], responses=GENERAL_ERROR_RESPONSES)
 
@@ -97,7 +96,6 @@ async def delete_message(
     return message
 
 
-# TODO Сделать пагинацию по дням
 @router.get(
     "/message/history/{chat_id}/",
     dependencies=[Depends(check_chat_exist)],

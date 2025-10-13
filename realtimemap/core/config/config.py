@@ -42,4 +42,4 @@ class AppConfig(BaseSettings):
     def static_dir(self) -> Path:
         return self.root_dir / "static"
 
-conf = AppConfig()  # noqa
+conf = AppConfig()  # type: ignore
