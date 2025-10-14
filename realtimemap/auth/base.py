@@ -10,8 +10,8 @@ class MyBaseUserDatabase(BaseUserDatabase[UP, ID]):
     ) -> Optional[UP]:
         raise NotImplementedError()
 
-    async def get_by_phone(self, phone: str):
+    async def get_by_phone(self, phone: str) -> Optional[UP]:
         raise NotImplementedError()
 
-    async def get_by_username(self, username: str):
+    async def get_by_username(self, username: str) -> Optional[UP]:
         raise NotImplementedError()

@@ -11,7 +11,7 @@ class MarkRequestParams(Coordinates):
     srid: Annotated[int, Field(4326, description="SRID")]
     date: Annotated[
         datetime,
-        Field(default_factory=lambda: datetime.now(), description="Date"),
+        Field(default=datetime.now(), description="Date"),
     ]
     duration: Annotated[
         Optional[int], Field(24, description="Search duration in hours.")

@@ -9,7 +9,7 @@ from dependencies.crud import (
     get_chat_repository,
     get_message_repository,
 )
-from exceptions import RecordNotFoundError
+from errors import RecordNotFoundError
 
 if TYPE_CHECKING:
     from crud.mark import MarkRepository

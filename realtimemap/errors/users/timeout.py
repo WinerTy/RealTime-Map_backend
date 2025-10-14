@@ -2,7 +2,7 @@ from typing import Optional, Dict
 
 from fastapi import status
 
-from exceptions.base import BaseRealTimeMapException
+from errors.base import BaseRealTimeMapException
 
 
 class TimeOutError(BaseRealTimeMapException):

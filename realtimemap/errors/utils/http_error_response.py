@@ -1,6 +1,6 @@
 from typing import Type
 
-from exceptions.base import BaseRealTimeMapException
+from errors.base import BaseRealTimeMapException
 
 
 def http_error_response_generator(

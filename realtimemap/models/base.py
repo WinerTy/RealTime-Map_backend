@@ -4,6 +4,7 @@ from sqlalchemy import MetaData, select, func, and_
 from sqlalchemy.orm import DeclarativeBase, declared_attr
 
 from core.config import conf
+from models.mixins import IntIdMixin
 from utils import camel_case_to_snake_case
 
 if TYPE_CHECKING:
@@ -46,3 +47,7 @@ class BaseSqlModel(DeclarativeBase):
         result = await session.execute(stmt)
         count_value = result.scalar_one()
         return count_value
+
+
+class Base(BaseSqlModel, IntIdMixin):
+    pass

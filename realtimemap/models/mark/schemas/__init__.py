@@ -8,10 +8,12 @@ __all__ = [
     "ReadMark",
     "DetailMark",
     "ActionType",
+    "MarkFilter",
 ]
 
 
 from .base import Coordinates
+from .filters import MarkFilter
 from .schemas import (
     CreateMark,
     UpdateMark,

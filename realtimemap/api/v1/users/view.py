@@ -7,7 +7,9 @@ from starlette.responses import Response
 
 from api.v1.auth.fastapi_users import get_current_user_without_ban
 from dependencies.crud import get_user_repository
+from dependencies.service import get_user_service
 from models.user.schemas import UserRead, UserUpdate
+from services.user.service import UserService
 
 if TYPE_CHECKING:
     from models import User
@@ -56,3 +58,12 @@ async def get_my_subscriptions(
     user: Annotated["User", Depends(get_current_user_without_ban)],
 ):
     return user.subscriptions
+
+
+@router.get("/me/ban")
+async def test_proto(
+    user: Annotated["User", Depends(get_current_user_without_ban)],
+    service: Annotated["UserService", Depends(get_user_service)],
+):
+    result = await service.is_ban(user.id)
+    return result

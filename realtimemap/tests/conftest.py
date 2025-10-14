@@ -1,33 +1,18 @@
 import pytest
-from httpx import AsyncClient, ASGITransport
+from fastapi.testclient import TestClient
 
+from database.helper import db_helper
 from main import app
-from tests.test_auth.data import LOGIN_DATA
+from models import BaseSqlModel
 
 
-@pytest.fixture(scope="session")
-def anyio_backend():
-    return "asyncio"
+@pytest.fixture(scope="session", autouse=True)
+def setup_db():
+    BaseSqlModel.metadata.drop_all(bind=db_helper.sync_engine)
+    BaseSqlModel.metadata.create_all(bind=db_helper.sync_engine)
 
 
-@pytest.fixture(scope="session")
-async def async_client():
-    async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as client:
-        yield client
-
-
-@pytest.fixture(scope="session")
-async def auth_async_client():
-    async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as client:
-        response = await client.post(
-            "api/v1/auth/login",
-            data=LOGIN_DATA,
-            headers={"Content-Type": "application/x-www-form-urlencoded"},
-        )
-        token = response.json().get("access_token")
-        client.headers.update({"Authorization": f"Bearer {token}"})
+@pytest.fixture
+def client():
+    with TestClient(app=app) as client:
         yield client

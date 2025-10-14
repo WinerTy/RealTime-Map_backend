@@ -1,18 +1,18 @@
 from typing import TYPE_CHECKING, List
 
-from exceptions import UserPermissionError
+from errors import UserPermissionError
 from models.chat.schemas import ReadChat
 from models.message.schemas import (
     CreateMessageRequest,
     CreateMessage,
     UpdateMessageRequest,
+    MessageFilter,
 )
 from models.message.schemas import MessageParamsRequest
 from services.base import BaseService
 
 if TYPE_CHECKING:
-    from crud.chat.repository import ChatRepository
-    from crud.message.repository import MessageRepository
+    from interfaces import IMessageRepository, IChatRepository
     from sqlalchemy.ext.asyncio import AsyncSession
     from models import User, Message
 
@@ -21,8 +21,8 @@ class ChatService(BaseService):
     def __init__(
         self,
         session: "AsyncSession",
-        chat_repo: "ChatRepository",
-        message_repo: "MessageRepository",
+        chat_repo: "IChatRepository",
+        message_repo: "IMessageRepository",
     ):
         super().__init__(session)
         self.chat_repo = chat_repo
@@ -55,10 +55,10 @@ class ChatService(BaseService):
         self, chat_id: int, user: "User", params: "MessageParamsRequest"
     ) -> List["Message"]:
         await self.check_user_in_chat(chat_id, user.id)
-        messages = await self.message_repo.get_chat_messages(chat_id, params)
+        filters = MessageFilter.from_request(params)
+        messages = await self.message_repo.get_chat_messages(chat_id, filters)
         return messages
 
-    # TODO Сделать авто подключение к чату если тот новый
     async def send_message(self, user: "User", message: CreateMessageRequest):
         is_new, chat = await self.chat_repo.find_or_create_private_chat(
             user1_id=user.id, user2_id=message.recipient_id
@@ -74,7 +74,7 @@ class ChatService(BaseService):
         chat_id: int,
         user: "User",
         message: CreateMessageRequest,
-    ):
+    ) -> CreateMessage:
         return CreateMessage(
             chat_id=chat_id,
             sender_id=user.id,

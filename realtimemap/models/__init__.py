@@ -13,10 +13,11 @@ __all__ = [
     "SubscriptionPlan",
     "Chat",
     "UserSubscription",
+    "Base",
 ]
 
 
-from .base import BaseSqlModel
+from .base import BaseSqlModel, Base
 from .category.model import Category
 from .chat.model import Chat
 from .mark.model import Mark

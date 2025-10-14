@@ -3,9 +3,6 @@ from typing import Annotated, TYPE_CHECKING
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from crud.chat.repository import ChatRepository
-from crud.mark_comment.repository import CommentReactionRepository
-from crud.message.repository import MessageRepository
 from database.helper import db_helper
 from dependencies.crud import (
     get_mark_repository,
@@ -17,35 +14,41 @@ from dependencies.crud import (
     get_message_repository,
     get_user_subscription_repository,
     get_subscription_plan_repository,
+    get_user_repository,
 )
-from dependencies.websocket import get_mark_websocket_manager
+from interfaces import (
+    IUserSubscriptionRepository,
+    IUserRepository,
+    IMarkCommentRepository,
+    ICategoryRepository,
+    IMarkRepository,
+    IMessageRepository,
+    IChatRepository,
+    ICommentReactionRepository,
+    ICommentStatRepository,
+    ISubscriptionPlanRepository,
+)
 from services.chat.service import ChatService
+from services.geo.dependency import get_geo_service
+from services.geo.service import GeoService
 from services.mark.service import MarkService
 from services.mark_comment.service import MarkCommentService
 from services.subscription.service import SubscriptionService
+from services.user.service import UserService
 
 if TYPE_CHECKING:
-    from crud.category import CategoryRepository
-    from crud.mark import MarkRepository
-
-    from websocket.mark_socket import MarkManager
-    from crud.mark_comment.repository import (
-        MarkCommentRepository,
-        CommentStatRepository,
-    )
-    from crud.user_subscription import UserSubscriptionRepository
-    from crud.subcription.repository import SubscriptionPlanRepository
+    pass
 
 get_session = Annotated[AsyncSession, Depends(db_helper.session_getter)]
 
 
 async def get_mark_service(
-    mark_repo: Annotated["MarkRepository", Depends(get_mark_repository)],
-    category_repo: Annotated["CategoryRepository", Depends(get_category_repository)],
+    mark_repo: Annotated["IMarkRepository", Depends(get_mark_repository)],
+    category_repo: Annotated["ICategoryRepository", Depends(get_category_repository)],
     mark_comment_repo: Annotated[
-        "MarkCommentRepository", Depends(get_mark_comment_repository)
+        "IMarkCommentRepository", Depends(get_mark_comment_repository)
     ],
-    manager: Annotated["MarkManager", Depends(get_mark_websocket_manager)],
+    geo_service: Annotated[GeoService, Depends(get_geo_service)],
     session: get_session,
 ):
     yield MarkService(
@@ -53,20 +56,20 @@ async def get_mark_service(
         mark_repo=mark_repo,
         category_repo=category_repo,
         mark_comment_repo=mark_comment_repo,
-        manager=manager,
+        geo_service=geo_service,
     )
 
 
 async def get_mark_comment_service(
     session: get_session,
     comment_repo: Annotated[
-        "MarkCommentRepository", Depends(get_mark_comment_repository)
+        "IMarkCommentRepository", Depends(get_mark_comment_repository)
     ],
     comment_stat_repo: Annotated[
-        "CommentStatRepository", Depends(get_comment_stat_repository)
+        "ICommentStatRepository", Depends(get_comment_stat_repository)
     ],
     comment_reaction_repo: Annotated[
-        "CommentReactionRepository", Depends(get_comment_reaction_repository)
+        "ICommentReactionRepository", Depends(get_comment_reaction_repository)
     ],
 ) -> MarkCommentService:
     yield MarkCommentService(
@@ -79,8 +82,8 @@ async def get_mark_comment_service(
 
 async def get_chat_service(
     session: get_session,
-    chat_repo: Annotated["ChatRepository", Depends(get_chat_repository)],
-    message_repo: Annotated["MessageRepository", Depends(get_message_repository)],
+    chat_repo: Annotated["IChatRepository", Depends(get_chat_repository)],
+    message_repo: Annotated["IMessageRepository", Depends(get_message_repository)],
 ) -> ChatService:
     yield ChatService(session, chat_repo, message_repo)
 
@@ -88,10 +91,16 @@ async def get_chat_service(
 async def get_subscription_service(
     session: get_session,
     user_subscription_repo: Annotated[
-        "UserSubscriptionRepository", Depends(get_user_subscription_repository)
+        "IUserSubscriptionRepository", Depends(get_user_subscription_repository)
     ],
     subscription_repo: Annotated[
-        "SubscriptionPlanRepository", Depends(get_subscription_plan_repository)
+        "ISubscriptionPlanRepository", Depends(get_subscription_plan_repository)
     ],
 ) -> SubscriptionService:
     yield SubscriptionService(session, user_subscription_repo, subscription_repo)
+
+
+async def get_user_service(
+    user_repo: Annotated["IUserRepository", Depends(get_user_repository)],
+) -> UserService:
+    yield UserService(user_repo)

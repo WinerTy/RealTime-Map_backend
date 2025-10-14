@@ -8,9 +8,9 @@ from crud.subcription.repository import SubscriptionPlanRepository
 from dependencies.crud import get_subscription_plan_repository
 from dependencies.payment import get_yookassa_client
 from dependencies.service import get_subscription_service
-from exceptions import RecordNotFoundError
-from exceptions.users import HaveActiveSubscriptionException
-from exceptions.utils import http_error_response_generator
+from errors import RecordNotFoundError
+from errors.users import HaveActiveSubscriptionException
+from errors.utils import http_error_response_generator
 from integrations.payment.yookassa import YookassaClient, GatewayException
 from models.subscription.schemas import ReadSubscriptionPlan
 from models.user_subscription.schemas import CreateSubscriptionRequest

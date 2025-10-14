@@ -15,8 +15,8 @@ from dependencies.notification import (
     get_mark_notification_service,
 )
 from dependencies.service import get_mark_service
-from exceptions import RecordNotFoundError, UserPermissionError, TimeOutError
-from exceptions.utils import http_error_response_generator
+from errors import RecordNotFoundError, UserPermissionError, TimeOutError
+from errors.utils import http_error_response_generator
 from models.mark.schemas import (
     CreateMarkRequest,
     ReadMark,

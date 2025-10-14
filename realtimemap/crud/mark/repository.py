@@ -17,11 +17,10 @@ from crud import BaseRepository
 from models import Mark
 from models.mark.schemas import (
     CreateMark,
-    ReadMark,
     UpdateMark,
     CreateMarkRequest,
-    MarkRequestParams,
     UpdateMarkRequest,
+    MarkFilter,
 )
 from services.geo.service import GeoService
 
@@ -32,7 +31,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
+class MarkRepository(BaseRepository[Mark, CreateMark, UpdateMark]):
     """
     Repository for the Mark model.
     """
@@ -44,28 +43,21 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
         self.upload_dir = "upload_marks"
         self.geo_service = geo_service if geo_service is not None else GeoService()
 
-    async def get_marks(self, params: MarkRequestParams) -> List[Mark]:
-        current_point = self.geo_service.create_point(params, params.srid)
-        # Preparation geohash sectors
-        neighbors = self.geo_service.get_neighbors(
-            self.geo_service.get_geohash(params), True
-        )
-        # Time
-        min_start = params.date - timedelta(hours=params.duration)
-        max_end = params.date + timedelta(hours=params.duration)
+    async def get_marks(self, filters: MarkFilter) -> List[Mark]:
         # Условия фильтрации
         conditions = [
-            self.model.geohash.in_(neighbors),
+            self.model.geohash.in_(filters.geohash_neighbors),
             ST_DWithin(
                 ST_Transform(self.model.geom, 3857),
-                ST_Transform(current_point, 3857),
-                params.radius,
+                ST_Transform(filters.current_point, 3857),
+                filters.radius,
             ),
-            self.model.start_at <= max_end,
-            self.model.start_at + timedelta(hours=params.duration) >= min_start,
+            self.model.start_at <= filters.max_end,
+            self.model.start_at + timedelta(hours=filters.duration)
+            >= filters.min_start,
         ]
-        if not params.show_ended:
-            conditions.append(self.model.is_ended == params.show_ended)
+        if not filters.show_ended:
+            conditions.append(self.model.is_ended == filters.show_ended)
 
         query = (
             select(self.model, ST_AsGeoJSON(self.model.geom).label("geom"))
@@ -147,36 +139,20 @@ class MarkRepository(BaseRepository[Mark, CreateMark, ReadMark, UpdateMark]):
         await super().delete(mark_id)
         return mark
 
-    async def check_distance(
-        self, current_location: MarkRequestParams, mark: Mark, radius: int = 500
-    ) -> bool:
-        """
-        Method for checking if the given location is within the given radius.
-
-        Args:
-            current_location (MarkRequestParams): Current location
-            mark (Mark): Mark to check
-            radius (int): Radius to check. Need for SQL expression
-
-        Returns:
-            bool: True or False
-        """
-        # Проверка вложена ли метка в зону
-        geohash = self.geo_service.get_geohash(current_location)
-        neighbors = self.geo_service.get_neighbors(geohash, need_include=True)
-
-        if mark.geohash not in neighbors:
+    async def check_distance(self, filters: MarkFilter, mark: Mark) -> bool:
+        if mark.geohash not in filters.geohash_neighbors:
             return False
 
         # Проверка вложена ли метка в радиус пользователя
-        user_point = self.geo_service.create_point(current_location)
-        exp = self.geo_service.distance_sphere(user_point, mark.geom, radius)
+        exp = self.geo_service.distance_sphere(
+            filters.current_point, mark.geom, filters.radius
+        )
 
         stmt = select(exp)
 
         result = await self.session.execute(stmt)
         distance = result.scalar()
-        return distance <= radius
+        return distance <= filters.radius
 
     async def update_mark(
         self, mark_id: int, update_data: UpdateMarkRequest, user: "User"

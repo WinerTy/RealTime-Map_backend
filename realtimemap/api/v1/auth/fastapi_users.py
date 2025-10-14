@@ -7,7 +7,7 @@ from crud.user_ban.repository import UsersBanRepository
 from dependencies.auth.backend import authentication_backend
 from dependencies.auth.manager import get_user_manager
 from dependencies.crud import get_user_ban_repository
-from exceptions import UserPermissionError
+from errors import UserPermissionError
 from models import User
 
 fastapi_users = FastAPIUsers[User, int](
