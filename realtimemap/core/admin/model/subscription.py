@@ -1,9 +1,14 @@
+from jinja2 import Environment, FileSystemLoader
 from sqlalchemy import Select
 from sqlalchemy.orm import joinedload, selectinload
 from starlette.requests import Request
 
+from core.admin.fields import JsonField
+from core.config import conf
 from models import SubscriptionPlan, UserSubscription
 from .base import BaseModelAdmin
+
+env = Environment(loader=FileSystemLoader(conf.template_dir))
 
 
 class AdminSubscriptionPlan(BaseModelAdmin):
@@ -13,11 +18,12 @@ class AdminSubscriptionPlan(BaseModelAdmin):
         SubscriptionPlan.price,
         SubscriptionPlan.plan_type,
         SubscriptionPlan.duration_days,
-        SubscriptionPlan.features,
+        JsonField("features"),
         SubscriptionPlan.is_active,
         SubscriptionPlan.created_at,
         SubscriptionPlan.updated_at,
     ]
+    exclude_fields_from_list = [SubscriptionPlan.features]
     exclude_fields_from_create = [
         SubscriptionPlan.created_at,
         SubscriptionPlan.updated_at,

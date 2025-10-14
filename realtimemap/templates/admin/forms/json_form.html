@@ -1,0 +1,215 @@
+<style>
+    .json-editor-container {
+        border: 1px solid #ccc;
+        padding: 15px;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+    }
+
+    .json-pair-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        gap: 10px;
+    }
+
+    .json-pair-row input {
+        flex: 1;
+        padding: 0.375rem 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+    }
+
+    .json-pair-row .delete-btn {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        cursor: pointer;
+        font-weight: bold;
+        line-height: 25px;
+        text-align: center;
+        flex-shrink: 0;
+    }
+
+    .add-btn {
+        background-color: #0d6efd;
+        color: white;
+        border: none;
+        padding: 5px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+</style>
+
+<!-- Основная разметка редактора -->
+<div class="{% if error %}{{ field.error_class }}{% endif %}">
+
+    <!-- 1. Скрытый инпут с ИСПРАВЛЕННЫМ выводом значения -->
+    <input type="hidden" id="{{ field.id }}" name="{{ field.id }}"
+           value='{{ (data|tojson) if data else "{}" }}' {{ field.input_params() | safe }} />
+
+    <div class="json-editor-container" data-target-input-id="{{ field.id }}">
+        <div class="json-pairs-wrapper">
+        </div>
+        <button type="button" class="add-btn">Добавить поле</button>
+    </div>
+
+    {% if field.help_text %}
+        <small class="form-hint">{{ field.help_text }}</small>
+    {% endif %}
+</div>
+{% include "@starlette-admin/forms/_error.html" %}
+
+
+<!-- Логика редактора на JavaScript -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.json-editor-container').forEach(initJsonEditor);
+
+        function initJsonEditor(container) {
+            const targetInputId = container.dataset.targetInputId;
+            const hiddenInput = document.getElementById(targetInputId);
+            const pairsWrapper = container.querySelector('.json-pairs-wrapper');
+            const addButton = container.querySelector('.add-btn');
+
+            if (!hiddenInput) {
+                console.error('Не найден скрытый инпут для JSON редактора:', targetInputId);
+                return;
+            }
+
+            function toHumanKey(key) {
+                return key.replace(/_/g, ' ');
+            }
+
+            function toProgrammaticKey(key) {
+                return key.trim().toLowerCase().replace(/\s+/g, '_');
+            }
+
+            function coerceValue(value) {
+                const trimmedValue = String(value).trim();
+                if (!isNaN(trimmedValue) && trimmedValue !== '') {
+                    return Number(trimmedValue);
+                }
+                if (trimmedValue.toLowerCase() === 'true') {
+                    return true;
+                }
+                if (trimmedValue.toLowerCase() === 'false') {
+                    return false;
+                }
+                if (trimmedValue.toLowerCase() === 'null' || trimmedValue.toLowerCase() === 'none') {
+                    return null;
+                }
+                return value;
+            }
+
+            function createPairRow(key = '', value = '') {
+                const row = document.createElement('div');
+                row.className = 'json-pair-row';
+
+                const keyInput = document.createElement('input');
+                keyInput.type = 'text';
+                keyInput.className = 'json-key-input';
+                keyInput.placeholder = 'Ключ (например, user name)';
+                keyInput.value = toHumanKey(key);
+
+                const valueInput = document.createElement('input');
+                valueInput.type = 'text';
+                valueInput.className = 'json-value-input';
+                valueInput.placeholder = 'Значение';
+                if (value === null) {
+                    valueInput.value = 'null';
+                } else {
+                    valueInput.value = String(value);
+                }
+
+                const deleteButton = document.createElement('button');
+                deleteButton.type = 'button';
+                deleteButton.className = 'delete-btn';
+                deleteButton.textContent = '−';
+
+                row.appendChild(keyInput);
+                row.appendChild(valueInput);
+                row.appendChild(deleteButton);
+
+                keyInput.addEventListener('input', updateHiddenInput);
+                valueInput.addEventListener('input', updateHiddenInput);
+                deleteButton.addEventListener('click', () => {
+                    row.remove();
+                    updateHiddenInput();
+                });
+
+                return row;
+            }
+
+            function updateHiddenInput() {
+                const data = {};
+                pairsWrapper.querySelectorAll('.json-pair-row').forEach(row => {
+                    const keyInput = row.querySelector('.json-key-input');
+                    const valueInput = row.querySelector('.json-value-input');
+                    const progKey = toProgrammaticKey(keyInput.value);
+                    if (progKey) {
+                        data[progKey] = coerceValue(valueInput.value);
+                    }
+                });
+                hiddenInput.value = JSON.stringify(data, null, 2);
+            }
+
+            function parseInitialData() {
+                let value = hiddenInput.value;
+                if (!value || value === 'null' || value === '{}') {
+                    return {};
+                }
+
+                let data;
+                try {
+                    data = JSON.parse(value);
+                } catch (e) {
+                    try {
+                        const jsonString = value
+                            .replace(/'/g, '"')
+                            .replace(/\bTrue\b/g, 'true')
+                            .replace(/\bFalse\b/g, 'false')
+                            .replace(/\bNone\b/g, 'null');
+                        data = JSON.parse(jsonString);
+                    } catch (e2) {
+                        console.error('Не удалось распарсить исходные данные JSON:', value, e2);
+                        return {};
+                    }
+                }
+
+                if (typeof data === 'string') {
+                    try {
+                        return JSON.parse(data);
+                    } catch (e) {
+                        console.error('Не удалось распарсить вложенные JSON-данные:', data, e);
+                        return {};
+                    }
+                }
+
+                if (typeof data === 'object' && data !== null) {
+                    return data;
+                }
+
+                return {};
+            }
+
+            const initialData = parseInitialData();
+            for (const key in initialData) {
+                if (Object.prototype.hasOwnProperty.call(initialData, key)) {
+                    const row = createPairRow(key, initialData[key]);
+                    pairsWrapper.appendChild(row);
+                }
+            }
+
+            addButton.addEventListener('click', () => {
+                const newRow = createPairRow();
+                pairsWrapper.appendChild(newRow);
+                newRow.querySelector('.json-key-input').focus();
+            });
+        }
+    });
+</script>
