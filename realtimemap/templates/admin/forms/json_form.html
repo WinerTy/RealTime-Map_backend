@@ -16,12 +16,11 @@
     .json-pair-row input {
         flex: 1;
         padding: 0.375rem 0.75rem;
-        border: 1px solid #ced4da;
         border-radius: 0.25rem;
     }
 
+
     .json-pair-row .delete-btn {
-        background-color: #dc3545;
         color: white;
         border: none;
         border-radius: 50%;
@@ -35,13 +34,10 @@
     }
 
     .add-btn {
-        background-color: #0d6efd;
-        color: white;
-        border: none;
         padding: 5px 15px;
-        border-radius: 5px;
         cursor: pointer;
         margin-top: 10px;
+        max-width: 300px;
     }
 </style>
 
@@ -52,10 +48,10 @@
     <input type="hidden" id="{{ field.id }}" name="{{ field.id }}"
            value='{{ (data|tojson) if data else "{}" }}' {{ field.input_params() | safe }} />
 
-    <div class="json-editor-container" data-target-input-id="{{ field.id }}">
+    <div class="card json-editor-container " data-target-input-id="{{ field.id }}">
         <div class="json-pairs-wrapper">
         </div>
-        <button type="button" class="add-btn">Добавить поле</button>
+        <button type="button" class="btn btn-secondary add-btn">Добавить поле</button>
     </div>
 
     {% if field.help_text %}
@@ -112,13 +108,13 @@
 
                 const keyInput = document.createElement('input');
                 keyInput.type = 'text';
-                keyInput.className = 'json-key-input';
+                keyInput.className = 'json-key-input form-control';
                 keyInput.placeholder = 'Ключ (например, user name)';
                 keyInput.value = toHumanKey(key);
 
                 const valueInput = document.createElement('input');
                 valueInput.type = 'text';
-                valueInput.className = 'json-value-input';
+                valueInput.className = 'json-value-input form-control';
                 valueInput.placeholder = 'Значение';
                 if (value === null) {
                     valueInput.value = 'null';
@@ -128,7 +124,7 @@
 
                 const deleteButton = document.createElement('button');
                 deleteButton.type = 'button';
-                deleteButton.className = 'delete-btn';
+                deleteButton.className = 'btn btn-danger';
                 deleteButton.textContent = '−';
 
                 row.appendChild(keyInput);

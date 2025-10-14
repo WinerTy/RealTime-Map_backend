@@ -1,241 +1,241 @@
 {% extends "detail.html" %}
-{#{% from "components/card.html" import card %}#}
-{##}
-{#{% block content %}#}
-{#    <style>#}
-{##}
-{#        .subscription-container {#}
-{#            max-width: 1200px;#}
-{#            margin: 0 auto;#}
-{#        }#}
-{##}
-{#        .detail__header {#}
-{#            display: flex;#}
-{#            justify-content: space-between;#}
-{#            align-items: center;#}
-{#            margin-bottom: 30px;#}
-{#        }#}
-{##}
-{#        .page-title {#}
-{#            font-size: 2rem;#}
-{#            font-weight: 700;#}
-{#color: var(--dark);#}
-{#        }#}
-{##}
-{#        .status-badge {#}
-{#            padding: 6px 16px;#}
-{#            border-radius: 20px;#}
-{#            font-size: 0.875rem;#}
-{#            font-weight: 600;#}
-{#        }#}
-{##}
-{#        .status-active {#}
-{#            background: #e7f7ef;#}
-{#            color: #0ca678;#}
-{#        }#}
-{##}
-{#        .status-inactive {#}
-{#            background: #fde8e8;#}
-{#            color: #e53e3e;#}
-{#        }#}
-{##}
-{#        .card {#}
-{#            background: white;#}
-{#            border-radius: 12px;#}
-{#            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);#}
-{#            margin-bottom: 24px;#}
-{#            overflow: hidden;#}
-{#        }#}
-{##}
-{#        .card-header {#}
-{#            padding: 20px 24px;#}
-{#            border-bottom: 1px solid #e9ecef;#}
-{#            background: #fafbfc;#}
-{#        }#}
-{##}
-{#        .card-title {#}
-{#            font-size: 1.25rem;#}
-{#            font-weight: 600;#}
-{#color: var(--dark);#}
-{#        }#}
-{##}
-{#        .card-body {#}
-{#            padding: 24px;#}
-{#        }#}
-{##}
-{#        .info-grid {#}
-{#            display: grid;#}
-{#            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));#}
-{#            gap: 24px;#}
-{#        }#}
-{##}
-{#        .info-item {#}
-{#            display: flex;#}
-{#            flex-direction: column;#}
-{#            gap: 8px;#}
-{#        }#}
-{##}
-{#        .info-label {#}
-{#            font-size: 0.875rem;#}
-{#color: var(--gray);#} font-weight: 500;
-{#        }#}
-{##}
-{#        .info-value {#}
-{#            font-size: 1rem;#}
-{#color: var(--dark);#} font-weight: 600;
-{#        }#}
-{##}
-{#        .price {#}
-{#            font-size: 1.5rem;#}
-{#color: var(--primary);#} font-weight: 700;
-{#        }#}
-{##}
-{#        .features-grid {#}
-{#            display: grid;#}
-{#            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));#}
-{#            gap: 16px;#}
-{#        }#}
-{##}
-{#        .feature-card {#}
-{#            background: #f8f9fa;#}
-{#            border-radius: 8px;#}
-{#            padding: 16px;#}
-{#border-left: 4px solid var(--primary);#}
-{#        }#}
-{##}
-{#        .feature-name {#}
-{#            font-weight: 600;#}
-{#            margin-bottom: 4px;#}
-{#            font-size: 0.95rem;#}
-{#        }#}
-{##}
-{#        .feature-value {#}
-{#color: var(--gray);#} font-size: 0.875rem;
-{#        }#}
-{##}
-{#        .meta-grid {#}
-{#            display: grid;#}
-{#            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));#}
-{#            gap: 16px;#}
-{#        }#}
-{##}
-{#        .actions {#}
-{#            display: flex;#}
-{#            gap: 12px;#}
-{#            justify-content: flex-end;#}
-{#            margin-top: 32px;#}
-{#        }#}
-{##}
-{#        .btn {#}
-{#            padding: 10px 20px;#}
-{#            border-radius: 8px;#}
-{#            border: none;#}
-{#            font-weight: 600;#}
-{#            cursor: pointer;#}
-{#            transition: all 0.2s ease;#}
-{#        }#}
-{##}
-{#        .btn-primary {#}
-{#background: var(--primary);#} color: white;
-{#        }#}
-{##}
-{#        .btn-secondary {#}
-{#            background: #e9ecef;#}
-{#color: var(--dark);#}
-{#        }#}
-{##}
-{#        .btn:hover {#}
-{#            transform: translateY(-1px);#}
-{#            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);#}
-{#        }#}
-{#    </style>#}
-{#    <div class="subscription-container">#}
-{#        <div class="detail__header">#}
-{#            <h1 class="page-title">Subscription detail</h1>#}
-{#            {% if obj.is_active %}#}
-{#                <div class="status-badge status-active">#}
-{#                    Active#}
-{#                </div>#}
-{#            {% else %}#}
-{#                <div class="status-badge status-inactive">#}
-{#                    Inactive#}
-{#                </div>#}
-{#            {% endif %}#}
-{#        </div>#}
-{#        <div class="card">#}
-{#            <div class="card-header">#}
-{#                <h2 class="card-title">Main information</h2>#}
-{#            </div>#}
-{#            <div class="card-body">#}
-{#                <div class="info-grid">#}
-{#                    <div class="info-item">#}
-{#                        <span class="info-label">Name</span>#}
-{#                        <span class="info-value">{{ obj.name }}</span>#}
-{#                    </div>#}
-{#                    <div class="info-item">#}
-{#                        <span class="info-label">Price</span>#}
-{#                        <span class="info-value price">{{ obj.price }} &#8381</span>#}
-{#                    </div>#}
-{#                    <div class="info-item">#}
-{#                        <span class="info-label">Duration</span>#}
-{#                        <span class="info-value">{{ obj.duration_days }} days</span>#}
-{#                    </div>#}
-{#                    <div class="info-item">#}
-{#                        <span class="info-label">Type</span>#}
-{#                        <span class="info-value">{{ obj.plan_type }}</span>#}
-{#                    </div>#}
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}
-{#        <div class="card">#}
-{#            <div class="card-header">#}
-{#                <h2 class="card-title">Sub features</h2>#}
-{#            </div>#}
-{#            <div class="card-body">#}
-{#                <div class="features-grid" id="features-container">#}
-{#                    {% for key, value in obj.features.items() %}#}
-{#                        <div class="feature-card">#}
-{#                            <div class="feature-name">{{ key | format_key }}</div>#}
-{#                            <div class="feature-value">{{ value }}</div>#}
-{#                        </div>#}
-{#                    {% endfor %}#}
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}
-{#        <div class="card">#}
-{#            <div class="card-header">#}
-{#                <h2 class="card-title">System information</h2>#}
-{#            </div>#}
-{#            <div class="card-body">#}
-{#                <div class="meta-grid">#}
-{#                    <div class="info-item">#}
-{#                        <span class="info-label">Status</span>#}
-{#                        <span class="info-value">#}
-{#                            {% if obj.is_active %}#}
-{#                                <span class="status-badge status-active">Active</span>#}
-{#                            {% else %}#}
-{#                                <span class="status-badge status-inactive">Inactive</span>#}
-{#                            {% endif %}#}
-{#                        </span>#}
-{#                    </div>#}
-{#                    <div class="info-item">#}
-{#                        <span class="info-label">Created at</span>#}
-{#                        <span class="info-value">{{ obj.created_at }}</span>#}
-{#                    </div>#}
-{#                    <div class="info-item">#}
-{#                        <span class="info-label">Updated at</span>#}
-{#                        <span class="info-value">{{ obj.updated_at }}</span>#}
-{#                    </div>#}
-{#                    <div class="info-item">#}
-{#                        <span class="info-label">Active subs</span>#}
-{#                        <span class="info-value">{{ raw_obj.user_subscriptions | length }}</span>#}
-{#                    </div>#}
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}
-{#        <div class="actions">#}
-{#            {% include "components/edit_btn.html" %}#}
-{#            {% include "components/delete_btn.html" %}#}
-{#        </div>#}
-{#    </div>#}
-{#{% endblock %}#}
+{% from "components/card.html" import card %}
+
+{% block content %}
+    <style>
+
+        .subscription-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .detail__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+        {#color: var(--dark);#}
+        }
+
+        .status-badge {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #e7f7ef;
+            color: #0ca678;
+        }
+
+        .status-inactive {
+            background: #fde8e8;
+            color: #e53e3e;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e9ecef;
+            background: #fafbfc;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        {#color: var(--dark);#}
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .info-label {
+            font-size: 0.875rem;
+        {#color: var(--gray);#} font-weight: 500;
+        }
+
+        .info-value {
+            font-size: 1rem;
+        {#color: var(--dark);#} font-weight: 600;
+        }
+
+        .price {
+            font-size: 1.5rem;
+        {#color: var(--primary);#} font-weight: 700;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+        {#border-left: 4px solid var(--primary);#}
+        }
+
+        .feature-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 0.95rem;
+        }
+
+        .feature-value {
+        {#color: var(--gray);#} font-size: 0.875rem;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 32px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+        {#background: var(--primary);#} color: white;
+        }
+
+        .btn-secondary {
+            background: #e9ecef;
+        {#color: var(--dark);#}
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <div class="subscription-container">
+        <div class="detail__header">
+            <h1 class="page-title">Subscription detail</h1>
+            {% if obj.is_active %}
+                <div class="status-badge status-active">
+                    Active
+                </div>
+            {% else %}
+                <div class="status-badge status-inactive">
+                    Inactive
+                </div>
+            {% endif %}
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Main information</h2>
+            </div>
+            <div class="card-body">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Name</span>
+                        <span class="info-value">{{ obj.name }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Price</span>
+                        <span class="info-value price">{{ obj.price }} &#8381</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Duration</span>
+                        <span class="info-value">{{ obj.duration_days }} days</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Type</span>
+                        <span class="info-value">{{ obj.plan_type }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Sub features</h2>
+            </div>
+            <div class="card-body">
+                <div class="features-grid" id="features-container">
+                    {% for key, value in obj.features.items() %}
+                        <div class="feature-card">
+                            <div class="feature-name">{{ key | format_key }}</div>
+                            <div class="feature-value">{{ value }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">System information</h2>
+            </div>
+            <div class="card-body">
+                <div class="meta-grid">
+                    <div class="info-item">
+                        <span class="info-label">Status</span>
+                        <span class="info-value">
+                            {% if obj.is_active %}
+                                <span class="status-badge status-active">Active</span>
+                            {% else %}
+                                <span class="status-badge status-inactive">Inactive</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Created at</span>
+                        <span class="info-value">{{ obj.created_at }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Updated at</span>
+                        <span class="info-value">{{ obj.updated_at }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Active subs</span>
+                        <span class="info-value">{{ raw_obj.user_subscriptions | length }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            {% include "components/edit_btn.html" %}
+            {% include "components/delete_btn.html" %}
+        </div>
+    </div>
+{% endblock %}

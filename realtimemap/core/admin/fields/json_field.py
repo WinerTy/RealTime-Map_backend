@@ -4,13 +4,11 @@ from typing import Any
 
 from starlette.datastructures import FormData
 from starlette.requests import Request
-from starlette_admin import RequestAction, StringField
-
-from models import SubscriptionPlan
+from starlette_admin import RequestAction, BaseField
 
 
 @dataclass
-class JsonField(StringField):
+class JsonField(BaseField):
     form_template: str = "forms/json_form.html"
     type: str = "json"
 
@@ -22,6 +20,3 @@ class JsonField(StringField):
             return json.loads(value) if value is not None else None  # type: ignore
         except json.JSONDecodeError:
             return None
-
-    async def parse_obj(self, request: Request, obj: SubscriptionPlan) -> Any:
-        return obj.features
