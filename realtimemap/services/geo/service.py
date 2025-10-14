@@ -60,9 +60,7 @@ class GeoService:
     @staticmethod
     def create_coordinates(data: BaseModel) -> Coordinates:
         if hasattr(data, "latitude") and hasattr(data, "longitude"):
-            return Coordinates.model_validate(
-                latitude=data.latitude, longitude=data.longitude
-            )
+            return Coordinates.model_validate(*data.model_dump())
         raise ValueError("Data object must have 'latitude' and 'longitude' attributes")
 
     def check_geohash_proximity(self, coords: "Coordinates", mark: Mark) -> bool:

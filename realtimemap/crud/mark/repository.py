@@ -152,7 +152,7 @@ class MarkRepository(BaseRepository[Mark, CreateMark, UpdateMark]):
 
         result = await self.session.execute(stmt)
         distance = result.scalar()
-        return distance <= radius
+        return distance <= filters.radius
 
     async def update_mark(
         self, mark_id: int, update_data: UpdateMarkRequest, user: "User"

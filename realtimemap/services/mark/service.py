@@ -8,6 +8,7 @@ from models.mark.schemas import (
     MarkRequestParams,
     UpdateMarkRequest,
     MarkFilter,
+    CreateMark,
 )
 from services.base import BaseService
 from services.geo.service import GeoService
@@ -33,11 +34,24 @@ class MarkService(BaseService):
         self.mark_comment_repo = mark_comment_repo
         self.geo_service = geo_service
 
+    def _validate__create_data(
+        self, data: CreateMarkRequest, user: "User"
+    ) -> CreateMark:
+        geom = None
+        if data.longitude and data.latitude:
+            geom = self.geo_service.create_geometry_point(data)
+        return CreateMark(
+            **data.model_dump(exclude={"latitude", "longitude"}),
+            owner_id=user.id,
+            geom=geom,
+        )
+
     async def create_mark(self, mark_data: CreateMarkRequest, user: User) -> Mark:
         category_exist = await self.category_repo.exist(mark_data.category_id)
         if not category_exist:
             raise RecordNotFoundError()
-        mark = await self.mark_repo.create_mark(mark_data, user)
+        create_data = self._validate__create_data(mark_data, user)
+        mark = await self.mark_repo.create_mark(create_data, user)
         return mark
 
     async def get_mark_by_id(self, mark_id: int) -> Mark:
