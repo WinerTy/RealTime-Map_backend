@@ -18,9 +18,7 @@ app = create_app()
 
 @app.exception_handler(HttpIntegrityError)
 async def http_exception_handler(request: Request, exc: HttpIntegrityError):
-    logger.exception(
-        f"DataBase Integrity Error. Request: {request.url.path}", exc_info=exc
-    )
+    logger.info(f"DataBase Integrity Error. Request: {request.url.path}")
     return ORJSONResponse(
         status_code=exc.status_code,
         content=exc.detail,
