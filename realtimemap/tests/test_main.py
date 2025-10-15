@@ -1,47 +1,29 @@
-# @pytest.mark.asyncio
-# async def test_root_redirect(client):
-#     response = await client.get("/")
-#     assert response.status_code == 307
+import asyncio
+
 import pytest
+from sqlalchemy import select, literal_column
 
 
-@pytest.mark.parametrize(
-    "username, email, password, status_code",
-    [
-        ("admin1", "admin1@mail.ru", "admin1", 201),
-        ("admin1", "admin1@mail.ru", "admin1", 400),
-    ],
-)
-def test_register(username, email, password, status_code, client):
-    response = client.post(
-        "/api/v1/auth/register",
-        json={"username": username, "email": email, "password": password},
-    )
-    assert response.status_code == status_code
+async def debug_func(x, y):
+    await asyncio.sleep(1)
+    return x + y
 
 
-# @pytest.mark.parametrize(
-#     "x, y, res",
-#     [
-#         (1, 2, 0.5),
-#         (1, 1, 1),
-#         (1, -2, -0.5),
-#         (1, 0, -0.5),
-#     ],
-# )
-# def test_devide(x, y, res):
-#     assert devide(x, y) == res
+# TODO временный тест по готовности убрать
+@pytest.mark.asyncio
+@pytest.mark.parametrize("x, y, res", [(1, 2, 3), (5, 5, 10), (10, 0, 10)])
+async def test_func(x, y, res):
+    result = await debug_func(x, y)
+    assert result == res
 
 
-# @pytest.mark.parametrize(
-#     "x, y, res, expected",
-#     [
-#         (1, 2, 0.5, does_not_raise()),
-#         (1, 1, 1, does_not_raise()),
-#         (1, -2, -0.5, does_not_raise()),
-#         (1, 0, -0.5, pytest.raises(ZeroDivisionError)),
-#     ],
-# )
-# def test_devide(x, y, res, expected):
-#     with expected:
-#         assert devide(x, y) == res
+# TODO временный тест по готовности убрать
+@pytest.mark.asyncio
+@pytest.mark.parametrize("x", [1, 2, 3, 4])
+async def test_db_session(x, db_session):
+    base = "hello world"
+    db_string = f"{base} {x}"
+    stmt = select(literal_column(f"'{db_string}'"))
+    result = await db_session.execute(stmt)
+    result = result.scalars().all()
+    assert result == [db_string]

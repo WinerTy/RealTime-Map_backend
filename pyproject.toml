@@ -44,6 +44,7 @@ dev = [
     "icecream>=2.1.4",
     "pre-commit>=4.2.0",
     "pytest>=8.4.2",
+    "pytest-asyncio>=1.2.0",
     "python-multipart>=0.0.20",
     "ruff>=0.11.10",
     "trio>=0.30.0",

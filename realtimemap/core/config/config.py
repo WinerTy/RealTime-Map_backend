@@ -25,6 +25,8 @@ class AppConfig(BaseSettings):
 
     log: LoggingConfig = LoggingConfig()
     payment: YooKassaPayment
+
+    mode: str = "dev"
     
     model_config = SettingsConfigDict(
         env_file=".env",
