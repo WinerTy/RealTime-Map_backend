@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from datetime import timedelta
-from typing import List, TYPE_CHECKING, Union, Type, Optional
+from typing import List, TYPE_CHECKING, Union, Type, Optional, Tuple, Sequence
 
 from geoalchemy2.functions import (
     ST_DWithin,
@@ -14,7 +14,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
 from crud import BaseRepository
-from models import Mark
+from models import Mark, Category
+from models import User
 from models.mark.schemas import (
     CreateMark,
     UpdateMark,
@@ -25,7 +26,6 @@ from models.mark.schemas import (
 from services.geo.service import GeoService
 
 if TYPE_CHECKING:
-    from models import User
     from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger(__name__)
@@ -99,18 +99,16 @@ class MarkRepository(BaseRepository[Mark, CreateMark, UpdateMark]):
         )
         return formated_data
 
-    async def create_mark(self, mark: CreateMarkRequest, user: "User") -> Mark:
+    async def create_mark(self, mark: CreateMark) -> Mark:
         """
         Method for creating a new mark
         Args:
             mark (CreateMarkRequest): CreateMark request (All needed data)
-            user (User): User. Who created the new mark
         Returns:
             Mark: Created mark
         Raises: Need for next version
         """
-        data = self.preparation_data(mark, user, CreateMark)
-        result: Mark = await super().create(data)
+        result: Mark = await super().create(mark)
         await self.session.refresh(result, ["category"])
         return result
 
@@ -159,3 +157,12 @@ class MarkRepository(BaseRepository[Mark, CreateMark, UpdateMark]):
     ) -> Mark:
         formated_data = self.preparation_data(update_data, user, UpdateMark)
         return await self.update(mark_id, formated_data)
+
+    async def get_ids_for_test(self) -> Tuple[Sequence[int], Sequence[int]]:
+        stmt = select(User.id).limit(10)
+        users_ids = await self.session.execute(stmt)
+        users_ids = users_ids.scalars().all()
+        stmt = select(Category.id)
+        category_ids = await self.session.execute(stmt)
+        category_ids = category_ids.scalars().all()
+        return users_ids, category_ids

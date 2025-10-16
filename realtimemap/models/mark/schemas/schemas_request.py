@@ -46,3 +46,10 @@ class UpdateMarkRequest(BaseMark, CoordinatesOptional, CommonMarkFields):
                 "Both latitude and longitude must be provided together or neither"
             )
         return self
+
+
+class CreateTestMarkRequest(Coordinates):
+    count: Annotated[int, Field(..., description="Count of test marks.", gt=0, lt=100)]
+    radius: Annotated[
+        int, Field(500, description="Search radius in meters.", gt=0, lt=5000)
+    ]

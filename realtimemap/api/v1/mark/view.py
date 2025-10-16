@@ -143,3 +143,53 @@ async def update_mark(
 @router.get("/allowed-duration/", response_model=List[int], status_code=200)
 async def get_allowed_duration():
     return allowed_duration
+
+
+#
+# def generate_random_point_in_radius(
+#     center_lat: float, center_lon: float, radius: float
+# ):
+#     # Более точный вариант для небольших радиусов, использующий смещение в метрах # Переводим радиус в метры
+#     distance = random.uniform(0, radius)
+#     angle = random.uniform(0, 2 * math.pi)
+#
+#     delta_x = distance * math.cos(angle)
+#     delta_y = distance * math.sin(angle)
+#
+#     new_lat = center_lat + (delta_y / 111139.0)
+#     new_lon = center_lon + (delta_x / (111139.0 * math.cos(math.radians(center_lat))))
+#
+#     return new_lat, new_lon
+#
+#
+# def generate_random_mark_time_data() -> Tuple[datetime, int]:
+#     duration = random.choice(allowed_duration)
+#     if random.random() < 0.7:
+#         start_at = datetime.now() + timedelta(days=random.randint(-2, 3))
+#     else:
+#         start_at = datetime.now() + timedelta(days=random.randint(5, 7))
+#     return start_at, duration
+#
+#
+# """
+# Задача: Создать тестовые метки в n количестве в радиусе от переданных координат.
+# Для облегчения создания тестовых данных
+#
+# Задачи:
+# 1. Получить ids Польователей и Категорий для рандомной выборки для тестовой метки. ГОТОВО
+# 2. Сделать функцию для генерации даты. 70% активных в настоящее время и 30% для активности в будущем ГОТОВО
+# 3. Функция для генерации рандомных координат в диапазоне пользователя
+# 4. Создать тестовые данные
+# """
+#
+#
+# @router.post("/test/")
+# async def create_test_marks(
+#     data: CreateTestMarkRequest,
+#     service: mark_service,
+#     db: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+# ):
+#
+#     point = service.geo_service.create_point(data)
+#
+#     return data

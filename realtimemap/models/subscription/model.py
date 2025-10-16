@@ -51,7 +51,8 @@ class SubscriptionPlan(BaseSqlModel, IntIdMixin, TimeMarkMixin):
         back_populates="plan"
     )
 
-    def calculate_expires_at(self) -> datetime:
+    @property
+    def expires_at(self) -> datetime:
         expires_at = datetime.now() + timedelta(days=self.duration_days)
         return expires_at
 

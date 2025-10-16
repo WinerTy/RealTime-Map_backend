@@ -36,3 +36,9 @@ class UserSubscriptionRepository(
         result = await self.session.execute(stmt)
         result = result.scalar_one_or_none()
         return result is not None
+
+    async def create_user_subscription(
+        self, data: CreateUserSubscription
+    ) -> UserSubscription:
+        result = await self.create(data=data)
+        return result

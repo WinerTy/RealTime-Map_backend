@@ -1,11 +1,10 @@
-from typing import Protocol, TYPE_CHECKING, List, Optional
+from typing import Protocol, TYPE_CHECKING, List, Optional, Tuple, Sequence
 
 from interfaces import IBaseRepository
 from models import Mark, Comment, CommentReaction, CommentStat
 from models.mark.schemas import (
     CreateMark,
     UpdateMark,
-    CreateMarkRequest,
     MarkFilter,
     MarkRequestParams,
     UpdateMarkRequest,
@@ -27,8 +26,7 @@ class IMarkRepository(IBaseRepository[Mark, CreateMark, UpdateMark], Protocol):
 
     async def get_marks(self, filters: MarkFilter) -> List[Mark]: ...
 
-    # TODO переписать параметры создания
-    async def create_mark(self, mark: CreateMarkRequest, user: "User") -> Mark: ...
+    async def create_mark(self, mark: CreateMark) -> Mark: ...
 
     async def get_mark_by_id(self, mark_id: int) -> Optional[Mark]: ...
 
@@ -39,6 +37,10 @@ class IMarkRepository(IBaseRepository[Mark, CreateMark, UpdateMark], Protocol):
     async def update_mark(
         self, mark_id: int, update_data: UpdateMarkRequest, user: "User"
     ) -> Mark: ...
+
+    async def delete_mark(self, mark_id: int) -> Mark: ...
+
+    async def get_ids_for_test(self) -> Tuple[Sequence[int], Sequence[int]]: ...
 
 
 class IMarkCommentRepository(

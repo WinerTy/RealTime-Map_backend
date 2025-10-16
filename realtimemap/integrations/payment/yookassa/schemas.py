@@ -1,7 +1,7 @@
 from decimal import Decimal
 from typing import Annotated, Optional, Dict, Any
 
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field
 
 
 class AmountPayment(BaseModel):
@@ -14,7 +14,7 @@ class AmountPayment(BaseModel):
 class ConfirmationPayment(BaseModel):
     type: Annotated[str, Field("redirect", description="Type")]
     return_url: Annotated[
-        HttpUrl, Field("https://www.example.com/return_url", description="Return URL")
+        str, Field("https://www.example.com/return_url", description="Return URL")
     ]
 
 

@@ -1,7 +1,7 @@
 from typing import Annotated, List, TYPE_CHECKING
 
 from fastapi import APIRouter, Depends, Request
-from starlette.responses import RedirectResponse
+from fastapi.responses import RedirectResponse
 
 from api.v1.auth.fastapi_users import get_current_user_without_ban
 from crud.subcription.repository import SubscriptionPlanRepository

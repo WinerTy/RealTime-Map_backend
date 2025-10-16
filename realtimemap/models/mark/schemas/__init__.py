@@ -9,6 +9,7 @@ __all__ = [
     "DetailMark",
     "ActionType",
     "MarkFilter",
+    "CreateTestMarkRequest",
 ]
 
 
@@ -21,4 +22,9 @@ from .schemas import (
     DetailMark,
     ActionType,
 )
-from .schemas_request import MarkRequestParams, CreateMarkRequest, UpdateMarkRequest
+from .schemas_request import (
+    MarkRequestParams,
+    CreateMarkRequest,
+    UpdateMarkRequest,
+    CreateTestMarkRequest,
+)

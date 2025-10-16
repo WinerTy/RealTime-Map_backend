@@ -9,6 +9,7 @@ from models.mark.schemas import (
     UpdateMarkRequest,
     MarkFilter,
     CreateMark,
+    CreateTestMarkRequest,
 )
 from services.base import BaseService
 from services.geo.service import GeoService
@@ -44,6 +45,11 @@ class MarkService(BaseService):
             **data.model_dump(exclude={"latitude", "longitude"}),
             owner_id=user.id,
             geom=geom,
+            geohash=(
+                self.geo_service.get_geohash(data)
+                if data.longitude and data.latitude
+                else None
+            ),
         )
 
     async def create_mark(self, mark_data: CreateMarkRequest, user: User) -> Mark:
@@ -51,7 +57,7 @@ class MarkService(BaseService):
         if not category_exist:
             raise RecordNotFoundError()
         create_data = self._validate__create_data(mark_data, user)
-        mark = await self.mark_repo.create_mark(create_data, user)
+        mark = await self.mark_repo.create_mark(create_data)
         return mark
 
     async def get_mark_by_id(self, mark_id: int) -> Mark:
@@ -115,3 +121,7 @@ class MarkService(BaseService):
         passed_time = datetime.now() - mark.created_at
         if passed_time > timedelta(hours=duration):
             raise TimeOutError()
+
+    async def create_test_mark(self, params: CreateTestMarkRequest):
+        res = await self.mark_repo.get_ids_for_test()
+        print(res)
