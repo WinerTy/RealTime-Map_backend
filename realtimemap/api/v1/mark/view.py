@@ -130,7 +130,7 @@ async def update_mark(
     background: BackgroundTasks,
     notification: mark_notification_service,
 ):
-    result = await service.update_mark(mark_id=mark_id, update_data=mark, user=user)
+    result = await service.update_mark(mark_id, mark, user)
     background.add_task(
         notification.notify_mark_action,
         mark=result,

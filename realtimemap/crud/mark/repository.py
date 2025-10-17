@@ -2,14 +2,13 @@ from __future__ import annotations
 
 import logging
 from datetime import timedelta
-from typing import List, TYPE_CHECKING, Union, Type, Optional, Tuple, Sequence
+from typing import List, TYPE_CHECKING, Optional, Tuple, Sequence
 
 from geoalchemy2.functions import (
     ST_DWithin,
     ST_Transform,
     ST_AsGeoJSON,
 )
-from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
@@ -20,7 +19,6 @@ from models.mark.schemas import (
     CreateMark,
     UpdateMark,
     CreateMarkRequest,
-    UpdateMarkRequest,
     MarkFilter,
 )
 from services.geo.service import GeoService
@@ -67,37 +65,6 @@ class MarkRepository(BaseRepository[Mark, CreateMark, UpdateMark]):
 
         result = await self.session.execute(query)
         return result.scalars().all()
-
-    def preparation_data(
-        self,
-        mark: Union[CreateMarkRequest, UpdateMarkRequest],
-        user: "User",
-        response_class: Type[BaseModel],
-    ) -> Type[BaseModel]:
-        """
-        Method for preparation raw data.
-        Args:
-            mark (CreateMarkRequest or UpdateMarkRequest): raw data for creating or updating a mark
-            user (User): User who make action
-            response_class (Type[BaseModel]): Class for response preparation data
-        Returns:
-            Type[BaseModel]: Prepared data
-        """
-        geom = None
-        if mark.longitude and mark.latitude:
-            geom = self.geo_service.create_geometry_point(mark)
-        mark_data = mark.model_dump(exclude={"longitude", "latitude"})
-        formated_data = response_class(
-            **mark_data,
-            geom=geom,
-            owner_id=user.id,
-            geohash=(
-                self.geo_service.get_geohash(mark)
-                if mark.longitude and mark.latitude
-                else None
-            ),
-        )
-        return formated_data
 
     async def create_mark(self, mark: CreateMark) -> Mark:
         """
@@ -152,11 +119,8 @@ class MarkRepository(BaseRepository[Mark, CreateMark, UpdateMark]):
         distance = result.scalar()
         return distance <= filters.radius
 
-    async def update_mark(
-        self, mark_id: int, update_data: UpdateMarkRequest, user: "User"
-    ) -> Mark:
-        formated_data = self.preparation_data(update_data, user, UpdateMark)
-        return await self.update(mark_id, formated_data)
+    async def update_mark(self, mark_id: int, update_data: UpdateMark) -> Mark:
+        return await self.update(mark_id, update_data)
 
     async def get_ids_for_test(self) -> Tuple[Sequence[int], Sequence[int]]:
         stmt = select(User.id).limit(10)

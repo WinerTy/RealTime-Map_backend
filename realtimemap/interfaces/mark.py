@@ -7,7 +7,6 @@ from models.mark.schemas import (
     UpdateMark,
     MarkFilter,
     MarkRequestParams,
-    UpdateMarkRequest,
 )
 from models.mark_comment.schemas import (
     UpdateComment,
@@ -19,7 +18,7 @@ from models.mark_comment.schemas import (
 )
 
 if TYPE_CHECKING:
-    from models import User
+    pass
 
 
 class IMarkRepository(IBaseRepository[Mark, CreateMark, UpdateMark], Protocol):
@@ -34,9 +33,7 @@ class IMarkRepository(IBaseRepository[Mark, CreateMark, UpdateMark], Protocol):
         self, current_location: MarkRequestParams, mark: Mark, radius: int = 500
     ) -> bool: ...
 
-    async def update_mark(
-        self, mark_id: int, update_data: UpdateMarkRequest, user: "User"
-    ) -> Mark: ...
+    async def update_mark(self, mark_id: int, update_data: UpdateMark) -> Mark: ...
 
     async def delete_mark(self, mark_id: int) -> Mark: ...
 

@@ -4,7 +4,6 @@ from typing import Optional, List, Annotated
 
 from geojson_pydantic import Point
 from pydantic import (
-    BaseModel,
     Field,
     field_validator,
     field_serializer,
@@ -43,7 +42,7 @@ class CreateMark(BaseMark, CommonMarkFields):
     geohash: Annotated[str, Field(..., description="Geohash sector for this mark")]
 
 
-class UpdateMark(BaseModel):
+class UpdateMark(CommonMarkFields):
     """
     Class for update mark in Database.
     """
@@ -52,6 +51,7 @@ class UpdateMark(BaseModel):
     start_at: Annotated[Optional[datetime], Field(None, description="Current date")]
     duration: Annotated[Optional[int], Field(None, description="Duration in hours.")]
     category_id: Annotated[Optional[int], Field(None, description="Category id")]
+    geom: Annotated[str, Field(..., description="Geometry of mark. Point string")]
     geohash: Annotated[
         Optional[str], Field(None, description="Geohash sector for this mark")
     ]

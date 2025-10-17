@@ -23,7 +23,6 @@ class AdminMark(ModelView):
         Mark.id,
         GeomField(
             "geom",
-            srid=4326,
             required=True,
             help_text="Latitude/Longitude. Example: 61.250, 73.3960.\nMap integrate in future!",
         ),
@@ -45,6 +44,7 @@ class AdminMark(ModelView):
         Mark.photo,
         Mark.is_ended,
     ]
+
     exclude_fields_from_create = [Mark.is_ended]
     detail_template = "view/mark_detail.html"
 

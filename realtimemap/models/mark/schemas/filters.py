@@ -29,7 +29,7 @@ class MarkFilter:
 
     @classmethod
     def from_request(
-        cls, req: "MarkRequestParams", geo_service: "GeoService"
+        cls, req: "MarkRequestParams", geo_service: "GeoService" = GeoService()
     ) -> "MarkFilter":
         current_point = geo_service.create_point(req, req.srid)
         geohash = geo_service.get_geohash(req)
