@@ -3,8 +3,7 @@ from typing import TYPE_CHECKING
 
 from fastapi import HTTPException
 
-from errors.http2 import GateWayError, NotFoundError
-from errors.users import HaveActiveSubscriptionException
+from errors.http2 import GateWayError, NotFoundError, HaveActiveSubscriptionError
 from integrations.payment.yookassa.schemas import (
     CreatePayment,
     ConfirmationPayment,
@@ -39,7 +38,7 @@ class SubscriptionService(BaseService):
             await self.user_subscription_repo.check_active_subscription(user_id)
         )
         if have_active_subscription:
-            raise HaveActiveSubscriptionException()
+            raise HaveActiveSubscriptionError()
 
     async def create_subscription_offer(
         self,
@@ -98,7 +97,7 @@ class SubscriptionService(BaseService):
         except GateWayError:
             logger.error("Payment service error", exc_info=True)
             raise
-        except HaveActiveSubscriptionException:
+        except HaveActiveSubscriptionError:
             logger.info("User alredy has active subscription, %v", user.id)
             raise
         except Exception as e:

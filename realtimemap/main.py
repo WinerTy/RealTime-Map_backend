@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import Request, Path
+from fastapi import Path
 from fastapi.responses import RedirectResponse, ORJSONResponse
 from libcloud.storage.drivers.local import LocalStorageDriver
 from libcloud.storage.types import ObjectDoesNotExistError
@@ -9,21 +9,10 @@ from starlette.responses import FileResponse, StreamingResponse
 
 from core.app import create_app
 from core.config import conf
-from errors import HttpIntegrityError
 
 logger = logging.getLogger(__name__)
 
 app = create_app()
-
-
-@app.exception_handler(HttpIntegrityError)
-async def http_exception_handler(request: Request, exc: HttpIntegrityError):
-    logger.info(f"DataBase Integrity Error. Request: {request.url.path}")
-    return ORJSONResponse(
-        status_code=exc.status_code,
-        content=exc.detail,
-        headers=exc.headers,
-    )
 
 
 @app.get("/", tags=["Root"], status_code=307)

@@ -1,3 +1,4 @@
+import logging
 from typing import TYPE_CHECKING
 
 from fastapi import status
@@ -10,10 +11,14 @@ from errors.http2 import (
     NestingLevelExceededError,
     NotFoundError,
     TimeOutError,
+    ServerError,
+    HaveActiveSubscriptionError,
 )
 
 if TYPE_CHECKING:
     from fastapi import FastAPI, Request
+
+logger = logging.getLogger(__name__)
 
 
 def register_exception_handler(app: "FastAPI"):
@@ -56,5 +61,22 @@ def register_exception_handler(app: "FastAPI"):
     async def user_permission_error_handler(_: "Request", exc: UserPermissionError):
         return ORJSONResponse(
             status_code=status.HTTP_403_FORBIDDEN,
+            content=exc.detail,
+        )
+
+    @app.exception_handler(ServerError)
+    async def server_error_handler(request: "Request", exc: ServerError):
+        logger.error("User path: ", request.url)
+        return ORJSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content=exc.detail,
+        )
+
+    @app.exception_handler(HaveActiveSubscriptionError)
+    async def active_subscription_error_handler(
+        _: "Request", exc: HaveActiveSubscriptionError
+    ):
+        return ORJSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
             content=exc.detail,
         )

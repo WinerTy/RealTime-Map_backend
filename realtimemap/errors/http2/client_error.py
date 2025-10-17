@@ -11,7 +11,7 @@ class MessageSendingError(RealTimeMapError):
         super().__init__(detail)
 
 
-class HaveActiveSubscriptionException(RealTimeMapError):
+class HaveActiveSubscriptionError(RealTimeMapError):
     def __init__(self, detail: str = "You already have an active subscription"):
         super().__init__(detail)
 

@@ -1,22 +1,23 @@
 __all__ = [
     "NestingLevelExceededError",
     "MessageSendingError",
-    "HaveActiveSubscriptionException",
+    "HaveActiveSubscriptionError",
     "TimeOutError",
     "UserPermissionError",
     "NotFoundError",
     "GateWayError",
     "IntegrityError",
+    "ServerError",
 ]
 
 from .client_error import (
     NestingLevelExceededError,
     MessageSendingError,
-    HaveActiveSubscriptionException,
+    HaveActiveSubscriptionError,
     TimeOutError,
     UserPermissionError,
     NotFoundError,
     IntegrityError,
 )
 
-from .server_error import GateWayError
+from .server_error import GateWayError, ServerError
