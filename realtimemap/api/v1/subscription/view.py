@@ -8,10 +8,9 @@ from crud.subcription.repository import SubscriptionPlanRepository
 from dependencies.crud import get_subscription_plan_repository
 from dependencies.payment import get_yookassa_client
 from dependencies.service import get_subscription_service
-from errors import RecordNotFoundError
 from errors.users import HaveActiveSubscriptionException
 from errors.utils import http_error_response_generator
-from integrations.payment.yookassa import YookassaClient, GatewayException
+from integrations.payment.yookassa import YookassaClient
 from models.subscription.schemas import ReadSubscriptionPlan
 from models.user_subscription.schemas import CreateSubscriptionRequest
 from services.subscription.service import SubscriptionService
@@ -20,9 +19,7 @@ if TYPE_CHECKING:
     from models import User
 
 
-PAYMENT_ERROR_RESPONSES = http_error_response_generator(
-    RecordNotFoundError, GatewayException, HaveActiveSubscriptionException
-)
+PAYMENT_ERROR_RESPONSES = http_error_response_generator(HaveActiveSubscriptionException)
 
 router = APIRouter(
     prefix="/subscription",

@@ -9,7 +9,7 @@ from dependencies.crud import (
     get_chat_repository,
     get_message_repository,
 )
-from errors import RecordNotFoundError
+from errors.http2 import NotFoundError
 
 if TYPE_CHECKING:
     from crud.mark import MarkRepository
@@ -22,7 +22,7 @@ async def check_mark_exist(
 ) -> None:
     is_exist = await repo.exist(mark_id)
     if not is_exist:
-        raise RecordNotFoundError()
+        raise NotFoundError()
 
 
 async def check_mark_comment_exist(
@@ -31,7 +31,7 @@ async def check_mark_comment_exist(
 ) -> None:
     is_exist = await repo.exist(comment_id)
     if not is_exist:
-        raise RecordNotFoundError()
+        raise NotFoundError()
 
 
 async def check_chat_exist(
@@ -40,7 +40,7 @@ async def check_chat_exist(
 ) -> None:
     is_exist = await repo.exist(chat_id)
     if not is_exist:
-        raise RecordNotFoundError()
+        raise NotFoundError()
 
 
 async def check_message_exist(
@@ -49,4 +49,4 @@ async def check_message_exist(
 ):
     is_exist = await repo.exist(message_id)
     if not is_exist:
-        raise RecordNotFoundError()
+        raise NotFoundError()

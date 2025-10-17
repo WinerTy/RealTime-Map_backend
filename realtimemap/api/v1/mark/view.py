@@ -15,7 +15,7 @@ from dependencies.notification import (
     get_mark_notification_service,
 )
 from dependencies.service import get_mark_service
-from errors import RecordNotFoundError, UserPermissionError, TimeOutError
+from errors import UserPermissionError, TimeOutError
 from errors.utils import http_error_response_generator
 from models.mark.schemas import (
     CreateMarkRequest,
@@ -32,14 +32,14 @@ from services.notification import MarkNotificationService
 if TYPE_CHECKING:
     from models import User
 
-GENERAL_ERROR_RESPONSES = http_error_response_generator(RecordNotFoundError)
+
 POST_ERROR_RESPONSES = http_error_response_generator(UserPermissionError)
 UPDATE_ERROR_RESPONSES = http_error_response_generator(
     UserPermissionError, TimeOutError
 )
 
 
-router = APIRouter(prefix="/marks", tags=["Marks"], responses=GENERAL_ERROR_RESPONSES)
+router = APIRouter(prefix="/marks", tags=["Marks"])
 
 logger = logging.getLogger(__name__)
 
