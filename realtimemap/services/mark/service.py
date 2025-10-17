@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from fastapi import HTTPException
 
-from errors import RecordNotFoundError, UserPermissionError, TimeOutError
+from errors.http2 import NotFoundError, TimeOutError, UserPermissionError
 from models import User, Mark
 from models.mark.schemas import (
     CreateMarkRequest,
@@ -61,7 +61,7 @@ class MarkService(BaseService):
     async def create_mark(self, mark_data: CreateMarkRequest, user: User) -> Mark:
         category_exist = await self.category_repo.exist(mark_data.category_id)
         if not category_exist:
-            raise RecordNotFoundError()
+            raise NotFoundError()
         create_data = self._validate_create_data(mark_data, user)
         mark = await self.mark_repo.create_mark(create_data)
         return mark
@@ -71,7 +71,7 @@ class MarkService(BaseService):
             mark_id, join_related=["owner", "category"]
         )
         if not result:
-            raise RecordNotFoundError()
+            raise NotFoundError()
         return result
 
     async def get_marks(self, params: MarkRequestParams):
@@ -119,19 +119,19 @@ class MarkService(BaseService):
         :param update_data: Данные для обновления
         :param user: Пользователь кто меняет данные
         :return: объект Mark
-        :raises RecordNotFoundError: если запись не найдена
+        :raises NotFoundError: если запись не найдена
         :raises TimeOutError: Если время изменения истекло
         :raises UserPermissionError: Если текущий пользователь не владелец записи
         """
         try:
             mark = await self.mark_repo.get_mark_by_id(mark_id)
             if not mark:
-                raise RecordNotFoundError()
+                raise NotFoundError()
 
             await self._before_update_mark(mark, user, update_data)
             valid_data = self._validate_update_data(update_data)
             return await self.mark_repo.update_mark(mark_id, valid_data)
-        except RecordNotFoundError:
+        except NotFoundError:
             logger.info("Record not found: %d", mark_id)
             raise
         except TimeOutError:
@@ -174,14 +174,14 @@ class MarkService(BaseService):
         Метод проверяет существует ли указанная категория
         :param update_data: Сырые данные
         :return: None
-        :raises RecordNotFoundError: Если указанная категория не найдена
+        :raises NotFoundError: Если указанная категория не найдена
         """
         if not update_data.category_id:
             return
 
         category_exist = await self.category_repo.exist(update_data.category_id)
         if not category_exist:
-            raise RecordNotFoundError()
+            raise NotFoundError()
 
     @staticmethod
     def _check_timeout(mark: Mark, duration: int = 1) -> None:

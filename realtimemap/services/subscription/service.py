@@ -3,9 +3,8 @@ from typing import TYPE_CHECKING
 
 from fastapi import HTTPException
 
-from errors import RecordNotFoundError
+from errors.http2 import GateWayError, NotFoundError
 from errors.users import HaveActiveSubscriptionException
-from integrations.payment.yookassa.exception import GatewayException
 from integrations.payment.yookassa.schemas import (
     CreatePayment,
     ConfirmationPayment,
@@ -56,7 +55,7 @@ class SubscriptionService(BaseService):
                 await self.subscription_repo.get_by_id(plan_id)
             )
             if subscription_info is None:
-                raise RecordNotFoundError()
+                raise NotFoundError()
 
             # Формирования запроса к сервису оплаты
             try:
@@ -73,10 +72,10 @@ class SubscriptionService(BaseService):
                     amount=AmountPayment(value=subscription_info.price, currency="RUB"),
                 )
                 # Запрос на создание счета
-                payment = payment_client.create_paymentv2(payment_request)
+                payment = payment_client.create_payment(payment_request)
             except Exception:
                 logger.error("Failed to create payment", exc_info=True)
-                raise GatewayException()
+                raise GateWayError()
 
             # TODO мб сначала создать запись бех payment_id сделать счет и позже обновить?
             create_data = CreateUserSubscription(
@@ -93,10 +92,10 @@ class SubscriptionService(BaseService):
             # Возвращаем url для переадресацию юзера на оплату
             return payment.confirmation["confirmation_url"]
 
-        except RecordNotFoundError:
+        except NotFoundError:
             logger.info("Subscription does not exist, %v", plan_id)
             raise
-        except GatewayException:
+        except GateWayError:
             logger.error("Payment service error", exc_info=True)
             raise
         except HaveActiveSubscriptionException:
