@@ -15,6 +15,7 @@ from api.v1 import router as v1_router
 from core.admin import setup_admin
 from core.config import conf
 from middleware import ProcessTimeMiddleware
+from .exception_handler import register_exception_handler
 from .lifespan import lifespan
 from .socket import sio_app
 
@@ -102,6 +103,7 @@ def create_app() -> FastAPI:
     setup_pagination(app)
     setup_admin(app)
     app.add_middleware(ProcessTimeMiddleware)
+    register_exception_handler(app)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
