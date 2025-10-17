@@ -29,3 +29,8 @@ class UserPermissionError(RealTimeMapError):
 class NotFoundError(RealTimeMapError):
     def __init__(self, detail: str = "Record not found"):
         super().__init__(detail)
+
+
+class IntegrityError(RealTimeMapError):
+    def __init__(self, detail: str = "Record already exists"):
+        super().__init__(detail)

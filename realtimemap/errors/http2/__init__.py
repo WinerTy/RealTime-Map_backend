@@ -6,6 +6,7 @@ __all__ = [
     "UserPermissionError",
     "NotFoundError",
     "GateWayError",
+    "IntegrityError",
 ]
 
 from .client_error import (
@@ -15,6 +16,7 @@ from .client_error import (
     TimeOutError,
     UserPermissionError,
     NotFoundError,
+    IntegrityError,
 )
 
 from .server_error import GateWayError
