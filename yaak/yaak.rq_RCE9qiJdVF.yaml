@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_RCE9qiJdVF
+createdAt: 2025-10-30T14:21:51.757626
+updatedAt: 2025-10-30T14:33:39.997461800
+workspaceId: wk_V99Hr7DmhP
+folderId: fl_JZLpMVdaT2
+authentication:
+  token: ${[ access_token ]}
+authenticationType: bearer
+body: {}
+bodyType: null
+description: ''
+headers: []
+method: POST
+name: Logout
+sortPriority: -1761833592105.0
+url: ${[ API_URL ]}/auth/logout
+urlParameters: []

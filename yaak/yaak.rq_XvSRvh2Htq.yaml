@@ -1,0 +1,18 @@
+type: http_request
+model: http_request
+id: rq_XvSRvh2Htq
+createdAt: 2025-10-30T14:58:27.706911500
+updatedAt: 2025-10-30T15:23:20.386936900
+workspaceId: wk_V99Hr7DmhP
+folderId: fl_JbHjhYdxRw
+authentication: {}
+authenticationType: null
+body: {}
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: Get
+sortPriority: -1761836307706.0
+url: ${[ API_URL ]}/category
+urlParameters: []
