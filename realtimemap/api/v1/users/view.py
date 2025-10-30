@@ -19,9 +19,10 @@ if TYPE_CHECKING:
 
 get_user_with_sub_ultra = partial(get_user_with_sub, sub_type=SubPlanType.ultra)
 
-router = APIRouter(prefix="", tags=["user"])
+router = APIRouter(tags=["user"])
 
 
+# TODO Убрать sub/ ban эндпоинты и переписать все в 1 метод с возможныстью управления состоянием ответа
 @router.get(
     "/me",
     response_model=UserRead,
@@ -53,7 +54,8 @@ async def delete_me(
     user: Annotated["User", Depends(get_current_user_without_ban)],
     repo: Annotated["UserRepository", Depends(get_user_repository)],
 ):
-    return await repo.delete_user(user)
+    await repo.delete_user(user)
+    return Response(status_code=204)
 
 
 @router.get("/me/subscriptions")
@@ -70,8 +72,3 @@ async def test_proto(
 ):
     result = await service.is_ban(user.id)
     return result
-
-
-@router.get("/testing")
-async def dep_test(user: Annotated["User", Depends(get_user_with_sub_ultra)]):
-    return user

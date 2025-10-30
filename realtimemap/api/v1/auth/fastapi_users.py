@@ -11,7 +11,7 @@ from database.helper import db_helper
 from dependencies.auth.backend import authentication_backend
 from dependencies.auth.manager import get_user_manager
 from dependencies.crud import get_user_ban_repository
-from errors import UserPermissionError
+from errors.http2 import UserPermissionError
 from models import User, UserSubscription, SubscriptionPlan
 from models.subscription.model import SubPlanType
 

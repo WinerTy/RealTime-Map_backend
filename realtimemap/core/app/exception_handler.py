@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 from fastapi import status
 from fastapi.responses import ORJSONResponse
 
-from errors import UserPermissionError
 from errors.http2 import (
     GateWayError,
     IntegrityError,
@@ -13,6 +12,7 @@ from errors.http2 import (
     TimeOutError,
     ServerError,
     HaveActiveSubscriptionError,
+    UserPermissionError,
 )
 
 if TYPE_CHECKING:

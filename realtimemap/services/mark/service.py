@@ -167,7 +167,7 @@ class MarkService(BaseService):
         :return: None
         """
         if mark.owner_id != user.id:
-            raise UserPermissionError(status_code=403)
+            raise UserPermissionError()
 
     async def _check_category_exist(self, update_data: UpdateMarkRequest) -> None:
         """

@@ -5,10 +5,6 @@ from fastapi import APIRouter, Depends
 from api.v1.auth.fastapi_users import get_current_user_without_ban
 from dependencies.checker import check_mark_exist, check_mark_comment_exist
 from dependencies.service import get_mark_comment_service
-from errors import (
-    UserPermissionError,
-)
-from errors.utils import http_error_response_generator
 from models.mark_comment.schemas import (
     CreateCommentRequest,
     ReadComment,
@@ -19,14 +15,11 @@ if TYPE_CHECKING:
     from services.mark_comment.service import MarkCommentService
     from models import User
 
-GENERAL_ERROR_RESPONSES = http_error_response_generator(UserPermissionError)
-
 
 router = APIRouter(
     prefix="/{mark_id}",
     tags=["Mark Comments"],
     dependencies=[Depends(check_mark_exist)],
-    responses=GENERAL_ERROR_RESPONSES,
 )
 
 

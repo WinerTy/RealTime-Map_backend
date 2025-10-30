@@ -64,7 +64,10 @@ class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
         back_populates="user", foreign_keys="CommentReaction.user_id"
     )
     subscriptions: Mapped[List["UserSubscription"]] = relationship(
-        "UserSubscription", back_populates="user", cascade="all, delete-orphan"
+        "UserSubscription",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        lazy="selectin",
     )
 
     @classmethod

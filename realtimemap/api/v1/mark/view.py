@@ -83,7 +83,7 @@ async def create_mark_point(
     return ReadMark.model_validate(instance, context={"request": request})
 
 
-@router.get("/{mark_id}/", response_model=DetailMark, status_code=200)
+@router.get("/{mark_id}", response_model=DetailMark, status_code=200)
 # @cache(expire=3600) TODO Fix
 async def get_mark(mark_id: int, service: mark_service, request: Request):
     result = await service.get_mark_by_id(mark_id)
@@ -91,7 +91,7 @@ async def get_mark(mark_id: int, service: mark_service, request: Request):
 
 
 @router.delete(
-    "/{mark_id}/",
+    "/{mark_id}",
     status_code=204,
 )
 async def delete_mark(
