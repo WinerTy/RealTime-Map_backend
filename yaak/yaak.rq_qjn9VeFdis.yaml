@@ -1,8 +1,8 @@
 type: http_request
 model: http_request
-id: rq_tsh5QCVFJD
-createdAt: 2025-10-30T14:13:12.106266100
-updatedAt: 2025-10-30T15:57:14.573864500
+id: rq_qjn9VeFdis
+createdAt: 2025-10-30T15:55:54.669277900
+updatedAt: 2025-10-30T16:06:40.477264500
 workspaceId: wk_V99Hr7DmhP
 folderId: fl_JZLpMVdaT2
 authentication: {}
@@ -10,19 +10,19 @@ authenticationType: null
 body:
   text: |-
     {
-      "username": "admin1",
-      "email":"admin1@admin.ru",
-      "password": "admin1"
+      "username": "${[ random_username ]}",
+      "email": "${[ random_email ]}",
+      "password": "${[ random_password ]}"
     }
 bodyType: application/json
-description: Регистрация юзера
+description: ''
 headers:
 - enabled: true
   name: Content-Type
   value: application/json
-  id: 6tnJ3kXKgS
+  id: cHJeAz0IQe
 method: POST
-name: Admin Register
+name: Random register
 sortPriority: -1761833592105.0
 url: ${[ api_url ]}/auth/register
 urlParameters: []

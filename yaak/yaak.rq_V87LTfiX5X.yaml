@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_V87LTfiX5X
 createdAt: 2025-10-30T15:43:57.266897300
-updatedAt: 2025-10-30T15:45:51.625669800
+updatedAt: 2025-10-30T15:57:42.527782900
 workspaceId: wk_V99Hr7DmhP
 folderId: fl_UJQvbUtxEx
 authentication:
@@ -15,7 +15,7 @@ headers: []
 method: DELETE
 name: Delete
 sortPriority: -1761836307706.0
-url: ${[ API_URL ]}/marks/:id
+url: ${[ api_url ]}/marks/:id
 urlParameters:
 - enabled: true
   name: :id

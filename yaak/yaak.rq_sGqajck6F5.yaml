@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_sGqajck6F5
 createdAt: 2025-10-30T15:02:55.714596600
-updatedAt: 2025-10-30T15:31:17.825011900
+updatedAt: 2025-10-30T15:57:33.577579500
 workspaceId: wk_V99Hr7DmhP
 folderId: fl_UJQvbUtxEx
 authentication: {}
@@ -14,7 +14,7 @@ headers: []
 method: GET
 name: Get
 sortPriority: -1761836307706.0
-url: ${[ API_URL ]}/marks/
+url: ${[ api_url ]}/marks/
 urlParameters:
 - enabled: true
   name: latitude

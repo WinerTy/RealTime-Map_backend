@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_DamiWewChx
 createdAt: 2025-10-30T15:24:06.723977500
-updatedAt: 2025-10-30T15:30:02.575342100
+updatedAt: 2025-10-30T16:01:06.546028700
 workspaceId: wk_V99Hr7DmhP
 folderId: fl_UJQvbUtxEx
 authentication:
@@ -25,7 +25,7 @@ body:
   - enabled: true
     id: q4JTtfUfAy
     name: category_id
-    value: ${[ response.body.path(request='rq_XvSRvh2Htq', path=b64'JC5bMF0uaWQ', behavior='smart') ]}
+    value: ${[ response.body.path(request='rq_XvSRvh2Htq', path=b64'JC5bMF0uaWQ', behavior='always') ]}
   - enabled: true
     id: HKEe2g9kF3
     name: latitude
@@ -43,11 +43,7 @@ body:
     id: jhYZdUfSWN
     name: photo
   - enabled: true
-    id: mXZCm8Wr9z
-    name: ''
-    value: ''
-  - enabled: true
-    id: 6Usd2PZtXB
+    id: frU5jIGQ5n
     name: ''
     value: ''
 bodyType: multipart/form-data
@@ -60,5 +56,5 @@ headers:
 method: POST
 name: Create
 sortPriority: -1761836307706.0
-url: ${[ API_URL ]}/marks/
+url: ${[ api_url ]}/marks/
 urlParameters: []

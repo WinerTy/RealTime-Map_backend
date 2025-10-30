@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_wwoGuU2Po5
 createdAt: 2025-10-30T14:32:21.744625600
-updatedAt: 2025-10-30T14:33:10.243858700
+updatedAt: 2025-10-30T15:57:24.245999200
 workspaceId: wk_V99Hr7DmhP
 folderId: fl_atqZ3pLazm
 authentication: {}
@@ -14,5 +14,5 @@ headers: []
 method: GET
 name: Me
 sortPriority: -1761833592105.0
-url: ${[ API_URL ]}/user/me
+url: ${[ api_url ]}/user/me
 urlParameters: []
