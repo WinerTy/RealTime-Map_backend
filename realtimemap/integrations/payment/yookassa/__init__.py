@@ -1,4 +1,3 @@
-__all__ = ["YookassaClient", "GatewayException"]
+__all__ = ["YookassaClient"]
 
 from .client import YookassaClient
-from .exception import GatewayException

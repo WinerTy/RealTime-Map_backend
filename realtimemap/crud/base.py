@@ -10,13 +10,12 @@ from typing import (
     TYPE_CHECKING,
 )
 
-from fastapi import HTTPException
 from sqlalchemy import select, delete, Select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.expression import exists as sql_exists
 
-from errors import HttpIntegrityError
+from errors.http2 import IntegrityError as RealTimeMapIntegrityError, ServerError
 from my_type import Model, CreateSchema, UpdateSchema
 
 if TYPE_CHECKING:
@@ -76,16 +75,13 @@ class BaseRepository(Generic[Model, CreateSchema, UpdateSchema]):
                 f"Record {data} already exists in Repository: {self.model.__name__}"
             )
             await self.session.rollback()
-            raise HttpIntegrityError()
+            raise RealTimeMapIntegrityError()
         except Exception as e:
             logger.error(
                 f"Create record {data} in Repository: {self.model.__name__}", e
             )
             await self.session.rollback()
-            raise HTTPException(
-                status_code=500,
-                detail=f"Error in Repository Class, please check create method. {str(e)}",
-            )
+            raise ServerError()
 
     async def update(self, item_id: Any, data: UpdateSchema) -> Optional[Model]:
         try:
@@ -105,9 +101,10 @@ class BaseRepository(Generic[Model, CreateSchema, UpdateSchema]):
             await self.session.refresh(instance)
 
             return instance
-        except Exception as e:
+        except Exception:
+            logger.error(f"Update record in {self.model.__name__}, data: {data}")
             await self.session.rollback()
-            raise HTTPException(status_code=500, detail=str(e))
+            raise ServerError()
 
     async def delete(self, record_id: Any) -> Optional[Model]:
         try:

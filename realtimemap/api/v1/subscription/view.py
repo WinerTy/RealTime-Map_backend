@@ -1,17 +1,14 @@
 from typing import Annotated, List, TYPE_CHECKING
 
 from fastapi import APIRouter, Depends, Request
-from starlette.responses import RedirectResponse
+from fastapi.responses import RedirectResponse
 
 from api.v1.auth.fastapi_users import get_current_user_without_ban
 from crud.subcription.repository import SubscriptionPlanRepository
 from dependencies.crud import get_subscription_plan_repository
 from dependencies.payment import get_yookassa_client
 from dependencies.service import get_subscription_service
-from errors import RecordNotFoundError
-from errors.users import HaveActiveSubscriptionException
-from errors.utils import http_error_response_generator
-from integrations.payment.yookassa import YookassaClient, GatewayException
+from integrations.payment.yookassa import YookassaClient
 from models.subscription.schemas import ReadSubscriptionPlan
 from models.user_subscription.schemas import CreateSubscriptionRequest
 from services.subscription.service import SubscriptionService
@@ -19,10 +16,6 @@ from services.subscription.service import SubscriptionService
 if TYPE_CHECKING:
     from models import User
 
-
-PAYMENT_ERROR_RESPONSES = http_error_response_generator(
-    RecordNotFoundError, GatewayException, HaveActiveSubscriptionException
-)
 
 router = APIRouter(
     prefix="/subscription",
@@ -44,7 +37,6 @@ async def get_subscription_plans(repo: get_sub_repo):
     "/",
     response_class=RedirectResponse,
     status_code=307,
-    responses=PAYMENT_ERROR_RESPONSES,
 )
 async def purchase_subscription(
     data: CreateSubscriptionRequest,

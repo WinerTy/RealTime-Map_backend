@@ -11,7 +11,11 @@ class MarkRequestParams(Coordinates):
     srid: Annotated[int, Field(4326, description="SRID")]
     date: Annotated[
         datetime,
-        Field(default=datetime.now(), description="Date"),
+        Field(
+            default=datetime.now(),
+            description="Date for start filtering. Format YYYY-MM-DD HH:MM:SS",
+            examples=["2025-10-30"],
+        ),
     ]
     duration: Annotated[
         Optional[int], Field(24, description="Search duration in hours.")
@@ -46,3 +50,10 @@ class UpdateMarkRequest(BaseMark, CoordinatesOptional, CommonMarkFields):
                 "Both latitude and longitude must be provided together or neither"
             )
         return self
+
+
+class CreateTestMarkRequest(Coordinates):
+    count: Annotated[int, Field(..., description="Count of test marks.", gt=0, lt=100)]
+    radius: Annotated[
+        int, Field(500, description="Search radius in meters.", gt=0, lt=5000)
+    ]

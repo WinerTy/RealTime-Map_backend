@@ -15,8 +15,6 @@ from dependencies.notification import (
     get_mark_notification_service,
 )
 from dependencies.service import get_mark_service
-from errors import RecordNotFoundError, UserPermissionError, TimeOutError
-from errors.utils import http_error_response_generator
 from models.mark.schemas import (
     CreateMarkRequest,
     ReadMark,
@@ -32,14 +30,8 @@ from services.notification import MarkNotificationService
 if TYPE_CHECKING:
     from models import User
 
-GENERAL_ERROR_RESPONSES = http_error_response_generator(RecordNotFoundError)
-POST_ERROR_RESPONSES = http_error_response_generator(UserPermissionError)
-UPDATE_ERROR_RESPONSES = http_error_response_generator(
-    UserPermissionError, TimeOutError
-)
 
-
-router = APIRouter(prefix="/marks", tags=["Marks"], responses=GENERAL_ERROR_RESPONSES)
+router = APIRouter(prefix="/marks", tags=["Marks"])
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +58,9 @@ async def get_marks(
 
 
 @router.post(
-    "/", response_model=ReadMark, status_code=201, responses=POST_ERROR_RESPONSES
+    "/",
+    response_model=ReadMark,
+    status_code=201,
 )
 async def create_mark_point(
     background: BackgroundTasks,
@@ -89,14 +83,17 @@ async def create_mark_point(
     return ReadMark.model_validate(instance, context={"request": request})
 
 
-@router.get("/{mark_id}/", response_model=DetailMark, status_code=200)
+@router.get("/{mark_id}", response_model=DetailMark, status_code=200)
 # @cache(expire=3600) TODO Fix
 async def get_mark(mark_id: int, service: mark_service, request: Request):
     result = await service.get_mark_by_id(mark_id)
     return DetailMark.model_validate(result, context={"request": request})
 
 
-@router.delete("/{mark_id}/", status_code=204, responses=POST_ERROR_RESPONSES)
+@router.delete(
+    "/{mark_id}",
+    status_code=204,
+)
 async def delete_mark(
     mark_id: int,
     background: BackgroundTasks,
@@ -119,7 +116,6 @@ async def delete_mark(
     "/{mark_id}",
     response_model=ReadMark,
     status_code=200,
-    responses=UPDATE_ERROR_RESPONSES,
 )
 async def update_mark(
     mark_id: int,
@@ -130,7 +126,7 @@ async def update_mark(
     background: BackgroundTasks,
     notification: mark_notification_service,
 ):
-    result = await service.update_mark(mark_id=mark_id, update_data=mark, user=user)
+    result = await service.update_mark(mark_id, mark, user)
     background.add_task(
         notification.notify_mark_action,
         mark=result,
@@ -143,3 +139,53 @@ async def update_mark(
 @router.get("/allowed-duration/", response_model=List[int], status_code=200)
 async def get_allowed_duration():
     return allowed_duration
+
+
+#
+# def generate_random_point_in_radius(
+#     center_lat: float, center_lon: float, radius: float
+# ):
+#     # Более точный вариант для небольших радиусов, использующий смещение в метрах # Переводим радиус в метры
+#     distance = random.uniform(0, radius)
+#     angle = random.uniform(0, 2 * math.pi)
+#
+#     delta_x = distance * math.cos(angle)
+#     delta_y = distance * math.sin(angle)
+#
+#     new_lat = center_lat + (delta_y / 111139.0)
+#     new_lon = center_lon + (delta_x / (111139.0 * math.cos(math.radians(center_lat))))
+#
+#     return new_lat, new_lon
+#
+#
+# def generate_random_mark_time_data() -> Tuple[datetime, int]:
+#     duration = random.choice(allowed_duration)
+#     if random.random() < 0.7:
+#         start_at = datetime.now() + timedelta(days=random.randint(-2, 3))
+#     else:
+#         start_at = datetime.now() + timedelta(days=random.randint(5, 7))
+#     return start_at, duration
+#
+#
+# """
+# Задача: Создать тестовые метки в n количестве в радиусе от переданных координат.
+# Для облегчения создания тестовых данных
+#
+# Задачи:
+# 1. Получить ids Польователей и Категорий для рандомной выборки для тестовой метки. ГОТОВО
+# 2. Сделать функцию для генерации даты. 70% активных в настоящее время и 30% для активности в будущем ГОТОВО
+# 3. Функция для генерации рандомных координат в диапазоне пользователя
+# 4. Создать тестовые данные
+# """
+#
+#
+# @router.post("/test/")
+# async def create_test_marks(
+#     data: CreateTestMarkRequest,
+#     service: mark_service,
+#     db: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+# ):
+#
+#     point = service.geo_service.create_point(data)
+#
+#     return data

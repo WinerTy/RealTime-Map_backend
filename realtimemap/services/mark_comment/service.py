@@ -2,7 +2,7 @@ from typing import Optional, List
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from errors import RecordNotFoundError, NestingLevelExceededError
+from errors.http2 import NestingLevelExceededError, NotFoundError
 from interfaces import (
     IMarkCommentRepository,
     ICommentStatRepository,
@@ -34,7 +34,7 @@ class MarkCommentService(BaseService):
     async def get_comment_by_id(self, comment_id: int) -> Comment:
         result = await self.comment_repo.get_by_id(comment_id)
         if not result:
-            raise RecordNotFoundError()
+            raise NotFoundError()
         return result
 
     async def after_create_comment(self, comment: Comment) -> None:
@@ -47,7 +47,7 @@ class MarkCommentService(BaseService):
         if create_data.parent_id:
             parent_comment = await self.comment_repo.get_by_id(create_data.parent_id)
             if not parent_comment:
-                raise RecordNotFoundError()
+                raise NotFoundError()
             if parent_comment.parent_id:
                 raise NestingLevelExceededError()
         full_data = CreateComment(

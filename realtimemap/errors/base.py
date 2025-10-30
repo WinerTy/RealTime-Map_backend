@@ -18,3 +18,10 @@ class BaseRealTimeMapException(HTTPException):
         headers: Optional[Dict[str, str]] = None,
     ):
         super().__init__(status_code=status_code, detail=detail, headers=headers)
+
+
+# TODO мб улучшить параметры для ясности??
+class RealTimeMapError(Exception):
+    def __init__(self, detail: str = None):
+        self.detail = {"detail": detail}
+        super().__init__()

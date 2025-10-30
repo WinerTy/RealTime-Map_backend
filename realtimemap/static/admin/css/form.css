@@ -14,3 +14,7 @@
     --tblr-form-check-bg: var(--bg-page) !important;
     color: var(--bg-page) !important;
 }
+
+.form-select {
+    background-color: var(--bg-page) !important;
+}

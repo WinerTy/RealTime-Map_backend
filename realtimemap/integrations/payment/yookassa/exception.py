@@ -3,7 +3,6 @@ from typing import Dict, Optional
 from errors.base import BaseRealTimeMapException
 
 
-# TODO Maybe Rename
 class GatewayException(BaseRealTimeMapException):
     def __init__(
         self,
