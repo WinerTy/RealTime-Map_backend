@@ -3,7 +3,7 @@ from sqlalchemy import Select
 from sqlalchemy.orm import joinedload, selectinload
 from starlette.requests import Request
 
-from core.admin.fields import JsonField
+from admin.fields import JsonField
 from core.config import conf
 from models import SubscriptionPlan, UserSubscription
 from .base import BaseModelAdmin

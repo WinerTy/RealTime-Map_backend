@@ -11,8 +11,8 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 from starlette.staticfiles import StaticFiles
 
+from admin import setup_admin
 from api.v1 import router as v1_router
-from core.admin import setup_admin
 from core.config import conf
 from middleware import ProcessTimeMiddleware
 from .exception_handler import register_exception_handler

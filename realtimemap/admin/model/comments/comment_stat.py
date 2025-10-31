@@ -2,7 +2,7 @@ from sqlalchemy import Select, select
 from sqlalchemy.orm import joinedload
 from starlette.requests import Request
 
-from core.admin.model.base import BaseModelAdmin
+from admin.model.base import BaseModelAdmin
 from models import CommentStat
 
 

@@ -3,6 +3,7 @@ from typing import Annotated, Optional, List
 
 from fastapi import UploadFile
 from pydantic import BaseModel, Field, field_validator
+from pydantic_extra_types.coordinate import Latitude, Longitude
 
 allowed_duration = [12, 24, 36, 48]
 
@@ -13,8 +14,8 @@ class Coordinates(BaseModel):
     Two fields required!
     """
 
-    latitude: Annotated[float, Field(..., ge=-90, le=90, examples=["75.445675"])]
-    longitude: Annotated[float, Field(..., ge=-180, le=180, examples=["63.201907"])]
+    latitude: Latitude
+    longitude: Longitude
 
 
 class CoordinatesOptional(BaseModel):
@@ -23,12 +24,8 @@ class CoordinatesOptional(BaseModel):
     Two fields not required!
     """
 
-    latitude: Annotated[
-        Optional[float], Field(None, ge=-90, le=90, examples=["75.445675"])
-    ]
-    longitude: Annotated[
-        Optional[float], Field(None, ge=-180, le=180, examples=["63.201907"])
-    ]
+    latitude: Optional[Latitude]
+    longitude: Optional[Longitude]
 
 
 class CommonMarkFields(BaseModel):

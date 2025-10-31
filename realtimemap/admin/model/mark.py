@@ -6,8 +6,8 @@ from starlette_admin import HasOne, IntegerField, DateTimeField
 from starlette_admin.contrib.sqla import ModelView
 from starlette_admin.exceptions import FormValidationError
 
-from core.admin.fields import GeomField
-from core.admin.fields.geohash_field import GeoHashField
+from admin.fields import GeomField
+from admin.fields.geohash_field import GeoHashField
 from core.app.socket import sio
 from crud.mark import MarkRepository
 from models import Mark

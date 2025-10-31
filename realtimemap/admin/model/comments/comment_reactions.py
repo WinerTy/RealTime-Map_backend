@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from starlette.requests import Request
 from starlette_admin.exceptions import FormValidationError
 
-from core.admin.model.base import BaseModelAdmin
+from admin.model.base import BaseModelAdmin
 from models import CommentReaction
 
 

@@ -14,7 +14,7 @@ from starlette_admin import (
 )
 from starlette_admin.exceptions import FormValidationError, ActionFailed
 
-from core.admin.model.base import BaseModelAdmin
+from admin.model.base import BaseModelAdmin
 from core.config import conf
 from crud.user_ban.repository import UsersBanRepository
 from models import User

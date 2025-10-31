@@ -7,8 +7,8 @@ from starlette.requests import Request
 from starlette_admin import DropDown
 from starlette_admin.contrib.sqla import Admin
 
-from core.admin.auth.provider import AdminAuthProvider
-from core.admin.model import (
+from admin.auth.provider import AdminAuthProvider
+from admin.model import (
     AdminCategory,
     AdminUser,
     AdminMark,
@@ -19,7 +19,7 @@ from core.admin.model import (
     AdminSubscriptionPlan,
     AdminUserSubscription,
 )
-from core.admin.view.home import HomeView
+from admin.view.home import HomeView
 from core.config import conf
 from database.helper import db_helper
 from models import (
