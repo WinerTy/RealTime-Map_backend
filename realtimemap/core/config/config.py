@@ -9,6 +9,7 @@ from .logging import LoggingConfig
 from .payment import YooKassaPayment
 from .redis import RedisConfig
 from .server import ServerConfig
+from .smtp import SmtpConfig
 from .socket import SocketIOConfig
 
 ROOT_DIR = Path(__file__).parent.parent.parent
@@ -20,6 +21,8 @@ class AppConfig(BaseSettings):
     server: ServerConfig = ServerConfig()
     socket: SocketIOConfig
     api: ApiPrefix = ApiPrefix()
+    smtp: SmtpConfig
+
     static: Path = Path("static")
     root_dir: Path = ROOT_DIR
 
@@ -43,5 +46,6 @@ class AppConfig(BaseSettings):
     @property
     def static_dir(self) -> Path:
         return self.root_dir / "static"
+
 
 conf = AppConfig()  # type: ignore
