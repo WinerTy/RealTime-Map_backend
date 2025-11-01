@@ -1,4 +1,4 @@
-from typing import Annotated, TYPE_CHECKING
+from typing import Annotated, TYPE_CHECKING, Any, AsyncGenerator
 
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -15,6 +15,7 @@ from dependencies.crud import (
     get_user_subscription_repository,
     get_subscription_plan_repository,
     get_user_repository,
+    get_user_ban_repository,
 )
 from interfaces import (
     IUserSubscriptionRepository,
@@ -28,6 +29,7 @@ from interfaces import (
     ICommentStatRepository,
     ISubscriptionPlanRepository,
 )
+from interfaces import IUsersBanRepository
 from services.chat.service import ChatService
 from services.geo.dependency import get_geo_service
 from services.geo.service import GeoService
@@ -50,7 +52,7 @@ async def get_mark_service(
     ],
     geo_service: Annotated[GeoService, Depends(get_geo_service)],
     session: get_session,
-):
+) -> AsyncGenerator[MarkService, Any]:
     yield MarkService(
         session=session,
         mark_repo=mark_repo,
@@ -71,7 +73,7 @@ async def get_mark_comment_service(
     comment_reaction_repo: Annotated[
         "ICommentReactionRepository", Depends(get_comment_reaction_repository)
     ],
-) -> MarkCommentService:
+) -> AsyncGenerator[MarkCommentService, Any]:
     yield MarkCommentService(
         session=session,
         comment_repo=comment_repo,
@@ -84,7 +86,7 @@ async def get_chat_service(
     session: get_session,
     chat_repo: Annotated["IChatRepository", Depends(get_chat_repository)],
     message_repo: Annotated["IMessageRepository", Depends(get_message_repository)],
-) -> ChatService:
+) -> AsyncGenerator[ChatService, Any]:
     yield ChatService(session, chat_repo, message_repo)
 
 
@@ -96,11 +98,15 @@ async def get_subscription_service(
     subscription_repo: Annotated[
         "ISubscriptionPlanRepository", Depends(get_subscription_plan_repository)
     ],
-) -> SubscriptionService:
+) -> AsyncGenerator[SubscriptionService, Any]:
     yield SubscriptionService(session, user_subscription_repo, subscription_repo)
 
 
 async def get_user_service(
     user_repo: Annotated["IUserRepository", Depends(get_user_repository)],
-) -> UserService:
-    yield UserService(user_repo)
+    user_ban_repo: Annotated["IUsersBanRepository", Depends(get_user_ban_repository)],
+    user_subs_repo: Annotated[
+        "IUserSubscriptionRepository", Depends(get_user_subscription_repository)
+    ],
+) -> AsyncGenerator[UserService, Any]:
+    yield UserService(user_repo, user_ban_repo, user_subs_repo)

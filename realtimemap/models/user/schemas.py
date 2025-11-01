@@ -1,10 +1,18 @@
-from typing import Optional, List
+from typing import Optional, List, Literal, Annotated
 
 from fastapi import UploadFile
 from fastapi_users import schemas
-from pydantic import BaseModel, field_validator, ConfigDict
+from pydantic import BaseModel, field_validator, ConfigDict, Field
 
 from utils.url_generator import generate_full_image_url
+
+QueryParams = Literal["sub", "ban"]
+
+
+class UserRequestParams(BaseModel):
+    include: Annotated[
+        Optional[List[QueryParams]], Field(None, description="Вложить в ответ")
+    ]
 
 
 class ReadUserSub(BaseModel):
@@ -19,7 +27,8 @@ class UserRead(schemas.BaseUser[int]):
     phone: Optional[str] = None
     username: str
     avatar: Optional[str] = None
-    subscriptions: Optional[List["ReadUserSub"]] = None
+    # subscriptions: Optional[List["ReadUserSub"]] = None
+    # ban: Optional[List["UsersBanRead"]] = None
     _validate_avatar = field_validator("avatar", mode="before")(generate_full_image_url)
     model_config = ConfigDict(from_attributes=True)
 

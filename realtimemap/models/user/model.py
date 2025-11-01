@@ -48,7 +48,6 @@ class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
         back_populates="user",
         foreign_keys="UsersBan.user_id",
         cascade="all, delete-orphan",
-        lazy="selectin",
     )
     issued_bans: Mapped[List["UsersBan"]] = relationship(
         "UsersBan",
@@ -67,7 +66,6 @@ class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
         "UserSubscription",
         back_populates="user",
         cascade="all, delete-orphan",
-        lazy="selectin",
     )
 
     @classmethod

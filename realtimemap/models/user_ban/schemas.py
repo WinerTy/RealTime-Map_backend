@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional, Union, Annotated
 
-from pydantic import Field, field_validator, model_validator, BaseModel
+from pydantic import Field, field_validator, model_validator, BaseModel, ConfigDict
 
 from models.user_ban.model import BanReason
 
@@ -65,7 +65,11 @@ class UsersBanCreate(BaseModel):
 
 
 class UsersBanRead(BaseModel):
-    pass
+    id: int
+    user_id: int
+    moderator_id: int
+    reason: BanReason
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UsersBanUpdate(BaseModel):

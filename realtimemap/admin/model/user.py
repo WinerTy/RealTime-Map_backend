@@ -5,6 +5,7 @@ from fastapi_users.password import PasswordHelper
 from jinja2 import Environment, FileSystemLoader
 from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 from starlette.datastructures import FormData
 from starlette.requests import Request
 from starlette_admin import (
@@ -49,6 +50,7 @@ class AdminUser(BaseModelAdmin):
         User.is_superuser,
         User.is_verified,
         User.bans,
+        User.subscriptions,
     ]
 
     exclude_fields_from_detail = [User.hashed_password]
@@ -72,7 +74,9 @@ class AdminUser(BaseModelAdmin):
         return await super().validate(request, data)
 
     def get_list_query(self, request: Request) -> Select:
-        return super().get_list_query(request)
+        stmt = super().get_list_query(request)
+        stmt = stmt.options(joinedload(User.subscriptions), joinedload(User.bans))
+        return stmt
 
     @row_action(
         name="ban_user",
