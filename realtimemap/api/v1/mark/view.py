@@ -23,7 +23,7 @@ from models.mark.schemas import (
     UpdateMarkRequest,
     ActionType,
 )
-from models.mark.schemas.schemas import allowed_duration
+from models.mark.schemas import allowed_duration
 from services.mark.service import MarkService
 from services.notification import MarkNotificationService
 

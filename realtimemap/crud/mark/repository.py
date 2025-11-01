@@ -15,11 +15,11 @@ from sqlalchemy.orm import joinedload
 from crud import BaseRepository
 from models import Mark, Category
 from models import User
+from models.mark.filters import MarkFilter
 from models.mark.schemas import (
     CreateMark,
     UpdateMark,
     CreateMarkRequest,
-    MarkFilter,
 )
 from services.geo.service import GeoService
 

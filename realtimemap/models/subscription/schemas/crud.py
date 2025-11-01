@@ -3,7 +3,7 @@ from typing import Annotated, Dict, Any, Literal, Union
 
 from pydantic import BaseModel, Field, ConfigDict, model_validator
 
-from .model import SubPlanType
+from models.subscription.model import SubPlanType
 
 
 class PremiumSubscriptionPlan(BaseModel):

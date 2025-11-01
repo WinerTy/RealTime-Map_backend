@@ -17,10 +17,6 @@ from utils.url_generator import generate_full_image_url
 from .base import BaseMark, CommonMarkFields
 
 
-class AllowedDuration(int, Enum):
-    pass
-
-
 class ActionType(str, Enum):
     CREATE = "marks_created"
     READ = "marks_get"

@@ -3,7 +3,7 @@ from typing import Annotated, Optional, List
 
 from pydantic import Field, BaseModel, ConfigDict
 
-from models.mark_comment.schemas.comment_stat.schemas import BaseCommentStat
+from models.mark_comment.schemas.comment_stat.crud import BaseCommentStat
 from models.user.schemas import UserRead
 
 

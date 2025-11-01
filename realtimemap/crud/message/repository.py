@@ -9,7 +9,7 @@ from models.message import CreateMessage, UpdateMessage
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
-    from models.message.schemas import MessageFilter
+    from models.message.filters import MessageFilter
 
 logger = logging.getLogger(__name__)
 

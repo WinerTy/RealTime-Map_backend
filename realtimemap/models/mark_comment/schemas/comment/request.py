@@ -2,7 +2,7 @@ from typing import Optional, Annotated
 
 from pydantic import Field
 
-from .schemas import BaseComment
+from .crud import BaseComment
 
 
 class CreateCommentRequest(BaseComment):

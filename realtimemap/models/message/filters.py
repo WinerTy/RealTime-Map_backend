@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .schemas_request import MessageParamsRequest
+    from .schemas import MessageParamsRequest
 
 
 @dataclass(frozen=True)

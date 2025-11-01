@@ -2,11 +2,11 @@ from typing import TYPE_CHECKING, List
 
 from errors.http2 import UserPermissionError
 from models.chat.schemas import ReadChat
+from models.message.filters import MessageFilter
 from models.message.schemas import (
     CreateMessageRequest,
     CreateMessage,
     UpdateMessageRequest,
-    MessageFilter,
 )
 from models.message.schemas import MessageParamsRequest
 from services.base import BaseService

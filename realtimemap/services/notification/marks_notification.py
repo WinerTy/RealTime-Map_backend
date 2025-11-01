@@ -7,7 +7,8 @@ from socketio import AsyncServer
 from core.config import conf
 from crud.mark import MarkRepository
 from models import Mark
-from models.mark.schemas import MarkRequestParams, ReadMark, MarkFilter
+from models.mark.filters import MarkFilter
+from models.mark.schemas import MarkRequestParams, ReadMark
 from services.geo.service import GeoService
 from .base import BaseNotificationSocketIO
 

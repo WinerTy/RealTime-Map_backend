@@ -6,7 +6,7 @@ __all__ = [
 ]
 
 
-from .schemas import (
+from .crud import (
     BaseCommentStat,
     CreateCommentStat,
     ReadCommentStat,

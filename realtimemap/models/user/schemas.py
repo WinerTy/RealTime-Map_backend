@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 
 from fastapi import UploadFile
 from fastapi_users import schemas
@@ -7,12 +7,19 @@ from pydantic import BaseModel, field_validator, ConfigDict
 from utils.url_generator import generate_full_image_url
 
 
+class ReadUserSub(BaseModel):
+    id: int
+    plan_id: int
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class UserRead(schemas.BaseUser[int]):
     id: int
     phone: Optional[str] = None
     username: str
     avatar: Optional[str] = None
-
+    subscriptions: Optional[List["ReadUserSub"]] = None
     _validate_avatar = field_validator("avatar", mode="before")(generate_full_image_url)
     model_config = ConfigDict(from_attributes=True)
 

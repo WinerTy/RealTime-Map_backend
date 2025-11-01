@@ -2,10 +2,10 @@ from typing import Protocol, TYPE_CHECKING, List, Optional, Tuple, Sequence
 
 from interfaces import IBaseRepository
 from models import Mark, Comment, CommentReaction, CommentStat
+from models.mark.filters import MarkFilter
 from models.mark.schemas import (
     CreateMark,
     UpdateMark,
-    MarkFilter,
     MarkRequestParams,
 )
 from models.mark_comment.schemas import (

@@ -6,14 +6,12 @@ __all__ = [
     "ReadMessage",
     "ChatEventName",
     "MessageParamsRequest",
-    "MessageFilter",
 ]
 
 
+from .crud import CreateMessage, UpdateMessage, ReadMessage
 from .enums import ChatEventName
-from .filter import MessageFilter
-from .schemas import CreateMessage, UpdateMessage, ReadMessage
-from .schemas_request import (
+from .request import (
     CreateMessageRequest,
     UpdateMessageRequest,
     MessageParamsRequest,

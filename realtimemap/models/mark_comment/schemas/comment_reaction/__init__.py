@@ -6,5 +6,5 @@ __all__ = [
 ]
 
 
-from .schemas import CreateCommentReaction, ReadCommentReaction, UpdateCommentReaction
-from .schemas_request import CommentReactionRequest
+from .crud import CreateCommentReaction, ReadCommentReaction, UpdateCommentReaction
+from .request import CommentReactionRequest

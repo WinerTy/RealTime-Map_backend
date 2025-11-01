@@ -5,7 +5,8 @@ from socketio import AsyncNamespace
 
 from crud.mark import MarkRepository
 from database.helper import db_helper
-from models.mark.schemas import MarkRequestParams, ReadMark, MarkFilter
+from models.mark.filters import MarkFilter
+from models.mark.schemas import MarkRequestParams, ReadMark
 from services.geo.service import GeoService
 
 logger = logging.getLogger(__name__)

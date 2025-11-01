@@ -5,5 +5,5 @@ __all__ = [
     "ReadComment",
     "CreateCommentRequest",
 ]
-from .schemas import CreateComment, UpdateComment, ReadCommentReply, ReadComment
-from .schemas_request import CreateCommentRequest
+from .crud import CreateComment, UpdateComment, ReadCommentReply, ReadComment
+from .request import CreateCommentRequest

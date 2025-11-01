@@ -7,7 +7,7 @@ from models.message import CreateMessage, UpdateMessage
 
 if TYPE_CHECKING:
     from sqlalchemy import Select
-    from models.message.schemas import MessageFilter
+    from models.message.filters import MessageFilter
 
 
 class IMessageRepository(

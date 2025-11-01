@@ -6,11 +6,11 @@ from fastapi import HTTPException
 
 from errors.http2 import NotFoundError, TimeOutError, UserPermissionError
 from models import User, Mark
+from models.mark.filters import MarkFilter
 from models.mark.schemas import (
     CreateMarkRequest,
     MarkRequestParams,
     UpdateMarkRequest,
-    MarkFilter,
     CreateMark,
     CreateTestMarkRequest,
     UpdateMark,

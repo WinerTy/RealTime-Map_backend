@@ -4,8 +4,8 @@ from typing import List
 
 from geoalchemy2.functions import ST_SetSRID
 
+from models.mark.schemas.request import MarkRequestParams
 from services.geo.service import GeoService
-from .schemas_request import MarkRequestParams
 
 DEFAULT_RADIUS_METERS: int = 5000
 
