@@ -1,17 +1,17 @@
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Sequence
 
 from sqlalchemy import select, and_, or_, Select
 
 from crud import BaseRepository
 from models import UsersBan
-from models.user_ban.schemas import UsersBanCreate, UsersBanUpdate
+from models.user_ban.schemas import UsersBanCreate, UpdateUsersBan
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
 
 
-class UsersBanRepository(BaseRepository[UsersBan, UsersBanCreate, UsersBanUpdate]):
+class UsersBanRepository(BaseRepository[UsersBan, UsersBanCreate, UpdateUsersBan]):
     def __init__(self, session: "AsyncSession"):
         super().__init__(session=session, model=UsersBan)
 
@@ -43,9 +43,19 @@ class UsersBanRepository(BaseRepository[UsersBan, UsersBanCreate, UsersBanUpdate
         result = await self.create(data)
         return result
 
-    async def unban_user(self, user_id: int, data: UsersBanUpdate) -> UsersBan:
+    async def unban_user(self, user_id: int, data: UpdateUsersBan) -> UsersBan:
         stmt = self._base_query(user_id)
         result = await self.session.execute(stmt)
         active_ban: UsersBan = result.scalar_one()
         result = await self.update(active_ban.id, data)
         return result
+
+    async def get_user_bans(self, user_id: int) -> Sequence[UsersBan]:
+        stmt = (
+            select(self.model)
+            .where(self.model.user_id == user_id)
+            .order_by(self.model.banned_at.desc())
+        )
+        result = await self.session.execute(stmt)
+        active_bans = result.scalars().all()
+        return active_bans

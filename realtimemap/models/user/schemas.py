@@ -1,17 +1,24 @@
-from typing import Optional, List, Literal, Annotated
+from enum import Enum
+from typing import Optional, List, Annotated
 
 from fastapi import UploadFile
 from fastapi_users import schemas
-from pydantic import BaseModel, field_validator, ConfigDict, Field
+from pydantic import BaseModel, field_validator, Field, ConfigDict
 
+from models.user_ban.schemas import ReadUsersBan
+from models.user_subscription.schemas import ReadUserSubscription
 from utils.url_generator import generate_full_image_url
 
-QueryParams = Literal["sub", "ban"]
+
+class UserRelationShip(str, Enum):
+    SUBSCRIPTION = "subscription"
+    BANS = "bans"
 
 
 class UserRequestParams(BaseModel):
     include: Annotated[
-        Optional[List[QueryParams]], Field(None, description="Вложить в ответ")
+        Optional[List[UserRelationShip]],
+        Field(None, description="Attach the relevant data to the response"),
     ]
 
 
@@ -27,9 +34,10 @@ class UserRead(schemas.BaseUser[int]):
     phone: Optional[str] = None
     username: str
     avatar: Optional[str] = None
-    # subscriptions: Optional[List["ReadUserSub"]] = None
-    # ban: Optional[List["UsersBanRead"]] = None
+    subscriptions: Optional[List["ReadUserSubscription"]] = []
+    bans: Optional[List["ReadUsersBan"]] = []
     _validate_avatar = field_validator("avatar", mode="before")(generate_full_image_url)
+
     model_config = ConfigDict(from_attributes=True)
 
 

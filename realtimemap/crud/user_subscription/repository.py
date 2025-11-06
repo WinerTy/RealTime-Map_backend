@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Sequence
 
 from sqlalchemy import select
 
@@ -36,6 +36,19 @@ class UserSubscriptionRepository(
         result = await self.session.execute(stmt)
         result = result.scalar_one_or_none()
         return result is not None
+
+    async def get_user_subscriptions(
+        self, user_id: int
+    ) -> Sequence[Optional[UserSubscription]]:
+        stmt = (
+            select(self.model)
+            .where(
+                self.model.user_id == user_id,
+            )
+            .order_by(self.model.expires_at.desc())
+        )
+        result = await self.session.execute(stmt)
+        return result.scalars().all()
 
     async def create_user_subscription(
         self, data: CreateUserSubscription

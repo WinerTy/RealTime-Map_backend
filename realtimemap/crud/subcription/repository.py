@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, Sequence
 
 from sqlalchemy import select
 
@@ -23,7 +23,7 @@ class SubscriptionPlanRepository(
     def __init__(self, session: "AsyncSession"):
         super().__init__(session=session, model=SubscriptionPlan)
 
-    async def get_subscription_plans(self) -> List[SubscriptionPlan]:
+    async def get_subscription_plans(self) -> Sequence[SubscriptionPlan]:
         stmt = select(self.model).where(self.model.is_active)
         result = await self.session.execute(stmt)
         return result.scalars().all()

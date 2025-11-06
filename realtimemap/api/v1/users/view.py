@@ -6,7 +6,9 @@ from starlette.responses import Response
 
 from api.v1.auth.fastapi_users import get_current_user_without_ban, get_current_user
 from dependencies.crud import get_user_repository
+from dependencies.service import get_user_service
 from models.user.schemas import UserRead, UserUpdate, UserRequestParams
+from services.user.service import UserService
 
 if TYPE_CHECKING:
     from models import User
@@ -16,19 +18,19 @@ if TYPE_CHECKING:
 router = APIRouter(tags=["user"])
 
 
-# TODO Убрать sub/ ban эндпоинты и переписать все в 1 метод с возможныстью управления состоянием ответа
 @router.get(
     "/me",
     response_model=UserRead,
 )
 # @cache(expire=3600, namespace="user")
 async def me(
-    params: Annotated[UserRequestParams, Query()],
-    user: Annotated["User", Depends(get_current_user)],
     request: Request,
+    user: Annotated["User", Depends(get_current_user)],
+    params: Annotated[UserRequestParams, Query()],
+    service: Annotated["UserService", Depends(get_user_service)],
 ):
-    user_response = UserRead.model_validate(user, context={"request": request})
-    return user_response
+    result = await service.get_included_user_info(request, user, params)
+    return result
 
 
 @router.patch(

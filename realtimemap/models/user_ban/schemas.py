@@ -64,15 +64,16 @@ class UsersBanCreate(BaseModel):
         return self
 
 
-class UsersBanRead(BaseModel):
+class ReadUsersBan(BaseModel):
     id: int
     user_id: int
     moderator_id: int
     reason: BanReason
+
     model_config = ConfigDict(from_attributes=True)
 
 
-class UsersBanUpdate(BaseModel):
+class UpdateUsersBan(BaseModel):
     unbanned_at: Annotated[
         Optional[datetime], Field(description="Datetime to unbanned")
     ]

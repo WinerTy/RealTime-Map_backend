@@ -20,7 +20,7 @@ from core.config import conf
 from crud.user_ban.repository import UsersBanRepository
 from models import User
 from models.user_ban.model import BanReason
-from models.user_ban.schemas import UsersBanCreate, ReasonTextException, UsersBanUpdate
+from models.user_ban.schemas import UsersBanCreate, ReasonTextException, UpdateUsersBan
 
 env = Environment(loader=FileSystemLoader(conf.template_dir))
 
@@ -152,6 +152,6 @@ class AdminUser(BaseModelAdmin):
         if not is_banned:
             raise ActionFailed("User already unbanned")
 
-        unban_data = UsersBanUpdate(unbanned_at=current_time, unbanned_by=moderator.id)
+        unban_data = UpdateUsersBan(unbanned_at=current_time, unbanned_by=moderator.id)
         _ = await user_ban_repo.unban_user(user_id, unban_data)
         return "User was approved!"

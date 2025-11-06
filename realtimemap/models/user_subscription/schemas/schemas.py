@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Annotated, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 from models.user_subscription.model import PaymentStatus
 
@@ -28,5 +28,7 @@ class UpdateUserSubscription(BaseUserSubscription):
 
 
 class ReadUserSubscription(BaseUserSubscription):
-    start_at: Annotated[datetime, Field(..., description="Start date")]
+    starts_at: Annotated[datetime, Field(..., description="Start date")]
     expires_at: Annotated[datetime, Field(..., description="Expires date")]
+
+    model_config = ConfigDict(from_attributes=True)
