@@ -51,6 +51,9 @@ class AdminUser(BaseModelAdmin):
         User.is_verified,
         User.bans,
         User.subscriptions,
+        User.level,
+        User.current_exp,
+        User.total_exp,
     ]
 
     exclude_fields_from_detail = [User.hashed_password]

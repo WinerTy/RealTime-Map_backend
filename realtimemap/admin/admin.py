@@ -18,6 +18,9 @@ from admin.model import (
     AdminCommentReaction,
     AdminSubscriptionPlan,
     AdminUserSubscription,
+    AdminLevel,
+    AdminExpAction,
+    AdmiUserExpHistory,
 )
 from admin.view.home import HomeView
 from core.config import conf
@@ -32,6 +35,9 @@ from models import (
     CommentReaction,
     SubscriptionPlan,
     UserSubscription,
+    Level,
+    ExpAction,
+    UserExpHistory,
 )
 from utils import format_key
 
@@ -73,22 +79,43 @@ def setup_admin(app: FastAPI) -> None:
         DropDown(
             label="Subs",
             icon="fa fa-list",
+            always_open=False,
             views=[
                 AdminSubscriptionPlan(SubscriptionPlan),
                 AdminUserSubscription(UserSubscription),
             ],
         ),
     )
-    admin.add_view(AdminCategory(Category))
-    admin.add_view(AdminMark(Mark))
+    admin.add_view(
+        DropDown(
+            label="Marks",
+            icon="fa fa-list",
+            always_open=False,
+            views=[AdminCategory(Category), AdminMark(Mark)],
+        )
+    )
+
     admin.add_view(
         DropDown(
             "Comments",
             icon="fa fa-list",
+            always_open=False,
             views=[
                 AdminComment(Comment),
                 AdminCommentStat(CommentStat),
                 AdminCommentReaction(CommentReaction),
+            ],
+        )
+    )
+    admin.add_view(
+        DropDown(
+            label="Gamefication",
+            icon="fa fa-list",
+            always_open=False,
+            views=[
+                AdminLevel(Level),
+                AdminExpAction(ExpAction),
+                AdmiUserExpHistory(UserExpHistory),
             ],
         )
     )

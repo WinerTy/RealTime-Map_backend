@@ -36,7 +36,11 @@ class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
     avatar: Mapped[ImageField] = mapped_column(
         ImageField(upload_storage="users"), nullable=True
     )
-
+    level: Mapped[int] = mapped_column(Integer, default=0, nullable=False, index=True)
+    current_exp: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    total_exp: Mapped[int] = mapped_column(
+        Integer, default=0, nullable=False, index=True
+    )
     # RS
     marks: Mapped["Mark"] = relationship(
         "Mark",
