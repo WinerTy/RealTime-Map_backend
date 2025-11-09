@@ -1,9 +1,20 @@
 import pytest
+import pytest_asyncio
 from sqlalchemy import text
 
 from core.config import conf
 from database.helper import db_helper
 from models import BaseSqlModel
+
+
+@pytest.fixture(scope="session")
+def event_loop():
+    """Создаем event loop для всей сессии тестов"""
+    import asyncio
+
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
 
 
 # Проверка готовности к тестированию
@@ -34,7 +45,7 @@ def setup_db():
     BaseSqlModel.metadata.create_all(bind=db_helper.sync_engine)
 
 
-@pytest.fixture
+@pytest_asyncio.fixture(scope="function")
 async def db_session():
     async with db_helper.session_factory() as session:
         yield session
