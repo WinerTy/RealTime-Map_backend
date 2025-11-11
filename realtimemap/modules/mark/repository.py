@@ -91,9 +91,6 @@ class MarkRepository(BaseRepository[Mark, CreateMark, UpdateMark]):
         return mark
 
     async def check_distance(self, filters: MarkFilter, mark: Mark) -> bool:
-        if mark.geohash not in filters.geohash_neighbors:
-            return False
-
         # Проверка вложена ли метка в радиус пользователя
         exp = self.geo_service.distance_sphere(
             filters.current_point, mark.geom, filters.radius

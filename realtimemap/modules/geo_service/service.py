@@ -74,7 +74,6 @@ class GeoService:
     def check_geohash_proximity(self, coords: "Coordinates", mark: Mark) -> bool:
         geohash = self.get_geohash(coords)
         neighbors = self.get_neighbors(geohash, need_include=True)
-
         if mark.geohash in neighbors:
             return True
         return False

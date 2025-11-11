@@ -38,7 +38,6 @@ class MarkNotificationService(BaseNotificationSocketIO):
             sessions = await self._get_sessions(room_sids)
 
             targets = await self._filter_connection_in_range(sessions, mark)
-
             if not targets:
                 return
 

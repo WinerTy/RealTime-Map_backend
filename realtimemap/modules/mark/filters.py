@@ -25,7 +25,11 @@ class MarkFilter:
 
     show_ended: bool
 
+    srid: int
+
     radius: int = DEFAULT_RADIUS_METERS
+
+    date: datetime = datetime.now()
 
     @classmethod
     def from_request(
@@ -37,7 +41,7 @@ class MarkFilter:
 
         min_start = req.date - timedelta(req.duration)
         max_end = req.date + timedelta(req.duration)
-
+        srid = req.srid
         return cls(
             latitude=req.latitude,
             longitude=req.longitude,
@@ -48,4 +52,6 @@ class MarkFilter:
             current_point=current_point,
             show_ended=req.show_ended,
             radius=req.radius,
+            srid=srid,
+            date=req.date,
         )
