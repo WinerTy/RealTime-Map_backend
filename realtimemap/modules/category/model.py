@@ -6,8 +6,8 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy_file import ImageField
 from starlette.requests import Request
 
-from models.base import BaseSqlModel
-from models.mixins import IntIdMixin
+from modules.base import BaseSqlModel
+from modules.mixins import IntIdMixin
 
 
 class Category(BaseSqlModel, IntIdMixin):
