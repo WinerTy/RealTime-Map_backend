@@ -25,6 +25,15 @@ services:
       redis:
         condition: service_healthy
 
+  migrations:
+    build: .
+    container_name: db-migrations
+    command: ../.venv/bin/alembic upgrade head
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: "no"
+
   celery:
     build: .
     container_name: celery-worker
