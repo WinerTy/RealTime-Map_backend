@@ -13,8 +13,8 @@ from fastapi_users.models import ID, UP
 
 from auth.base import MyBaseUserDatabase
 from core.config import conf
-from models import User
-from models.user.schemas import UserCreate
+from modules import User
+from modules.user.schemas import UserCreate
 
 log = logging.getLogger(__name__)
 

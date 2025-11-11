@@ -4,7 +4,7 @@ from typing import Annotated, Optional, TYPE_CHECKING
 from fastapi import Depends, WebSocket, status, WebSocketException
 
 from database.helper import db_helper
-from models.user.schemas import UserRead
+from modules.user.schemas import UserRead
 from utils.dependency_resolver import resolve_dependency
 from .access_token import get_access_token_db
 from .manager import get_user_manager
@@ -14,7 +14,7 @@ from .users import get_users_db
 if TYPE_CHECKING:
     from fastapi_users.authentication.strategy import DatabaseStrategy
     from auth.user_manager import UserManager
-    from models import User
+    from modules import User
 
 
 async def websocket_auth(

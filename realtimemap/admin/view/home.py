@@ -6,7 +6,7 @@ from starlette.responses import Response
 from starlette.templating import Jinja2Templates
 from starlette_admin import CustomView
 
-from models import User
+from modules import User
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession

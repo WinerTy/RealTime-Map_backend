@@ -1,13 +1,13 @@
 from typing import Protocol, List, Tuple, TYPE_CHECKING, Union
 
 from interfaces import IBaseRepository
-from models import Message, Chat, User
-from models.chat.schemas import UpdateChat, CreateChat
-from models.message import CreateMessage, UpdateMessage
+from modules import Message, Chat, User
+from modules.chat.schemas import UpdateChat, CreateChat
+from modules.message import CreateMessage, UpdateMessage
 
 if TYPE_CHECKING:
     from sqlalchemy import Select
-    from models.message.filters import MessageFilter
+    from modules.message.filters import MessageFilter
 
 
 class IMessageRepository(

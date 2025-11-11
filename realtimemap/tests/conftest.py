@@ -9,9 +9,8 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 from core.config import conf
 from database.helper import db_helper
-from dependencies.crud import get_session
 from main import app
-from models import BaseSqlModel
+from modules import BaseSqlModel
 
 
 @pytest.fixture(scope="session")
@@ -111,7 +110,7 @@ def setup_db():
 async def client():
     """HTTP клиент для тестирования endpoints"""
 
-    app.dependency_overrides[get_session] = override_get_session
+    # app.dependency_overrides[get_session] = override_get_session
     # app.dependency_overrides[db_helper.session_getter] = override_get_session
 
     transport = ASGITransport(app=app)

@@ -5,7 +5,7 @@ from starlette.requests import Request
 
 from admin.fields import JsonField
 from core.config import conf
-from models import SubscriptionPlan, UserSubscription
+from modules import SubscriptionPlan, UserSubscription
 from .base import BaseModelAdmin
 
 env = Environment(loader=FileSystemLoader(conf.template_dir))

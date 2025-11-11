@@ -3,11 +3,11 @@ from typing import Any, Optional
 
 from socketio import AsyncNamespace
 
-from crud.mark import MarkRepository
 from database.helper import db_helper
-from models.mark.filters import MarkFilter
-from models.mark.schemas import MarkRequestParams, ReadMark
-from services.geo.service import GeoService
+from modules.geo_service.service import GeoService
+from modules.mark.filters import MarkFilter
+from modules.mark.repository import MarkRepository
+from modules.mark.schemas import MarkRequestParams, ReadMark
 
 logger = logging.getLogger(__name__)
 

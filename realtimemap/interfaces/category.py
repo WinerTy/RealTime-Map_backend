@@ -1,8 +1,8 @@
 from typing import Protocol, Optional, List
 
 from interfaces import IBaseRepository
-from models import Category
-from models.category.schemas import CreateCategory, UpdateCategory, ReadCategory
+from modules import Category
+from modules.category.schemas import CreateCategory, UpdateCategory, ReadCategory
 
 
 class ICategoryRepository(

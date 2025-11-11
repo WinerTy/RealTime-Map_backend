@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING, Optional, Sequence
 
 from sqlalchemy import select
 
-from crud import BaseRepository
+from core.common import BaseRepository
 from .model import Category
 from .schemas import CreateCategory, UpdateCategory
 

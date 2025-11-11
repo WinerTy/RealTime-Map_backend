@@ -1,6 +1,6 @@
 from starlette_admin.contrib.sqla import ModelView
 
-from models import UsersBan
+from modules import UsersBan
 
 
 class AdminUsersBans(ModelView):

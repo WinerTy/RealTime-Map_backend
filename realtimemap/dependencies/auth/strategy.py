@@ -7,7 +7,7 @@ from core.config import conf
 from .access_token import get_access_token_db
 
 if TYPE_CHECKING:
-    from models import AccessToken
+    from modules import AccessToken
     from fastapi_users.authentication.strategy.db import AccessTokenDatabase
 
 

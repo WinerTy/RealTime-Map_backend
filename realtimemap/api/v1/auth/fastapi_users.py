@@ -3,12 +3,12 @@ from typing import Annotated, Optional
 from fastapi import Depends
 from fastapi_users import FastAPIUsers
 
-from crud.user_ban.repository import UsersBanRepository
 from dependencies.auth.backend import authentication_backend
 from dependencies.auth.manager import get_user_manager
-from dependencies.crud import get_user_ban_repository
 from errors.http2 import UserPermissionError
-from models import User
+from modules import User
+from modules.user_ban.dependencies import get_user_ban_repository
+from modules.user_ban.repository import UsersBanRepository
 
 fastapi_users = FastAPIUsers[User, int](
     get_user_manager,

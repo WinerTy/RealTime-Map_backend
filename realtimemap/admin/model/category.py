@@ -1,7 +1,7 @@
 from starlette_admin import ColorField
 from starlette_admin.contrib.sqla import ModelView
 
-from models import Category
+from modules import Category
 
 
 class AdminCategory(ModelView):

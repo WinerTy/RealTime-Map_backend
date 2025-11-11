@@ -8,8 +8,8 @@ from starlette_admin.exceptions import LoginFailed
 from database.helper import db_helper
 from dependencies.auth.manager import get_user_manager
 from dependencies.auth.users import get_users_db
-from models import User
-from models.user.schemas import UserLogin
+from modules import User
+from modules.user.schemas import UserLogin
 
 if TYPE_CHECKING:
     pass

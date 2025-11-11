@@ -3,11 +3,11 @@ from typing import Any, Optional
 
 from socketio import AsyncNamespace
 
-from crud.chat.repository import ChatRepository
-from crud.message.repository import MessageRepository
 from database.helper import db_helper
 from dependencies.auth.web_socket import socket_current_user
-from services.chat.service import ChatService
+from modules.chat.repository import ChatRepository
+from modules.chat.service import ChatService
+from modules.message.repository import MessageRepository
 
 
 @asynccontextmanager

@@ -1,8 +1,8 @@
 from typing import Protocol, List
 
 from interfaces import IBaseRepository
-from models import SubscriptionPlan
-from models.subscription.schemas import CreateSubscriptionPlan, UpdateSubscriptionPlan
+from modules import SubscriptionPlan
+from modules.subscription.schemas import CreateSubscriptionPlan, UpdateSubscriptionPlan
 
 
 class ISubscriptionPlanRepository(

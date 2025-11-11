@@ -17,10 +17,10 @@ from starlette_admin.exceptions import FormValidationError, ActionFailed
 
 from admin.model.base import BaseModelAdmin
 from core.config import conf
-from crud.user_ban.repository import UsersBanRepository
-from models import User
-from models.user_ban.model import BanReason
-from models.user_ban.schemas import UsersBanCreate, ReasonTextException, UpdateUsersBan
+from modules import User
+from modules.user_ban.model import BanReason
+from modules.user_ban.repository import UsersBanRepository
+from modules.user_ban.schemas import UsersBanCreate, ReasonTextException, UpdateUsersBan
 
 env = Environment(loader=FileSystemLoader(conf.template_dir))
 

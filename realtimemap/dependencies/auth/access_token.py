@@ -7,7 +7,7 @@ from typing import (
 from fastapi import Depends
 
 from database.helper import db_helper
-from models import AccessToken
+from modules import AccessToken
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession

@@ -5,14 +5,13 @@ from fastapi_limiter.depends import RateLimiter
 from starlette.responses import Response
 
 from api.v1.auth.fastapi_users import get_current_user_without_ban, get_current_user
-from dependencies.crud import get_user_repository
-from dependencies.service import get_user_service
-from models.user.schemas import UserRead, UserUpdate, UserRequestParams
-from services.user.service import UserService
+from modules.user.dependencies import get_user_repository, get_user_service
+from modules.user.schemas import UserRead, UserUpdate, UserRequestParams
+from modules.user.service import UserService
 
 if TYPE_CHECKING:
-    from models import User
-    from crud.user.repository import UserRepository
+    from modules import User
+    from modules.user.repository import UserRepository
 
 
 router = APIRouter(tags=["user"])

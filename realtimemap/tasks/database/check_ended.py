@@ -4,7 +4,7 @@ from sqlalchemy import select
 
 from core.celery import app
 from database.helper import db_helper
-from models import Mark
+from modules import Mark
 
 
 @app.task

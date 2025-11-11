@@ -1,10 +1,10 @@
 from typing import Protocol, Optional, Sequence
 
 from interfaces import IBaseRepository
-from models import User, UsersBan, UserSubscription
-from models.user.schemas import UserCreate, UserUpdate
-from models.user_ban.schemas import UsersBanCreate, UpdateUsersBan
-from models.user_subscription.schemas import (
+from modules import User, UsersBan, UserSubscription
+from modules.user.schemas import UserCreate, UserUpdate
+from modules.user_ban.schemas import UsersBanCreate, UpdateUsersBan
+from modules.user_subscription.schemas import (
     CreateUserSubscription,
     UpdateUserSubscription,
 )

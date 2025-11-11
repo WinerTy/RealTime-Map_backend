@@ -6,7 +6,7 @@ from starlette.requests import Request
 from starlette_admin.exceptions import FormValidationError
 
 from admin.model.base import BaseModelAdmin
-from models import CommentReaction
+from modules import CommentReaction
 
 
 # TODO Придумать как ограничить в админке

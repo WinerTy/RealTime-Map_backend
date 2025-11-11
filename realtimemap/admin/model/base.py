@@ -4,7 +4,7 @@ from starlette.requests import Request
 from starlette_admin.contrib.sqla import ModelView
 
 if TYPE_CHECKING:
-    from models import User
+    from modules import User
 
 
 class BaseModelAdmin(ModelView):

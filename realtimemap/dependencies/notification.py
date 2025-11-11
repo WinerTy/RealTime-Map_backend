@@ -3,11 +3,10 @@ from typing import Annotated
 from fastapi import Depends
 
 from core.app.socket import sio
-from crud.mark import MarkRepository
-from dependencies.crud import get_mark_repository
-from services.geo.dependency import get_geo_service
-from services.geo.service import GeoService
-from services.notification import MarkNotificationService, ChatNotificationService
+from modules.geo_service import GeoService, get_geo_service
+from modules.mark.dependencies import get_mark_repository
+from modules.mark.repository import MarkRepository
+from modules.notification import MarkNotificationService, ChatNotificationService
 
 
 async def get_mark_notification_service(

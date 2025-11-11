@@ -9,10 +9,10 @@ from starlette_admin.exceptions import FormValidationError
 from admin.fields import GeomField
 from admin.fields.geohash_field import GeoHashField
 from core.app.socket import sio
-from crud.mark import MarkRepository
-from models import Mark
-from models.mark.schemas import ActionType
-from services.notification import MarkNotificationService
+from modules import Mark
+from modules.mark.repository import MarkRepository
+from modules.mark.schemas import ActionType
+from modules.notification import MarkNotificationService
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession

@@ -4,9 +4,9 @@ import pytest
 from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from crud.subcription.repository import SubscriptionPlanRepository
-from models.subscription.model import SubPlanType
-from models.subscription.schemas import CreateSubscriptionPlan
+from modules.subscription.model import SubPlanType
+from modules.subscription.repository import SubscriptionPlanRepository
+from modules.subscription.schemas import CreateSubscriptionPlan
 
 
 class TestSubscriptionPlanRepository:

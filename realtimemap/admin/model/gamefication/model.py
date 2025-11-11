@@ -1,7 +1,7 @@
 from starlette_admin import TextAreaField, IntegerField
 from starlette_admin.contrib.sqla import ModelView
 
-from models import Level, ExpAction
+from modules import Level, ExpAction
 
 
 class AdminLevel(ModelView):

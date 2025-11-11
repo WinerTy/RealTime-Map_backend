@@ -25,7 +25,7 @@ from admin.model import (
 from admin.view.home import HomeView
 from core.config import conf
 from database.helper import db_helper
-from models import (
+from modules import (
     Category,
     User,
     Mark,

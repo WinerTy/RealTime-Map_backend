@@ -3,7 +3,7 @@ from sqlalchemy.orm import joinedload
 from starlette.requests import Request
 
 from admin.model.base import BaseModelAdmin
-from models import CommentStat
+from modules import CommentStat
 
 
 class AdminCommentStat(BaseModelAdmin):

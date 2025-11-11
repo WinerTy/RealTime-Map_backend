@@ -2,19 +2,17 @@ from typing import Annotated, TYPE_CHECKING
 
 from fastapi import Depends
 
-from crud.message.repository import MessageRepository
-from dependencies.crud import (
-    get_mark_repository,
-    get_mark_comment_repository,
-    get_chat_repository,
-    get_message_repository,
-)
 from errors.http2 import NotFoundError
+from modules.chat.dependencies import get_chat_repository
+from modules.mark.dependencies import get_mark_repository
+from modules.mark_comment.dependencies import get_mark_comment_repository
+from modules.message.dependencies import get_message_repository
+from modules.message.repository import MessageRepository
 
 if TYPE_CHECKING:
-    from crud.mark import MarkRepository
-    from crud.mark_comment import MarkCommentRepository
-    from crud.chat.repository import ChatRepository
+    from modules.mark.repository import MarkRepository
+    from modules.mark_comment.repository import MarkCommentRepository
+    from modules.chat.repository import ChatRepository
 
 
 async def check_mark_exist(
