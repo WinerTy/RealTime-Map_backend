@@ -5,13 +5,13 @@ from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from fastapi_limiter import FastAPILimiter
 from redis import asyncio as asyncredis
-from starlette.templating import Jinja2Templates
 from yookassa import Configuration
 
 from core.config import conf
 from database.helper import db_helper
 from integrations.payment.yookassa import YookassaClient
 from utils.cache import OrJsonEncoder, custom_key_builder
+from .templating import TemplateManager
 
 
 @asynccontextmanager
@@ -19,7 +19,7 @@ async def lifespan(app: FastAPI):
     redis = asyncredis.from_url(str(conf.redis.url))
     await FastAPILimiter.init(redis=redis)
     app.state.redis = redis
-    app.state.templates = Jinja2Templates(directory=conf.template_dir)
+    app.state.templates = TemplateManager(conf.template_dir)
     FastAPICache.init(
         RedisBackend(redis),
         prefix=conf.redis.prefix,

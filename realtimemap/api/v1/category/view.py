@@ -5,9 +5,9 @@ from fastapi_cache.decorator import cache
 from fastapi_pagination import Page, Params
 from fastapi_pagination.ext.sqlalchemy import apaginate
 
-from crud.category.repository import CategoryRepository
-from dependencies.crud import get_category_repository
-from models.category.schemas import ReadCategory, CreateCategory
+from modules.category.dependencies import get_category_repository
+from modules.category.repository import CategoryRepository
+from modules.category.schemas import ReadCategory, CreateCategory
 
 router = APIRouter(prefix="/category", tags=["Category"])
 

@@ -4,16 +4,16 @@ from fastapi import APIRouter, Depends
 
 from api.v1.auth.fastapi_users import get_current_user_without_ban
 from dependencies.checker import check_mark_exist, check_mark_comment_exist
-from dependencies.service import get_mark_comment_service
-from models.mark_comment.schemas import (
+from modules.mark_comment.dependencies import get_mark_comment_service
+from modules.mark_comment.schemas import (
     CreateCommentRequest,
     ReadComment,
     CommentReactionRequest,
 )
 
 if TYPE_CHECKING:
-    from services.mark_comment.service import MarkCommentService
-    from models import User
+    from modules.mark_comment.service import MarkCommentService
+    from modules import User
 
 
 router = APIRouter(
@@ -23,7 +23,10 @@ router = APIRouter(
 )
 
 
-@router.post("/comments/", response_model=ReadComment)
+@router.post(
+    "/comments/",
+    # response_model=ReadComment,
+)
 async def create_comment_endpoint(
     mark_id: int,
     service: Annotated["MarkCommentService", Depends(get_mark_comment_service)],
@@ -33,7 +36,8 @@ async def create_comment_endpoint(
     result = await service.create_comment(
         mark_id=mark_id, create_data=create_data, user=user
     )
-    return result
+    return f"Запись создана, но вернуть ее пока мы не можем. Фикс вот вот уже будет готов! Id записи {result.id}"  # TODO ПОФИКСИТЬ JOIN!!!
+    # return result
 
 
 @router.get("/comments/", response_model=List[ReadComment])

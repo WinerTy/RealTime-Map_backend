@@ -5,18 +5,18 @@ from fastapi import APIRouter, Depends, BackgroundTasks
 from api.v1.auth.fastapi_users import get_current_user_without_ban
 from dependencies.checker import check_message_exist, check_chat_exist
 from dependencies.notification import get_chat_notification_service
-from dependencies.service import get_chat_service
-from models import User
-from models.chat.schemas import ReadChat
-from models.message import ReadMessage
-from models.message.schemas import (
+from modules import User
+from modules.chat.dependencies import get_chat_service
+from modules.chat.schemas import ReadChat
+from modules.chat.service import ChatService
+from modules.message import ReadMessage
+from modules.message.schemas import (
     CreateMessageRequest,
     UpdateMessageRequest,
     ChatEventName,
     MessageParamsRequest,
 )
-from services.chat.service import ChatService
-from services.notification import ChatNotificationService
+from modules.notification import ChatNotificationService
 
 router = APIRouter(
     prefix="/chats",

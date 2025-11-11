@@ -1,37 +1,35 @@
-from functools import partial
 from typing import Annotated, TYPE_CHECKING
 
-from fastapi import APIRouter, Request, Form, Depends
-from fastapi_cache.decorator import cache
+from fastapi import APIRouter, Request, Form, Depends, Query
 from fastapi_limiter.depends import RateLimiter
 from starlette.responses import Response
 
-from api.v1.auth.fastapi_users import get_current_user_without_ban, get_user_with_sub
-from dependencies.crud import get_user_repository
-from dependencies.service import get_user_service
-from models.subscription.model import SubPlanType
-from models.user.schemas import UserRead, UserUpdate
-from services.user.service import UserService
+from api.v1.auth.fastapi_users import get_current_user_without_ban, get_current_user
+from modules.user.dependencies import get_user_repository, get_user_service
+from modules.user.schemas import UserRead, UserUpdate, UserRequestParams
+from modules.user.service import UserService
 
 if TYPE_CHECKING:
-    from models import User
-    from crud.user.repository import UserRepository
+    from modules import User
+    from modules.user.repository import UserRepository
 
-get_user_with_sub_ultra = partial(get_user_with_sub, sub_type=SubPlanType.ultra)
 
 router = APIRouter(tags=["user"])
 
 
-# TODO Убрать sub/ ban эндпоинты и переписать все в 1 метод с возможныстью управления состоянием ответа
 @router.get(
     "/me",
     response_model=UserRead,
 )
-@cache(expire=3600, namespace="user")
+# @cache(expire=3600, namespace="user")
 async def me(
-    user: Annotated["User", Depends(get_current_user_without_ban)], request: Request
+    request: Request,
+    user: Annotated["User", Depends(get_current_user)],
+    params: Annotated[UserRequestParams, Query()],
+    service: Annotated["UserService", Depends(get_user_service)],
 ):
-    return UserRead.model_validate(user, context={"request": request})
+    result = await service.get_included_user_info(request, user, params)
+    return result
 
 
 @router.patch(
@@ -56,19 +54,3 @@ async def delete_me(
 ):
     await repo.delete_user(user)
     return Response(status_code=204)
-
-
-@router.get("/me/subscriptions")
-async def get_my_subscriptions(
-    user: Annotated["User", Depends(get_current_user_without_ban)],
-):
-    return user.subscriptions
-
-
-@router.get("/me/ban")
-async def test_proto(
-    user: Annotated["User", Depends(get_current_user_without_ban)],
-    service: Annotated["UserService", Depends(get_user_service)],
-):
-    result = await service.is_ban(user.id)
-    return result

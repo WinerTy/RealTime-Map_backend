@@ -2,7 +2,7 @@ from typing import TypeVar, Protocol
 
 from pydantic import BaseModel
 
-from models import Base
+from modules import Base
 
 
 class ModelWithId(Protocol):

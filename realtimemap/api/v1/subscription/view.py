@@ -4,17 +4,19 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.responses import RedirectResponse
 
 from api.v1.auth.fastapi_users import get_current_user_without_ban
-from crud.subcription.repository import SubscriptionPlanRepository
-from dependencies.crud import get_subscription_plan_repository
 from dependencies.payment import get_yookassa_client
-from dependencies.service import get_subscription_service
 from integrations.payment.yookassa import YookassaClient
-from models.subscription.schemas import ReadSubscriptionPlan
-from models.user_subscription.schemas import CreateSubscriptionRequest
-from services.subscription.service import SubscriptionService
+from modules.subscription.dependencies import (
+    get_subscription_plan_repository,
+    get_subscription_service,
+)
+from modules.subscription.repository import SubscriptionPlanRepository
+from modules.subscription.schemas import ReadSubscriptionPlan
+from modules.subscription.service import SubscriptionService
+from modules.user_subscription.schemas import CreateSubscriptionRequest
 
 if TYPE_CHECKING:
-    from models import User
+    from modules import User
 
 
 router = APIRouter(

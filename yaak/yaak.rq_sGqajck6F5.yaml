@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_sGqajck6F5
 createdAt: 2025-10-30T15:02:55.714596600
-updatedAt: 2025-10-30T15:57:33.577579500
+updatedAt: 2025-11-01T07:14:19.635491100
 workspaceId: wk_V99Hr7DmhP
 folderId: fl_UJQvbUtxEx
 authentication: {}
@@ -34,11 +34,11 @@ urlParameters:
   id: SppXVGe63v
 - enabled: true
   name: duration
-  value: '24'
+  value: '48'
   id: IitK4WeQNc
 - enabled: true
   name: show_ended
-  value: 'false'
+  value: 'true'
   id: 8jK3Zm8hWA
 - enabled: true
   name: radius
@@ -47,4 +47,4 @@ urlParameters:
 - enabled: true
   name: ''
   value: ''
-  id: fWHuCh9Bfu
+  id: swkv850eT7

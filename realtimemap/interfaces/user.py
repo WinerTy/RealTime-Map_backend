@@ -1,10 +1,10 @@
-from typing import Protocol, Optional
+from typing import Protocol, Optional, Sequence
 
 from interfaces import IBaseRepository
-from models import User, UsersBan, UserSubscription
-from models.user.schemas import UserCreate, UserUpdate
-from models.user_ban.schemas import UsersBanCreate, UsersBanUpdate
-from models.user_subscription.schemas import (
+from modules import User, UsersBan, UserSubscription
+from modules.user.schemas import UserCreate, UserUpdate
+from modules.user_ban.schemas import UsersBanCreate, UpdateUsersBan
+from modules.user_subscription.schemas import (
     CreateUserSubscription,
     UpdateUserSubscription,
 )
@@ -29,14 +29,16 @@ class IUserRepository(IBaseRepository[User, UserCreate, UserUpdate], Protocol):
 
 
 class IUsersBanRepository(
-    IBaseRepository[UsersBan, UsersBanCreate, UsersBanUpdate], Protocol
+    IBaseRepository[UsersBan, UsersBanCreate, UpdateUsersBan], Protocol
 ):
 
     async def check_active_user_ban(self, user_id: int) -> bool: ...
 
     async def ban_user(self, data: UsersBanCreate) -> UsersBan: ...
 
-    async def unban_user(self, user_id: int, data: UsersBanUpdate) -> UsersBan: ...
+    async def unban_user(self, user_id: int, data: UpdateUsersBan) -> UsersBan: ...
+
+    async def get_user_bans(self, user_id: int) -> Sequence[UsersBanCreate]: ...
 
 
 class IUserSubscriptionRepository(
@@ -48,3 +50,7 @@ class IUserSubscriptionRepository(
     ) -> Optional[UserSubscription]: ...
 
     async def create_user_subscription(self, data: CreateUserSubscription): ...
+
+    async def get_user_subscriptions(
+        self, user_id: int
+    ) -> Sequence[Optional[UserSubscription]]: ...

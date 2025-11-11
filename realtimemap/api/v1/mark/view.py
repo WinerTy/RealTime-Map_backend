@@ -14,8 +14,8 @@ from api.v1.auth.fastapi_users import Annotated, get_current_user_without_ban
 from dependencies.notification import (
     get_mark_notification_service,
 )
-from dependencies.service import get_mark_service
-from models.mark.schemas import (
+from modules.mark.dependencies import get_mark_service
+from modules.mark.schemas import (
     CreateMarkRequest,
     ReadMark,
     MarkRequestParams,
@@ -23,12 +23,12 @@ from models.mark.schemas import (
     UpdateMarkRequest,
     ActionType,
 )
-from models.mark.schemas.schemas import allowed_duration
-from services.mark.service import MarkService
-from services.notification import MarkNotificationService
+from modules.mark.schemas import allowed_duration
+from modules.mark.service import MarkService
+from modules.notification import MarkNotificationService
 
 if TYPE_CHECKING:
-    from models import User
+    from modules import User
 
 
 router = APIRouter(prefix="/marks", tags=["Marks"])

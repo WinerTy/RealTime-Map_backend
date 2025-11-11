@@ -34,3 +34,8 @@ class NotFoundError(RealTimeMapError):
 class IntegrityError(RealTimeMapError):
     def __init__(self, detail: str = "Record already exists"):
         super().__init__(detail)
+
+
+class AuthenticationError(RealTimeMapError):
+    def __init__(self, detail: str = "Authentication failed"):
+        super().__init__(detail)
