@@ -67,7 +67,7 @@ class BaseRepository(Generic[Model, CreateSchema, UpdateSchema]):
 
             db_item = self.model(**dict_data)
             self.session.add(db_item)
-            await self.session.commit()
+            await self.session.flush()
             await self.session.refresh(db_item)
             return db_item
         except IntegrityError:
@@ -78,7 +78,7 @@ class BaseRepository(Generic[Model, CreateSchema, UpdateSchema]):
             raise RealTimeMapIntegrityError()
         except Exception as e:
             logger.error(
-                f"Create record {data} in Repository: {self.model.__name__}", e
+                f"Create record {data} in Repository: {self.model.__name__}", exc_info=e
             )
             await self.session.rollback()
             raise ServerError()
@@ -97,7 +97,7 @@ class BaseRepository(Generic[Model, CreateSchema, UpdateSchema]):
                 setattr(instance, k, v)
 
             self.session.add(instance)
-            await self.session.commit()
+            await self.session.flush()
             await self.session.refresh(instance)
 
             return instance
@@ -122,7 +122,7 @@ class BaseRepository(Generic[Model, CreateSchema, UpdateSchema]):
             )
 
             await self.session.execute(stmt)
-            await self.session.commit()
+            await self.session.flush()
 
             return record
         except Exception as e:
