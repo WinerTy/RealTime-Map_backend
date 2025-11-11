@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from datetime import timedelta
-from typing import List, TYPE_CHECKING, Optional, Tuple, Sequence
+from typing import List, TYPE_CHECKING, Optional, Sequence
 
 from geoalchemy2.functions import (
     ST_DWithin,
@@ -13,8 +13,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
 from crud import BaseRepository
-from models import Mark, Category
-from models import User
+from models import Mark
 from models.mark.filters import MarkFilter
 from models.mark.schemas import (
     CreateMark,
@@ -41,7 +40,7 @@ class MarkRepository(BaseRepository[Mark, CreateMark, UpdateMark]):
         self.upload_dir = "upload_marks"
         self.geo_service = geo_service if geo_service is not None else GeoService()
 
-    async def get_marks(self, filters: MarkFilter) -> List[Mark]:
+    async def get_marks(self, filters: MarkFilter) -> Sequence[Mark]:
         # Условия фильтрации
         conditions = [
             self.model.geohash.in_(filters.geohash_neighbors),
@@ -121,12 +120,3 @@ class MarkRepository(BaseRepository[Mark, CreateMark, UpdateMark]):
 
     async def update_mark(self, mark_id: int, update_data: UpdateMark) -> Mark:
         return await self.update(mark_id, update_data)
-
-    async def get_ids_for_test(self) -> Tuple[Sequence[int], Sequence[int]]:
-        stmt = select(User.id).limit(10)
-        users_ids = await self.session.execute(stmt)
-        users_ids = users_ids.scalars().all()
-        stmt = select(Category.id)
-        category_ids = await self.session.execute(stmt)
-        category_ids = category_ids.scalars().all()
-        return users_ids, category_ids

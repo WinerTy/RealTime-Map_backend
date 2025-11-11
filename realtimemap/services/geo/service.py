@@ -9,6 +9,7 @@ from geoalchemy2.functions import (
     ST_DistanceSphere,
 )
 from pydantic import BaseModel
+from pydantic_extra_types.coordinate import Latitude, Longitude
 from pygeohash import encode, get_adjacent, decode
 
 from models import Mark
@@ -37,7 +38,9 @@ class GeoService:
     @staticmethod
     def get_coords(geohash: str) -> Coordinates:
         result = decode(geohash)
-        return Coordinates(latitude=result.latitude, longitude=result.longitude)
+        return Coordinates(
+            latitude=Latitude(result.latitude), longitude=Longitude(result.longitude)
+        )
 
     @staticmethod
     def get_neighbors(geohash: str, need_include: bool = False) -> List[str]:

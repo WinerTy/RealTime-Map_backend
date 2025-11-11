@@ -67,6 +67,8 @@ class CreateSubscriptionPlan(BaseSubscriptionPlan):
     features: Annotated[
         Dict[str, Any], Field(default_factory=dict, description="Features dict")
     ]
+    plan_type: SubPlanType
+    duration_days: Annotated[int, Field(default=30)]
 
 
 class ReadSubscriptionPlan(BaseSubscriptionPlan):

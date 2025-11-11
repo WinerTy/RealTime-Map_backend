@@ -7,12 +7,14 @@ from fastapi_users_db_sqlalchemy.access_token import (
     SQLAlchemyBaseAccessTokenTable,
 )
 from jinja2 import Template
-from sqlalchemy import String, Integer, ForeignKey
+from sqlalchemy import String, Integer, ForeignKey, event, Connection, insert
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy_file import ImageField
 
 from auth.user_database import MySQLAlchemyUserDatabase
-from models import BaseSqlModel
+from crud.gamefication.exp_action_repository import ExpActionRepository
+from crud.gamefication.level_repository import LevelRepository
+from models import BaseSqlModel, UserExpHistory
 from models.mixins import IntIdMixin
 
 if TYPE_CHECKING:
@@ -99,3 +101,30 @@ class AccessToken(BaseSqlModel, SQLAlchemyBaseAccessTokenTable[int]):
     @classmethod
     def get_db(cls, session: "AsyncSession"):
         return SQLAlchemyAccessTokenDatabase(session, cls)
+
+
+@event.listens_for(User, "after_insert")
+def update_comment_stats(mapper, connection: Connection, target: User):
+    repo = ExpActionRepository(connection)
+    level_repo = LevelRepository(connection)
+    levels = level_repo.get_all_levels()
+    print(levels)
+    for level in levels:
+        level1, level2 = level
+    action = repo.get_action_by_type("register")
+    print(action)
+    if action:
+        print("событие есть")
+        connection.execute(
+            insert(UserExpHistory).values(
+                user_id=target.id,
+                action_id=action.id,
+                base_exp=action.base_exp,
+                total_exp=target.total_exp + action.base_exp,
+                source_type=target.__tablename__,
+                source_id=target.id,
+                level_before=target.level,
+                level_after=target.level,
+                exp_before=target.current_exp,
+            )
+        )
