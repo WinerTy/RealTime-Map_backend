@@ -1,6 +1,6 @@
 from datetime import datetime
 from decimal import Decimal
-from typing import Optional
+from typing import Optional, TYPE_CHECKING, List
 
 from sqlalchemy import (
     Integer,
@@ -13,10 +13,13 @@ from sqlalchemy import (
     func,
     CheckConstraint,
 )
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from modules.base import BaseSqlModel
 from modules.mixins import IntIdMixin, TimeMarkMixin
+
+if TYPE_CHECKING:
+    from modules.user.model import User
 
 
 class Level(BaseSqlModel, IntIdMixin, TimeMarkMixin):
@@ -56,6 +59,10 @@ class ExpAction(BaseSqlModel, IntIdMixin, TimeMarkMixin):
     is_repeatable: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
     max_per_day: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    history_records: Mapped[List["UserExpHistory"]] = relationship(
+        "UserExpHistory", back_populates="action", lazy="noload"
+    )
 
 
 class UserExpHistory(BaseSqlModel, IntIdMixin, TimeMarkMixin):
@@ -105,6 +112,10 @@ class UserExpHistory(BaseSqlModel, IntIdMixin, TimeMarkMixin):
         ForeignKey("subscription_plans.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
+    )
+    user: Mapped["User"] = relationship("User", back_populates="experience_history")
+    action: Mapped["ExpAction"] = relationship(
+        "ExpAction", back_populates="history_records"
     )
     __table_args__ = (
         # Быстрая проверка лимитов
