@@ -1,7 +1,7 @@
 from starlette_admin import TextAreaField, IntegerField
 from starlette_admin.contrib.sqla import ModelView
 
-from modules import Level, ExpAction
+from modules import Level, ExpAction, UserExpHistory
 
 
 class AdminLevel(ModelView):
@@ -27,4 +27,13 @@ class AdminExpAction(ModelView):
 
 
 class AdmiUserExpHistory(ModelView):
-    pass
+    fields = [
+        UserExpHistory.user,
+        UserExpHistory.action,
+        UserExpHistory.source_id,
+        UserExpHistory.base_exp,
+        UserExpHistory.exp_before,
+        UserExpHistory.total_exp,
+        UserExpHistory.level_before,
+        UserExpHistory.level_after,
+    ]
