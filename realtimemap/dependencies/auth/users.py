@@ -5,7 +5,7 @@ from typing import (
 
 from fastapi import Depends
 
-from database.helper import db_helper
+from database import get_session
 from modules import User
 
 if TYPE_CHECKING:
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 async def get_users_db(
     session: Annotated[
         "AsyncSession",
-        Depends(db_helper.session_getter),
+        Depends(get_session),
     ],
 ):
     yield User.get_db(session=session)

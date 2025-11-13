@@ -6,7 +6,7 @@ from typing import (
 
 from fastapi import Depends
 
-from database.helper import db_helper
+from database import get_session
 from modules import AccessToken
 
 if TYPE_CHECKING:
@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 async def get_access_token_db(
     session: Annotated[
         "AsyncSession",
-        Depends(db_helper.session_getter),
+        Depends(get_session),
     ],
 ) -> AsyncGenerator["SQLAlchemyAccessTokenDatabase"]:
     yield AccessToken.get_db(session=session)

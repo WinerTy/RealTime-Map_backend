@@ -1,8 +1,9 @@
 from typing import TYPE_CHECKING, Annotated, Any, AsyncGenerator
 
 from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.helper import db_helper
+from database import get_session
 from modules.category.dependencies import get_category_repository
 from modules.geo_service import get_geo_service
 from modules.mark_comment.dependencies import get_mark_comment_repository
@@ -10,12 +11,13 @@ from .repository import MarkRepository
 from .service import MarkService
 
 if TYPE_CHECKING:
-    from sqlalchemy.ext.asyncio import AsyncSession
     from modules.geo_service import GeoService
+
+DBSession = Annotated[AsyncSession, Depends(get_session)]
 
 
 async def get_mark_repository(
-    session: Annotated["AsyncSession", Depends(db_helper.session_getter)],
+    session: DBSession,
     geo_service: Annotated["GeoService", Depends(get_geo_service)],
 ):
     yield MarkRepository(session=session, geo_service=geo_service)

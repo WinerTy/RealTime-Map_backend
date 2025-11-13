@@ -1,15 +1,16 @@
 from typing import AsyncGenerator, Annotated, Any
 
 from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.helper import db_helper
+from database import get_session
 from modules.user_subscription.dependencies import get_user_subscription_repository
 from .repository import SubscriptionPlanRepository
 from .service import SubscriptionService
 
 
 async def get_subscription_plan_repository(
-    session: Annotated["AsyncSession", Depends(db_helper.session_getter)],
+    session: Annotated["AsyncSession", Depends(get_session)],
 ):
     yield SubscriptionPlanRepository(session=session)
 

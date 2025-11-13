@@ -1,8 +1,9 @@
-from typing import Annotated, TYPE_CHECKING, Any, AsyncGenerator
+from typing import Annotated, Any, AsyncGenerator
 
 from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.helper import db_helper
+from database import get_session
 from modules.gamefication.repository import (
     NewLevelRepository,
     LevelRepository,
@@ -16,24 +17,23 @@ from modules.user.dependencies import get_user_repository
 from modules.user_subscription.dependencies import get_user_subscription_repository
 from modules.user_subscription.repository import UserSubscriptionRepository
 
-if TYPE_CHECKING:
-    from sqlalchemy.ext.asyncio import AsyncSession
+DBSession = Annotated[AsyncSession, Depends(get_session)]
 
 
 async def get_level_repository(
-    session: Annotated["AsyncSession", Depends(db_helper.session_getter)],
+    session: DBSession,
 ) -> AsyncGenerator[LevelRepository, Any]:
     yield NewLevelRepository(session)
 
 
 async def get_user_exp_history_repository(
-    session: Annotated["AsyncSession", Depends(db_helper.session_getter)],
+    session: DBSession,
 ) -> AsyncGenerator[UserExpHistoryRepository, Any]:
     yield NewUserExpHistoryRepository(session)
 
 
 async def get_exp_action_repository(
-    session: Annotated["AsyncSession", Depends(db_helper.session_getter)],
+    session: DBSession,
 ) -> AsyncGenerator[ExpActionRepository, Any]:
     yield NewExpActionRepository(session)
 

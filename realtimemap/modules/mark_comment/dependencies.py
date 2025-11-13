@@ -1,8 +1,9 @@
-from typing import TYPE_CHECKING, Annotated, Any, AsyncGenerator
+from typing import Annotated, Any, AsyncGenerator
 
 from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.helper import db_helper
+from database import get_session
 from .repository import (
     MarkCommentRepository,
     CommentReactionRepository,
@@ -10,25 +11,18 @@ from .repository import (
 )
 from .service import MarkCommentService
 
-if TYPE_CHECKING:
-    from sqlalchemy.ext.asyncio import AsyncSession
+DBSession = Annotated[AsyncSession, Depends(get_session)]
 
 
-async def get_mark_comment_repository(
-    session: Annotated["AsyncSession", Depends(db_helper.session_getter)],
-):
+async def get_mark_comment_repository(session: DBSession):
     yield MarkCommentRepository(session=session)
 
 
-async def get_comment_stat_repository(
-    session: Annotated["AsyncSession", Depends(db_helper.session_getter)],
-):
+async def get_comment_stat_repository(session: DBSession):
     yield CommentStatRepository(session=session)
 
 
-async def get_comment_reaction_repository(
-    session: Annotated["AsyncSession", Depends(db_helper.session_getter)],
-):
+async def get_comment_reaction_repository(session: DBSession):
     yield CommentReactionRepository(session=session)
 
 
