@@ -1,9 +1,10 @@
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Sequence, Optional
 
 from sqlalchemy import select, and_, or_
 
 from core.common import BaseRepository
+from modules.gamefication.model import Level
 from modules.user.schemas import UserCreate, UserUpdate
 from modules.user_ban.model import UsersBan
 from .model import User
@@ -53,3 +54,43 @@ class UserRepository(BaseRepository[User, UserCreate, UserUpdate]):
         active_ban = result.scalar_one_or_none()
 
         return active_ban is not None
+
+    async def level_up(self, user_id: int) -> int:
+        user = await self.get_by_id(user_id)
+        level_stmt = select(Level).where(Level.is_active).order_by(Level.level.asc())
+        raw_levels = await self.session.execute(level_stmt)
+        levels: Sequence[Level] = raw_levels.scalars().all()
+
+        if not levels:
+            return user.level  # noqa
+
+        new_level = 0
+        for level in levels:
+            if user.total_exp >= level.required_exp:
+                new_level = level.level
+            else:
+                break
+
+        if new_level > 0:
+            current_level = next(
+                (level for level in levels if level.level == new_level), None
+            )
+            if current_level:
+                user.current_exp = user.total_exp - current_level.required_exp
+        else:
+            user.current_exp = user.total_exp
+
+        user.level = new_level
+
+        return new_level
+
+    async def get_users_for_leaderboard(self) -> Optional[Sequence[User]]:
+        stmt = (
+            select(self.model)
+            .where(self.model.is_active)
+            .order_by(self.model.level.desc())
+            .limit(10)
+        )
+        raw_users = await self.session.execute(stmt)
+        users = raw_users.scalars().all()
+        return users
