@@ -2,7 +2,7 @@ from typing import Annotated, TYPE_CHECKING
 
 from fastapi import Depends
 
-from database.helper import db_helper
+from database import get_session
 from .repository import MessageRepository
 
 if TYPE_CHECKING:
@@ -10,6 +10,6 @@ if TYPE_CHECKING:
 
 
 async def get_message_repository(
-    session: Annotated["AsyncSession", Depends(db_helper.session_getter)],
+    session: Annotated["AsyncSession", Depends(get_session)],
 ):
     yield MessageRepository(session=session)

@@ -2,9 +2,10 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Optional, Sequence
 
 from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 
 from core.common import BaseRepository
-from .model import UserSubscription
+from .model import UserSubscription, PaymentStatus
 from .schemas import (
     CreateUserSubscription,
     UpdateUserSubscription,
@@ -54,4 +55,24 @@ class UserSubscriptionRepository(
         self, data: CreateUserSubscription
     ) -> UserSubscription:
         result = await self.create(data=data)
+        return result
+
+    async def get_active_subscriptions(
+        self, user_id: int
+    ) -> Optional[UserSubscription]:
+        now = datetime.now()
+        stmt = (
+            select(self.model)
+            .where(
+                self.model.user_id == user_id,
+                self.model.is_active,
+                self.model.starts_at <= now,
+                self.model.expires_at >= now,
+                self.model.payment_status == PaymentStatus.succeeded,
+            )
+            .options(joinedload(self.model.plan))
+            .limit(1)
+        )
+        raw_result = await self.session.execute(stmt)
+        result = raw_result.scalar_one_or_none()
         return result

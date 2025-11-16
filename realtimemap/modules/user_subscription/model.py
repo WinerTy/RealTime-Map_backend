@@ -44,4 +44,6 @@ class UserSubscription(BaseSqlModel, IntIdMixin, TimeMarkMixin):
     )
     # RS
     user: Mapped["User"] = relationship("User", back_populates="subscriptions")
-    plan: Mapped["SubscriptionPlan"] = relationship(back_populates="user_subscriptions")
+    plan: Mapped["SubscriptionPlan"] = relationship(
+        "SubscriptionPlan", back_populates="user_subscriptions"
+    )

@@ -22,6 +22,7 @@ if TYPE_CHECKING:
     from modules.mark_comment.model import Comment, CommentReaction
     from modules.message.model import Chat
     from modules.user_subscription.model import UserSubscription
+    from modules.gamefication.model import UserExpHistory
 
 
 class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
@@ -72,6 +73,13 @@ class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
         back_populates="user",
         cascade="all, delete-orphan",
         lazy="noload",
+    )
+    experience_history: Mapped[List["UserExpHistory"]] = relationship(
+        "UserExpHistory",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        lazy="noload",
+        order_by="UserExpHistory.created_at.desc()",
     )
 
     @classmethod

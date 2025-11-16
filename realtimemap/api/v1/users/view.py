@@ -1,4 +1,4 @@
-from typing import Annotated, TYPE_CHECKING
+from typing import Annotated, TYPE_CHECKING, List
 
 from fastapi import APIRouter, Request, Form, Depends, Query
 from fastapi_limiter.depends import RateLimiter
@@ -54,3 +54,11 @@ async def delete_me(
 ):
     await repo.delete_user(user)
     return Response(status_code=204)
+
+
+@router.get("/leaderboard", response_model=List[UserRead])
+async def get_leaderboard(
+    request: Request, service: Annotated["UserService", Depends(get_user_service)]
+):
+    leaders = await service.get_leaderboard(request)
+    return leaders

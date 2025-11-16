@@ -1,4 +1,5 @@
 import logging
+from abc import ABC, abstractmethod
 from typing import (
     Generic,
     Type,
@@ -22,6 +23,25 @@ if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger(__name__)
+
+
+class IBaseRepository(ABC):
+    @abstractmethod
+    async def create(self, data: CreateSchema) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def update(self, data: UpdateSchema) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_by_id(
+        self,
+        item_id: Any,
+        join_related: Optional[Union[List[str], Dict[str, Any]]] = None,
+        load_strategy: Any = joinedload,
+    ) -> Optional[Model]:
+        raise NotImplementedError
 
 
 class BaseRepository(Generic[Model, CreateSchema, UpdateSchema]):

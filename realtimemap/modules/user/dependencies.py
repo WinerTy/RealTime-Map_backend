@@ -1,19 +1,19 @@
-from typing import Annotated, TYPE_CHECKING, AsyncGenerator, Any
+from typing import Annotated, AsyncGenerator, Any
 
 from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.helper import db_helper
+from database import get_session
 from modules.user_ban.dependencies import get_user_ban_repository
 from modules.user_subscription.dependencies import get_user_subscription_repository
 from .repository import UserRepository
 from .service import UserService
 
-if TYPE_CHECKING:
-    from sqlalchemy.ext.asyncio import AsyncSession
+DBSession = Annotated[AsyncSession, Depends(get_session)]
 
 
 async def get_user_repository(
-    session: Annotated["AsyncSession", Depends(db_helper.session_getter)],
+    session: DBSession,
 ):
     yield UserRepository(session=session)
 

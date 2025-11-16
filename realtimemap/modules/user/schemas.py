@@ -34,6 +34,7 @@ class UserRead(schemas.BaseUser[int]):
     phone: Optional[str] = None
     username: str
     avatar: Optional[str] = None
+    level: int
     subscriptions: Optional[List["ReadUserSubscription"]] = []
     bans: Optional[List["ReadUsersBan"]] = []
     _validate_avatar = field_validator("avatar", mode="before")(generate_full_image_url)
@@ -60,6 +61,11 @@ class UserUpdate(schemas.BaseUserUpdate):
 
     username: Optional[str] = None
     avatar: Optional[UploadFile] = None
+
+
+class UserGameFicationUpdate(UserUpdate):
+    total_exp: Optional[int] = None
+    curent_exp: Optional[int] = None
 
 
 class UserLogin(BaseModel):

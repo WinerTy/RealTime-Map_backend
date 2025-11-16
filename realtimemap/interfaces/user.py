@@ -27,6 +27,8 @@ class IUserRepository(IBaseRepository[User, UserCreate, UserUpdate], Protocol):
         """
         ...
 
+    async def get_users_for_leaderboard(self) -> Optional[Sequence[User]]: ...
+
 
 class IUsersBanRepository(
     IBaseRepository[UsersBan, UsersBanCreate, UpdateUsersBan], Protocol

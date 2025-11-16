@@ -52,3 +52,11 @@ class UserService:
                 ]
 
         return user_response
+
+    async def get_leaderboard(self, request: "Request"):
+        leaders = await self.user_repo.get_users_for_leaderboard()
+        users = [
+            UserRead.model_validate(leader, context={"request": request})
+            for leader in leaders
+        ]
+        return users
