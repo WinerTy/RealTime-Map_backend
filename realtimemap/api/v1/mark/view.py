@@ -9,11 +9,13 @@ from fastapi import (
     Request,
     Response,
 )
+from fastapi_cache.decorator import cache
 
 from api.v1.auth.fastapi_users import Annotated, get_current_user_without_ban
 from dependencies.notification import (
     get_mark_notification_service,
 )
+from modules.gamefication.dependencies import get_game_fication_service
 from modules.mark.dependencies import get_mark_service
 from modules.mark.schemas import (
     CreateMarkRequest,
@@ -29,6 +31,7 @@ from modules.notification import MarkNotificationService
 
 if TYPE_CHECKING:
     from modules import User
+    from modules.gamefication.service import GameFicationService
 
 
 router = APIRouter(prefix="/marks", tags=["Marks"])
@@ -61,6 +64,52 @@ async def get_marks(
     "/",
     response_model=ReadMark,
     status_code=201,
+    responses={
+        404: {
+            "description": "Category not found",
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {"detail": {"type": "string"}},
+                    }
+                }
+            },
+        },
+        403: {
+            "description": "Forbidden",
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {"detail": {"type": "string"}},
+                    }
+                }
+            },
+        },
+        429: {
+            "description": "Forbidden",
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {"detail": {"type": "string"}},
+                    }
+                }
+            },
+        },
+        401: {
+            "description": "Unauthorized",
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {"detail": {"type": "string"}},
+                    }
+                }
+            },
+        },
+    },
 )
 async def create_mark_point(
     background: BackgroundTasks,
@@ -69,6 +118,9 @@ async def create_mark_point(
     service: mark_service,
     request: Request,
     notification: mark_notification_service,
+    gamefication_serive: Annotated[
+        "GameFicationService", Depends(get_game_fication_service)
+    ],
 ):
     """
     Protected endpoint for create mark.
@@ -80,10 +132,28 @@ async def create_mark_point(
         event=ActionType.CREATE.value,
         request=request,
     )
+    await gamefication_serive.great_user_exp(user, "create_mark")
     return ReadMark.model_validate(instance, context={"request": request})
 
 
-@router.get("/{mark_id}", response_model=DetailMark, status_code=200)
+@router.get(
+    "/{mark_id}",
+    response_model=DetailMark,
+    status_code=200,
+    responses={
+        404: {
+            "description": "Mark not found",
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {"detail": {"type": "string"}},
+                    }
+                }
+            },
+        }
+    },
+)
 # @cache(expire=3600) TODO Fix
 async def get_mark(mark_id: int, service: mark_service, request: Request):
     result = await service.get_mark_by_id(mark_id)
@@ -93,6 +163,41 @@ async def get_mark(mark_id: int, service: mark_service, request: Request):
 @router.delete(
     "/{mark_id}",
     status_code=204,
+    responses={
+        404: {
+            "description": "Mark not found",
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {"detail": {"type": "string"}},
+                    }
+                }
+            },
+        },
+        403: {
+            "description": "Forbiden",
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {"detail": {"type": "string"}},
+                    }
+                }
+            },
+        },
+        401: {
+            "description": "Unauthorized",
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {"detail": {"type": "string"}},
+                    }
+                }
+            },
+        },
+    },
 )
 async def delete_mark(
     mark_id: int,
@@ -116,6 +221,41 @@ async def delete_mark(
     "/{mark_id}",
     response_model=ReadMark,
     status_code=200,
+    responses={
+        404: {
+            "description": "Mark not found",
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {"detail": {"type": "string"}},
+                    }
+                }
+            },
+        },
+        403: {
+            "description": "Forbiden",
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {"detail": {"type": "string"}},
+                    }
+                }
+            },
+        },
+        400: {
+            "description": "Bad Request. Example: TimeOut for updating",
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {"detail": {"type": "string"}},
+                    }
+                }
+            },
+        },
+    },
 )
 async def update_mark(
     mark_id: int,
@@ -136,7 +276,13 @@ async def update_mark(
     return ReadMark.model_validate(result, context={"request": request})
 
 
-@router.get("/allowed-duration/", response_model=List[int], status_code=200)
+@router.get(
+    "/allowed-duration/",
+    response_model=List[int],
+    status_code=200,
+    responses={},
+)
+@cache(7200, namespace="marks")
 async def get_allowed_duration():
     return allowed_duration
 
