@@ -1,4 +1,5 @@
-from typing import TYPE_CHECKING
+import asyncio
+from typing import TYPE_CHECKING, Optional, List
 
 from errors.http2 import AuthenticationError
 from interfaces import IUserRepository, IUsersBanRepository, IUserSubscriptionRepository
@@ -34,42 +35,77 @@ class UserService:
     async def is_ban(self, user_id: int) -> bool:
         return await self.user_repo.user_is_banned(user_id)
 
+    async def _load_subscriptions(
+        self, user_id: int, request: "Request"
+    ) -> List[ReadUserSubscription]:
+        user_subs = await self.user_subs_repo.get_user_subscriptions(user_id)
+        return (
+            [
+                ReadUserSubscription.model_validate(sub, context={"request": request})
+                for sub in user_subs
+            ]
+            if user_subs
+            else []
+        )
+
+    async def _load_bans(self, user_id: int, request: "Request") -> List[ReadUsersBan]:
+        user_bans = await self.user_ban_repo.get_user_bans(user_id)
+        return (
+            [
+                ReadUsersBan.model_validate(ban, context={"request": request})
+                for ban in user_bans
+            ]
+            if user_bans
+            else []
+        )
+
+    async def _load_gamefication(self, user: "User") -> Optional[UserGamefication]:
+        raw_level = await self.level_repo.get_next_level(user.level)
+        if not raw_level:
+            return None
+
+        level = LevelRead.model_validate(raw_level)
+        return UserGamefication(
+            current_level=user.level,
+            current_exp=user.current_exp,
+            next_level=level,
+        )
+
     async def get_included_user_info(
         self, request: "Request", user: "User", params: UserRequestParams
     ) -> UserRead:
         if not user:
             raise AuthenticationError()
+
         user_response = UserRead.model_validate(user, context={"request": request})
 
         if not params.include:
             return user_response
 
+        # Параллельная загрузка
+        tasks = []
+        include_mapping = {}
+
         if UserRelationShip.SUBSCRIPTION in params.include:
-            user_subs = await self.user_subs_repo.get_user_subscriptions(user.id)
-            if user_subs:
-                user_response.subscriptions = [
-                    ReadUserSubscription.model_validate(
-                        sub, context={"request": request}
-                    )
-                    for sub in user_subs
-                ]
+            tasks.append(self._load_subscriptions(user.id, request))
+            include_mapping[len(tasks) - 1] = "subscriptions"
 
         if UserRelationShip.BANS in params.include:
-            user_bans = await self.user_ban_repo.get_user_bans(user.id)
-            if user_bans:
-                user_response.bans = [
-                    ReadUsersBan.model_validate(ban, context={"request": request})
-                    for ban in user_bans
-                ]
+            tasks.append(self._load_bans(user.id, request))
+            include_mapping[len(tasks) - 1] = "bans"
 
         if UserRelationShip.GAMEFICATION in params.include:
-            raw_level = await self.level_repo.get_next_level(user.level)
-            level = LevelRead.model_validate(raw_level)
-            user_response.gamefication = UserGamefication(
-                current_level=user.level,
-                current_exp=user.current_exp,
-                next_level=level,
-            )
+            tasks.append(self._load_gamefication(user))
+            include_mapping[len(tasks) - 1] = "gamefication"
+
+        if tasks:
+            results = await asyncio.gather(*tasks)
+
+            for idx, result in enumerate(results):
+                field_name = include_mapping[idx]
+                if result:
+                    setattr(user_response, field_name, result)
+
         return user_response
 
     async def get_leaderboard(self, request: "Request"):
