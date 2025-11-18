@@ -60,15 +60,14 @@ class UserService:
         )
 
     async def _load_gamefication(self, user: "User") -> Optional[UserGamefication]:
+        next_level = None
         raw_level = await self.level_repo.get_next_level(user.level)
-        if not raw_level:
-            return None
-
-        level = LevelRead.model_validate(raw_level)
+        if raw_level:
+            next_level = LevelRead.model_validate(raw_level)
         return UserGamefication(
             current_level=user.level,
             current_exp=user.current_exp,
-            next_level=level,
+            next_level=next_level,
         )
 
     async def get_included_user_info(
@@ -100,7 +99,6 @@ class UserService:
 
         if tasks:
             results = await asyncio.gather(*tasks)
-
             for idx, result in enumerate(results):
                 field_name = include_mapping[idx]
                 if result:
