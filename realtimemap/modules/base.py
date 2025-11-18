@@ -9,6 +9,7 @@ from utils import camel_case_to_snake_case
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
+    from starlette.requests import Request
 
 
 class BaseSqlModel(DeclarativeBase):
@@ -47,6 +48,12 @@ class BaseSqlModel(DeclarativeBase):
         result = await session.execute(stmt)
         count_value = result.scalar_one()
         return count_value
+
+    async def __admin_repr__(self, _: "Request") -> str:
+        return self.__class__.__name__
+
+    async def __admin_select2_repr__(self, _: "Request") -> str:
+        return self.__class__.__name__
 
 
 class Base(BaseSqlModel, IntIdMixin):
