@@ -13,6 +13,7 @@ from errors.http2 import (
     ServerError,
     HaveActiveSubscriptionError,
     UserPermissionError,
+    ValidationError,
 )
 
 if TYPE_CHECKING:
@@ -78,5 +79,12 @@ def register_exception_handler(app: "FastAPI"):
     ):
         return ORJSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
+            content=exc.detail,
+        )
+
+    @app.exception_handler(ValidationError)
+    async def validation_error_handler(_: "Request", exc: ValidationError):
+        return ORJSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content=exc.detail,
         )

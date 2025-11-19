@@ -9,6 +9,7 @@ __all__ = [
     "IntegrityError",
     "ServerError",
     "AuthenticationError",
+    "ValidationError",
 ]
 
 from .client_error import (
@@ -20,6 +21,7 @@ from .client_error import (
     NotFoundError,
     IntegrityError,
     AuthenticationError,
+    ValidationError,
 )
 
 from .server_error import GateWayError, ServerError
