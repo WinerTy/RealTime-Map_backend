@@ -36,7 +36,7 @@ def generate_full_image_url(
     if isinstance(value, list):
         return [_generate_url(photo) for photo in value if photo]
 
-    if isinstance(value, str):  # TODO SEE THIS MB BAGS
+    if isinstance(value, str):
         return value
 
     return _generate_url(value)
