@@ -1,6 +1,6 @@
 from typing import Optional, List
 
-from errors.http2 import NestingLevelExceededError, NotFoundError
+from errors.http2 import NestingLevelExceededError, NotFoundError, ValidationError
 from interfaces import (
     IMarkCommentRepository,
     ICommentStatRepository,
@@ -39,11 +39,14 @@ class MarkCommentService:
     async def create_comment(
         self, create_data: CreateCommentRequest, mark_id: int, user: User
     ):
-        # TODO Fix load options
         if create_data.parent_id:
             parent_comment = await self.comment_repo.get_by_id(create_data.parent_id)
             if not parent_comment:
-                raise NotFoundError()
+                raise ValidationError(
+                    field="parent_id",
+                    user_input=create_data.parent_id,
+                    input_type="number",
+                )
             if parent_comment.parent_id:
                 raise NestingLevelExceededError()
         full_data = CreateComment(
