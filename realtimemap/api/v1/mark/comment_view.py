@@ -10,6 +10,7 @@ from modules.mark_comment.schemas import (
     ReadComment,
     CommentReactionRequest,
 )
+from modules.mark_comment.schemas.comment.crud import BaseReadComment
 
 if TYPE_CHECKING:
     from modules.mark_comment.service import MarkCommentService
@@ -20,12 +21,28 @@ router = APIRouter(
     prefix="/{mark_id}",
     tags=["Mark Comments"],
     dependencies=[Depends(check_mark_exist)],
+    responses={
+        404: {
+            "description": "Mark not found",
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "detail": {"type": "string"},
+                        },
+                    }
+                }
+            },
+        },
+    },
 )
 
 
 @router.post(
     "/comments/",
-    # response_model=ReadComment,
+    response_model=BaseReadComment,
+    responses={},
 )
 async def create_comment_endpoint(
     mark_id: int,
@@ -36,10 +53,10 @@ async def create_comment_endpoint(
     result = await service.create_comment(
         mark_id=mark_id, create_data=create_data, user=user
     )
-    return f"Запись создана, но вернуть ее пока мы не можем. Фикс вот вот уже будет готов! Id записи {result.id}"  # TODO ПОФИКСИТЬ JOIN!!!
-    # return result
+    return result
 
 
+# TODO Пагинация
 @router.get("/comments/", response_model=List[ReadComment])
 async def get_comments(
     mark_id: int,

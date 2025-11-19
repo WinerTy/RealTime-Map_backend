@@ -1,3 +1,5 @@
+from typing import Any
+
 from errors.base import RealTimeMapError
 
 
@@ -39,3 +41,22 @@ class IntegrityError(RealTimeMapError):
 class AuthenticationError(RealTimeMapError):
     def __init__(self, detail: str = "Authentication failed"):
         super().__init__(detail)
+
+
+class ValidationError(RealTimeMapError):
+    def __init__(
+        self,
+        field: str,
+        user_input: Any,
+        input_type: str,
+        detail: str = "Validation failed",
+    ):
+        error_obj = [
+            {
+                "loc": ["body", field],
+                "msg": detail,
+                "input": user_input,
+                "type": input_type,
+            }
+        ]
+        super().__init__(error_obj)

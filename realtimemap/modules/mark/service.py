@@ -4,7 +4,12 @@ from typing import TYPE_CHECKING
 
 from fastapi import HTTPException
 
-from errors.http2 import NotFoundError, TimeOutError, UserPermissionError
+from errors.http2 import (
+    NotFoundError,
+    TimeOutError,
+    UserPermissionError,
+    ValidationError,
+)
 from modules import User
 from modules.geo_service import GeoService
 from .filters import MarkFilter
@@ -136,6 +141,9 @@ class MarkService:
         except UserPermissionError:
             logger.info("User permission error: %d %d", mark_id, user.id)
             raise
+        except ValidationError:
+            logger.info("Category does not exist: %d", update_data.category_id)
+            raise
         except ValueError:
             logger.error("Update data error: %d %v", mark_id, update_data)
             raise HTTPException(status_code=400, detail="Update data error")
@@ -177,7 +185,12 @@ class MarkService:
 
         category_exist = await self.category_repo.exist(update_data.category_id)
         if not category_exist:
-            raise NotFoundError()
+            raise ValidationError(
+                field="category_id",
+                user_input=update_data.category_id,
+                input_type="number",
+                detail="Category does not exist",
+            )
 
     @staticmethod
     def _check_timeout(mark: Mark, duration: int = 1) -> None:

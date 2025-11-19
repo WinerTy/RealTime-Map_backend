@@ -20,6 +20,7 @@ from modules.mixins import IntIdMixin, TimeMarkMixin
 
 if TYPE_CHECKING:
     from modules.user.model import User
+    from starlette.requests import Request
 
 
 class Level(BaseSqlModel, IntIdMixin, TimeMarkMixin):
@@ -63,6 +64,12 @@ class ExpAction(BaseSqlModel, IntIdMixin, TimeMarkMixin):
     history_records: Mapped[List["UserExpHistory"]] = relationship(
         "UserExpHistory", back_populates="action", lazy="noload"
     )
+
+    async def __admin_repr__(self, _: "Request") -> str:
+        return self.action_type
+
+    async def __admin_select2_repr__(self, _: "Request") -> str:
+        return self.action_type
 
 
 class UserExpHistory(BaseSqlModel, IntIdMixin, TimeMarkMixin):

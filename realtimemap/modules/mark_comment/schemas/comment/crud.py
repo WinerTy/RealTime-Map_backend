@@ -17,7 +17,8 @@ class BaseReadComment(BaseComment):
     id: Annotated[int, Field(0, ge=0, description="id")]
     owner: UserRead
     created_at: datetime
-    stats: BaseCommentStat
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class CreateComment(BaseComment):
@@ -34,7 +35,7 @@ class UpdateComment(BaseComment):
 
 
 class ReadCommentReply(BaseReadComment):
-    pass
+    stats: BaseCommentStat
 
 
 class ReadComment(BaseReadComment):
@@ -42,3 +43,4 @@ class ReadComment(BaseReadComment):
         Optional[List[ReadCommentReply]],
         Field(default_factory=list, description="Replies to comment"),
     ]
+    stats: BaseCommentStat

@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 class LevelRepository(ABC):
 
     @abstractmethod
-    async def get_next_lelel(self, current_level: int) -> Optional[Level]:
+    async def get_next_level(self, current_level: int) -> Optional[Level]:
         raise NotImplementedError("get next level or none ")
 
     @abstractmethod
@@ -27,7 +27,7 @@ class NewLevelRepository(BaseRepository[Level, None, None], LevelRepository):
     def __init__(self, session: "AsyncSession"):
         super().__init__(session=session, model=Level)
 
-    async def get_next_lelel(self, current_level: int) -> Optional[Level]:
+    async def get_next_level(self, current_level: int) -> Optional[Level]:
         stmt = select(self.model).where(
             self.model.level == current_level + 1, self.model.is_active
         )
