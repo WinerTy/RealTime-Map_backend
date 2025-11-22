@@ -58,6 +58,6 @@ class BaseMark(BaseModel):
 
     @field_validator("duration")
     def validate_duration(cls, value):
-        if value not in allowed_duration:  # TODO maybe ENUM???
+        if value not in allowed_duration:
             raise ValueError("Duration not supported.")
         return value

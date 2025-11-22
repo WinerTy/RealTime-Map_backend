@@ -8,6 +8,7 @@ from sqlalchemy import text, NullPool
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from core.config import conf
+from database import get_session
 from database.helper import db_helper
 from main import app
 from modules import BaseSqlModel
@@ -61,6 +62,7 @@ async def override_get_session(test_session_factory):
         async with test_session_factory() as session:
             async with session.begin():
                 yield session
+                # await session.commit()
                 await session.rollback()
 
     return _get_test_session
@@ -110,7 +112,7 @@ def setup_db():
 async def client():
     """HTTP клиент для тестирования endpoints"""
 
-    # app.dependency_overrides[get_session] = override_get_session
+    app.dependency_overrides[get_session] = override_get_session
     # app.dependency_overrides[db_helper.session_getter] = override_get_session
 
     transport = ASGITransport(app=app)

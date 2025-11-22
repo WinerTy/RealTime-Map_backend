@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
 from fastapi import HTTPException
+from sqlalchemy.orm import joinedload
 
 from errors.http2 import (
     NotFoundError,
@@ -19,22 +20,31 @@ from .schemas import (
     MarkRequestParams,
     UpdateMarkRequest,
     CreateMark,
-    CreateTestMarkRequest,
     UpdateMark,
 )
 
 if TYPE_CHECKING:
-    from interfaces import IMarkRepository, ICategoryRepository, IMarkCommentRepository
-
+    from core.common.repository import (
+        MarkRepository,
+        CategoryRepository,
+        MarkCommentRepository,
+    )
 logger = logging.getLogger(__name__)
 
 
 class MarkService:
+    __slots__ = (
+        "mark_repo",
+        "category_repo",
+        "mark_comment_repo",
+        "geo_service",
+    )
+
     def __init__(
         self,
-        mark_repo: "IMarkRepository",
-        category_repo: "ICategoryRepository",
-        mark_comment_repo: "IMarkCommentRepository",
+        mark_repo: "MarkRepository",
+        category_repo: "CategoryRepository",
+        mark_comment_repo: "MarkCommentRepository",
         geo_service: "GeoService",
     ):
         self.mark_repo = mark_repo
@@ -81,9 +91,9 @@ class MarkService:
         return result
 
     async def delete_mark(self, mark_id: int, user: User):
-        mark = await self.get_mark_by_id(mark_id)
+        mark = await self.mark_repo.get_by_id(mark_id)
         await self._check_mark_ownership(mark, user)
-        result = await self.mark_repo.delete_mark(mark.id)
+        result = await self.mark_repo.delete_mark(mark.id)  # noqa: ignore
         return result
 
     def _validate_update_data(self, update_data: UpdateMarkRequest) -> UpdateMark:
@@ -125,7 +135,9 @@ class MarkService:
         :raises UserPermissionError: Если текущий пользователь не владелец записи
         """
         try:
-            mark = await self.mark_repo.get_mark_by_id(mark_id)
+            mark = await self.mark_repo.get_by_id(
+                mark_id, join_related=["category"], load_strategy=joinedload
+            )
             if not mark:
                 raise NotFoundError()
 
@@ -204,7 +216,3 @@ class MarkService:
         passed_time = datetime.now() - mark.created_at
         if passed_time > timedelta(hours=duration):
             raise TimeOutError()
-
-    async def create_test_mark(self, params: CreateTestMarkRequest):
-        res = await self.mark_repo.get_ids_for_test()
-        print(res)

@@ -10,7 +10,7 @@ from admin.fields import GeomField
 from admin.fields.geohash_field import GeoHashField
 from core.app.socket import sio
 from modules import Mark
-from modules.mark.repository import MarkRepository
+from modules.mark.repository import PgMarkRepository
 from modules.mark.schemas import ActionType
 from modules.notification import MarkNotificationService
 
@@ -79,7 +79,7 @@ class AdminMark(ModelView):
         request: Request, mark: Mark, action_type: str
     ) -> None:
         session: "AsyncSession" = request.state.session
-        mark_repo = MarkRepository(session)
+        mark_repo = PgMarkRepository(session)
         notify_service = MarkNotificationService(mark_repo, sio)
         await notify_service.notify_mark_action(mark, action_type, request)
 

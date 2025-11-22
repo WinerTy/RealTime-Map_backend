@@ -7,10 +7,10 @@ from api.v1.auth.fastapi_users import get_current_user_without_ban
 from dependencies.payment import get_yookassa_client
 from integrations.payment.yookassa import YookassaClient
 from modules.subscription.dependencies import (
-    get_subscription_plan_repository,
+    get_pg_subscription_plan_repository,
     get_subscription_service,
 )
-from modules.subscription.repository import SubscriptionPlanRepository
+from modules.subscription.repository import PgSubscriptionPlanRepository
 from modules.subscription.schemas import ReadSubscriptionPlan
 from modules.subscription.service import SubscriptionService
 from modules.user_subscription.schemas import CreateSubscriptionRequest
@@ -25,7 +25,7 @@ router = APIRouter(
 )
 
 get_sub_repo = Annotated[
-    SubscriptionPlanRepository, Depends(get_subscription_plan_repository)
+    PgSubscriptionPlanRepository, Depends(get_pg_subscription_plan_repository)
 ]
 
 

@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING, List
 
 from errors.http2 import UserPermissionError
 from modules.chat.schemas import ReadChat
+from modules.message import ReadMessage, UpdateMessage
 from modules.message.filters import MessageFilter
 from modules.message.schemas import (
     CreateMessageRequest,
@@ -9,17 +10,18 @@ from modules.message.schemas import (
     UpdateMessageRequest,
 )
 from modules.message.schemas import MessageParamsRequest
+from modules.user.schemas import UserRead
 
 if TYPE_CHECKING:
-    from interfaces import IMessageRepository, IChatRepository
     from modules import User, Message
+    from core.common.repository import ChatRepository, MessageRepository
 
 
 class ChatService:
     def __init__(
         self,
-        chat_repo: "IChatRepository",
-        message_repo: "IMessageRepository",
+        chat_repo: "ChatRepository",
+        message_repo: "MessageRepository",
     ):
         self.chat_repo = chat_repo
         self.message_repo = message_repo
@@ -33,8 +35,8 @@ class ChatService:
                 ReadChat(
                     id=chat.id,
                     created_at=chat.created_at,
-                    other_participant=user,
-                    last_message=message,
+                    other_participant=UserRead.model_validate(user),
+                    last_message=ReadMessage.model_validate(message),
                 )
             )
         return result
@@ -61,7 +63,7 @@ class ChatService:
         )
         await self._before_send_message(chat.id, user_id=user.id)
         valid_message = self._prepare_message(chat.id, user, message)
-        result = await self.message_repo.create_message(valid_message)
+        result = await self.message_repo.create(valid_message)
         await self._after_send_message()
         return result
 
@@ -92,7 +94,8 @@ class ChatService:
         if instance.sender_id != user.id:
             raise UserPermissionError()
 
-        instance = await self.message_repo.update(message_id, message)
+        valid_message = UpdateMessage.model_validate(**message.model_dump())
+        instance = await self.message_repo.update(message_id, valid_message)
         return instance
 
     async def delete_message(self, message_id: int, user: "User"):

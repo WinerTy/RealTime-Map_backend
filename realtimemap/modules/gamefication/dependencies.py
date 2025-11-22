@@ -1,54 +1,69 @@
-from typing import Annotated, Any, AsyncGenerator
+from typing import Annotated, TYPE_CHECKING
 
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import get_session
+from database.adapter import PgAdapter
 from modules.gamefication.repository import (
-    NewLevelRepository,
-    LevelRepository,
-    NewUserExpHistoryRepository,
-    UserExpHistoryRepository,
-    ExpActionRepository,
-    NewExpActionRepository,
+    PgLevelRepository,
+    PgUserExpHistoryRepository,
+    PgExpActionRepository,
 )
 from modules.gamefication.service import GameFicationService
-from modules.user.dependencies import get_user_repository
+from modules.user.dependencies import get_pg_user_repository
 from modules.user_subscription.dependencies import get_user_subscription_repository
-from modules.user_subscription.repository import UserSubscriptionRepository
+from modules.user_subscription.repository import PgUserSubscriptionRepository
+from .model import Level, UserExpHistory, ExpAction
+from .schemas import CreateUserExpHistory, UpdateUserExpHistory
+
+if TYPE_CHECKING:
+    from core.common.repository import (
+        LevelRepository,
+        ExpActionRepository,
+        UserExpHistoryRepository,
+        UserRepository,
+    )
 
 DBSession = Annotated[AsyncSession, Depends(get_session)]
 
 
-async def get_level_repository(
+async def get_pg_level_repository(
     session: DBSession,
-) -> AsyncGenerator[LevelRepository, Any]:
-    yield NewLevelRepository(session)
+) -> "LevelRepository":
+    adapter = PgAdapter[Level, None, None](session, Level)
+    return PgLevelRepository(adapter=adapter)
 
 
-async def get_user_exp_history_repository(
+async def get_pg_exp_action_repository(
     session: DBSession,
-) -> AsyncGenerator[UserExpHistoryRepository, Any]:
-    yield NewUserExpHistoryRepository(session)
+) -> "ExpActionRepository":
+    adapter = PgAdapter[ExpAction, None, None](session, ExpAction)
+    return PgExpActionRepository(adapter=adapter)
 
 
-async def get_exp_action_repository(
+async def get_pg_user_exp_history_repository(
     session: DBSession,
-) -> AsyncGenerator[ExpActionRepository, Any]:
-    yield NewExpActionRepository(session)
+) -> "UserExpHistoryRepository":
+    adapter = PgAdapter[UserExpHistory, CreateUserExpHistory, UpdateUserExpHistory](
+        session, UserExpHistory
+    )
+    return PgUserExpHistoryRepository(adapter=adapter)
 
 
 async def get_game_fication_service(
     history_repo: Annotated[
-        "UserExpHistoryRepository", Depends(get_user_exp_history_repository)
+        "UserExpHistoryRepository", Depends(get_pg_user_exp_history_repository)
     ],
-    action_repo: Annotated["ExpActionRepository", Depends(get_exp_action_repository)],
-    level_repo: Annotated["LevelRepository", Depends(get_level_repository)],
-    user_repo: Annotated["UserRepository", Depends(get_user_repository)],
+    action_repo: Annotated[
+        "ExpActionRepository", Depends(get_pg_exp_action_repository)
+    ],
+    level_repo: Annotated["LevelRepository", Depends(get_pg_level_repository)],
+    user_repo: Annotated["UserRepository", Depends(get_pg_user_repository)],
     user_subs_repo: Annotated[
-        "UserSubscriptionRepository", Depends(get_user_subscription_repository)
+        "PgUserSubscriptionRepository", Depends(get_user_subscription_repository)
     ],
-) -> GameFicationService:
+) -> "GameFicationService":
     return GameFicationService(
         history_repo, action_repo, level_repo, user_repo, user_subs_repo
     )

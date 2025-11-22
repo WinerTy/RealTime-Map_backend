@@ -1,16 +1,19 @@
 import logging
-from typing import List, Optional, Dict, Set
+from typing import List, Optional, Dict, Set, TYPE_CHECKING
 
 from fastapi import Request
 from socketio import AsyncServer
 
 from core.config import conf
 from modules import Mark
-from modules.geo_service import GeoService
+from modules.geo_service import GeoService, get_geo_service
 from modules.mark.filters import MarkFilter
-from modules.mark.repository import MarkRepository
 from modules.mark.schemas import MarkRequestParams, ReadMark
 from .base import BaseNotificationSocketIO
+
+if TYPE_CHECKING:
+    from core.common.repository import MarkRepository
+
 
 logger = logging.getLogger(__name__)
 
@@ -18,9 +21,9 @@ logger = logging.getLogger(__name__)
 class MarkNotificationService(BaseNotificationSocketIO):
     def __init__(
         self,
-        mark_repo: MarkRepository,
+        mark_repo: "MarkRepository",
         sio: AsyncServer,
-        geo_service: GeoService = GeoService(),
+        geo_service: GeoService = get_geo_service(),
         namespace: str = conf.socket.prefix.marks,
     ):
         super().__init__(sio, namespace)

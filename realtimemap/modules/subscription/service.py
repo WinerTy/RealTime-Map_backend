@@ -13,9 +13,10 @@ from modules.user_subscription.model import PaymentStatus
 from modules.user_subscription.schemas import CreateUserSubscription
 
 if TYPE_CHECKING:
-    from interfaces import IUserSubscriptionRepository, ISubscriptionPlanRepository
+    from interfaces import IUserSubscriptionRepository
     from modules import User, SubscriptionPlan
     from integrations.payment.yookassa import YookassaClient
+    from core.common.repository import SubscriptionPlanRepository
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +25,7 @@ class SubscriptionService:
     def __init__(
         self,
         user_subscription_repo: "IUserSubscriptionRepository",
-        subscription_repo: "ISubscriptionPlanRepository",
+        subscription_repo: "SubscriptionPlanRepository",
     ):
         self.user_subscription_repo = user_subscription_repo
         self.subscription_repo = subscription_repo

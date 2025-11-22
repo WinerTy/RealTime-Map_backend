@@ -5,17 +5,17 @@ from socketio import AsyncNamespace
 
 from database.helper import db_helper
 from dependencies.auth.web_socket import socket_current_user
-from modules.chat.repository import ChatRepository
+from modules.chat.repository import PgChatRepository
 from modules.chat.service import ChatService
-from modules.message.repository import MessageRepository
+from modules.message.repository import PgMessageRepository
 
 
 @asynccontextmanager
 async def get_chat_service():
     async with db_helper.session_factory() as session:
-        message_repo = MessageRepository(session)
-        chat_repo = ChatRepository(session)
-        yield ChatService(session, chat_repo, message_repo)
+        message_repo = PgMessageRepository(session)
+        chat_repo = PgChatRepository(session)
+        yield ChatService(chat_repo, message_repo)
 
 
 class ChatNamespace(AsyncNamespace):

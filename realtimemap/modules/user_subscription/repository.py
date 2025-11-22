@@ -1,10 +1,11 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional, Sequence
+from typing import TYPE_CHECKING, Optional, List
 
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
-from core.common import BaseRepository
+from core.common.repository import UserSubscriptionRepository
+from database.adapter import PgAdapter
 from .model import UserSubscription, PaymentStatus
 from .schemas import (
     CreateUserSubscription,
@@ -12,44 +13,43 @@ from .schemas import (
 )
 
 if TYPE_CHECKING:
-    from sqlalchemy.ext.asyncio import AsyncSession
+    pass
 
 
-class UserSubscriptionRepository(
-    BaseRepository[
-        UserSubscription,
-        CreateUserSubscription,
-        UpdateUserSubscription,
-    ]
-):
-    def __init__(self, session: "AsyncSession"):
-        super().__init__(session=session, model=UserSubscription)
+class PgUserSubscriptionRepository(UserSubscriptionRepository):
+    def __init__(
+        self,
+        adapter: PgAdapter[
+            UserSubscription, CreateUserSubscription, UpdateUserSubscription
+        ],
+    ):
+        super().__init__(adapter)
+        self.adapter = adapter
 
     async def check_active_subscription(
         self, user_id: int
     ) -> Optional[UserSubscription]:
         current_date = datetime.now()
-        stmt = select(self.model).where(
-            self.model.user_id == user_id,
-            self.model.is_active,
-            self.model.expires_at > current_date,
+        stmt = select(UserSubscription).where(
+            UserSubscription.user_id == user_id,
+            UserSubscription.is_active,
+            UserSubscription.expires_at > current_date,
         )
-        result = await self.session.execute(stmt)
-        result = result.scalar_one_or_none()
+        result = await self.adapter.execute_query_one(stmt)
         return result is not None
 
     async def get_user_subscriptions(
         self, user_id: int
-    ) -> Sequence[Optional[UserSubscription]]:
+    ) -> List[Optional[UserSubscription]]:
         stmt = (
-            select(self.model)
+            select(UserSubscription)
             .where(
-                self.model.user_id == user_id,
+                UserSubscription.user_id == user_id,
             )
-            .order_by(self.model.expires_at.desc())
+            .order_by(UserSubscription.expires_at.desc())
         )
-        result = await self.session.execute(stmt)
-        return result.scalars().all()
+        result = await self.adapter.execute_query(stmt)
+        return result
 
     async def create_user_subscription(
         self, data: CreateUserSubscription
@@ -62,17 +62,16 @@ class UserSubscriptionRepository(
     ) -> Optional[UserSubscription]:
         now = datetime.now()
         stmt = (
-            select(self.model)
+            select(UserSubscription)
             .where(
-                self.model.user_id == user_id,
-                self.model.is_active,
-                self.model.starts_at <= now,
-                self.model.expires_at >= now,
-                self.model.payment_status == PaymentStatus.succeeded,
+                UserSubscription.user_id == user_id,
+                UserSubscription.is_active,
+                UserSubscription.starts_at <= now,
+                UserSubscription.expires_at >= now,
+                UserSubscription.payment_status == PaymentStatus.succeeded,
             )
-            .options(joinedload(self.model.plan))
+            .options(joinedload(UserSubscription.plan))
             .limit(1)
         )
-        raw_result = await self.session.execute(stmt)
-        result = raw_result.scalar_one_or_none()
+        result = await self.adapter.execute_query_one(stmt)
         return result

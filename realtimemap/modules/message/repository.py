@@ -3,20 +3,22 @@ from typing import TYPE_CHECKING, List
 
 from sqlalchemy import select
 
-from core.common import BaseRepository
+from core.common.repository import MessageRepository
+from database.adapter import PgAdapter
+from . import UpdateMessage
 from .model import Message
-from .schemas import CreateMessage, UpdateMessage
+from .schemas import CreateMessage
 
 if TYPE_CHECKING:
-    from sqlalchemy.ext.asyncio import AsyncSession
     from modules.message.filters import MessageFilter
 
 logger = logging.getLogger(__name__)
 
 
-class MessageRepository(BaseRepository[Message, CreateMessage, UpdateMessage]):
-    def __init__(self, session: "AsyncSession"):
-        super().__init__(model=Message, session=session)
+class PgMessageRepository(MessageRepository):
+    def __init__(self, adapter: PgAdapter[Message, CreateMessage, UpdateMessage]):
+        super().__init__(adapter)
+        self.adapter = adapter
 
     async def create_message(self, data: CreateMessage) -> Message:
         result = await self.create(data)
@@ -27,16 +29,16 @@ class MessageRepository(BaseRepository[Message, CreateMessage, UpdateMessage]):
     ) -> List[Message]:
         try:
             stmt = (
-                select(self.model)
-                .where(self.model.chat_id == chat_id)
-                .order_by(self.model.created_at.desc(), self.model.id.desc())
+                select(Message)
+                .where(Message.chat_id == chat_id)
+                .order_by(Message.created_at.desc(), Message.id.desc())
             )
             if params.before:
-                stmt = stmt.where(self.model.created_at < params.before)
+                stmt = stmt.where(Message.created_at < params.before)
 
             stmt = stmt.limit(params.limit)
-            result = await self.session.execute(stmt)
-            return result.scalars().all()
+            result = await self.adapter.execute_query(stmt)
+            return result
         except Exception as e:
             logger.error("Error while getting chat messages.", exc_info=e)
             return []

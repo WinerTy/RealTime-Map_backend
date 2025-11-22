@@ -8,7 +8,7 @@ from dependencies.auth.manager import get_user_manager
 from errors.http2 import UserPermissionError
 from modules import User
 from modules.user_ban.dependencies import get_user_ban_repository
-from modules.user_ban.repository import UsersBanRepository
+from modules.user_ban.repository import PgUsersBanRepository
 
 fastapi_users = FastAPIUsers[User, int](
     get_user_manager,
@@ -27,7 +27,7 @@ async def get_current_user(
 
 
 async def get_current_user_without_ban(
-    user_ban_repo: Annotated[UsersBanRepository, Depends(get_user_ban_repository)],
+    user_ban_repo: Annotated[PgUsersBanRepository, Depends(get_user_ban_repository)],
     user: Annotated[User, Depends(get_current_user)],
 ):
     user_ban = await user_ban_repo.check_active_user_ban(user.id)

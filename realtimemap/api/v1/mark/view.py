@@ -154,7 +154,6 @@ async def create_mark_point(
         }
     },
 )
-# @cache(expire=3600) TODO Fix
 async def get_mark(mark_id: int, service: mark_service, request: Request):
     result = await service.get_mark_by_id(mark_id)
     return DetailMark.model_validate(result, context={"request": request})

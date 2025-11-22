@@ -2,15 +2,17 @@ from __future__ import annotations
 
 from typing import List
 
-from geoalchemy2 import Geometry
+from geoalchemy2 import WKBElement, Geometry
 from geoalchemy2.functions import (
     ST_SetSRID,
     ST_MakePoint,
     ST_DistanceSphere,
 )
+from geoalchemy2.shape import from_shape
 from pydantic import BaseModel
 from pydantic_extra_types.coordinate import Latitude, Longitude
 from pygeohash import encode, get_adjacent, decode
+from shapely.geometry import Point
 
 from modules import Mark
 from modules.mark.schemas import Coordinates
@@ -27,8 +29,8 @@ class GeoService:
         return ST_SetSRID(ST_MakePoint(coords.longitude, coords.latitude), srid)
 
     @staticmethod
-    def create_geometry_point(coords: "Coordinates", srid: int = 4326) -> str:
-        return f"SRID={srid};POINT({coords.longitude} {coords.latitude})"
+    def create_geometry_point(coords: "Coordinates", srid: int = 4326) -> WKBElement:
+        return from_shape(Point(coords.longitude, coords.latitude), srid)
 
     @staticmethod
     def get_geohash(coords: "Coordinates", precision: int = 5) -> str:
@@ -62,7 +64,7 @@ class GeoService:
         return result
 
     @staticmethod
-    def distance_sphere(geom_1: Geometry, geom_2: Geometry, radius: int = 500):
+    def distance_sphere(geom_1: ST_SetSRID, geom_2: Geometry, radius: int = 500):
         return ST_DistanceSphere(geom_1, geom_2, radius)
 
     @staticmethod
