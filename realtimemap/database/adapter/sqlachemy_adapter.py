@@ -84,12 +84,13 @@ class SQLAlchemyAdapter(
         try:
             logger.info(f"Create record {data} in Repository: {self.model.__name__}")
             dict_data: Dict[str, Any] = data.model_dump()
-            dict_data.update(kwargs)
+            join_related: Optional[List[str]] = kwargs.get("join_related", None)
 
             db_item = self.model(**dict_data)
             self.session.add(db_item)
             await self.session.flush()
-            await self.session.refresh(db_item)
+            await self.session.refresh(db_item, join_related)
+
             return db_item
         except IntegrityError:
             logger.info(
@@ -191,12 +192,19 @@ class SQLAlchemyAdapter(
         result = await self.session.execute(stmt)
         return result.scalar_one()
 
-    async def execute_query(self, query: Select[tuple[T]]) -> List[T]:
+    async def execute_query(
+        self, query: Select[tuple[T]], unique: Optional[bool] = False
+    ) -> List[T]:
         """
         Выполнить произвольный SELECT запрос.
         """
         result = await self.session.execute(query)
-        return list(result.scalars().all())
+        scalars = result.scalars()
+
+        if unique:
+            scalars = scalars.unique()
+
+        return list(scalars.all())
 
     async def execute_query_one(self, query: Select[tuple[T]]) -> Optional[T]:
         """
