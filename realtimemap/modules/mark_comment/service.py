@@ -1,11 +1,6 @@
-from typing import Optional, List
+from typing import Optional, List, TYPE_CHECKING
 
 from errors.http2 import NestingLevelExceededError, NotFoundError, ValidationError
-from interfaces import (
-    IMarkCommentRepository,
-    ICommentStatRepository,
-    ICommentReactionRepository,
-)
 from modules.user.model import User
 from .model import Comment
 from .schemas import (
@@ -15,13 +10,27 @@ from .schemas import (
     CreateCommentReaction,
 )
 
+if TYPE_CHECKING:
+    from core.common.repository import (
+        MarkCommentRepository,
+        CommentStatRepository,
+        CommentReactionRepository,
+    )
+
 
 class MarkCommentService:
+    # Явно указывем слоты для экономии памяти
+    __slots__ = (
+        "comment_repo",
+        "comment_stat_repo",
+        "comment_reaction_repo",
+    )
+
     def __init__(
         self,
-        comment_repo: "IMarkCommentRepository",
-        comment_stat_repo: "ICommentStatRepository",
-        comment_reaction_repo: "ICommentReactionRepository",
+        comment_repo: "MarkCommentRepository",
+        comment_stat_repo: "CommentStatRepository",
+        comment_reaction_repo: "CommentReactionRepository",
     ):
         self.comment_repo = comment_repo
         self.comment_stat_repo = comment_stat_repo
@@ -52,7 +61,7 @@ class MarkCommentService:
         full_data = CreateComment(
             **create_data.model_dump(), mark_id=mark_id, owner_id=user.id
         )
-        result = await self.comment_repo.create_comment(full_data)
+        result = await self.comment_repo.create(full_data)
         await self.after_create_comment(result)
         return result
 
@@ -71,18 +80,12 @@ class MarkCommentService:
             create_data = CreateCommentReaction(
                 comment_id=comment_id, user_id=user.id, **data.model_dump()
             )
-            result = await self.comment_reaction_repo.create_comment_reaction(
-                create_data
-            )
+            result = await self.comment_reaction_repo.create(create_data)
             return result
 
         if comment_reaction.reaction_type == data.reaction_type:
-            result = await self.comment_reaction_repo.delete_comment_reaction(
-                comment_reaction.id
-            )
+            result = await self.comment_reaction_repo.delete(comment_reaction.id)
             return result
 
-        result = await self.comment_reaction_repo.update_comment_reaction(
-            comment_reaction.id, data
-        )
+        result = await self.comment_reaction_repo.update(comment_reaction.id, data)
         return result

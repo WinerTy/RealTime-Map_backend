@@ -4,20 +4,19 @@ from typing import TYPE_CHECKING, Optional, Tuple
 
 from pydantic import BaseModel, Field
 
-from modules.user.repository import UserRepository
 from modules.user.schemas import UserGameFicationUpdate
-from modules.user_subscription.repository import UserSubscriptionRepository
 from .model import ExpAction, UserExpHistory
 from .schemas import CreateUserExpHistory
 
 if TYPE_CHECKING:
-    from .repository import (
+    from core.common.repository import (
         UserExpHistoryRepository,
         ExpActionRepository,
         LevelRepository,
+        UserSubscriptionRepository,
     )
     from modules import User
-
+    from core.common.repository import UserRepository
 
 logger = logging.getLogger(__name__)
 
@@ -75,7 +74,7 @@ class GameFicationService:
             exp_before = user.current_exp
 
             await self._update_user_experience(user, exp_calculation.final_exp)
-            level_after = await self.user_repo.level_up(user.id)
+            level_after = await self.user_repo.get_level_up(user.id)
 
             history = await self._create_history_record(
                 user,
@@ -179,7 +178,7 @@ class GameFicationService:
             curent_exp=user.current_exp,  # Временное значение
         )
 
-        await self.user_repo.update_user(user, update_data)
+        await self.user_repo.update(user.id, update_data)
 
     async def _create_history_record(
         self,

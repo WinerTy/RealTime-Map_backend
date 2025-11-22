@@ -1,15 +1,19 @@
 import logging
+from contextlib import asynccontextmanager
 from typing import Any, Optional
 
 from socketio import AsyncNamespace
 
 from database.helper import db_helper
 from modules.geo_service.service import GeoService
+from modules.mark.dependencies import get_pg_mark_repository
 from modules.mark.filters import MarkFilter
-from modules.mark.repository import MarkRepository
 from modules.mark.schemas import MarkRequestParams, ReadMark
 
 logger = logging.getLogger(__name__)
+
+
+mark_repository_context = asynccontextmanager(get_pg_mark_repository)
 
 
 # TODO СДЕЛАТЬ РУМЫ ПО ГЕОХЭШУ ДЛЯ СОКРАЩЕНИЯ ЧИСЛА ЗАПРОСОВ
@@ -31,8 +35,10 @@ class MarksNamespace(AsyncNamespace):
         await self.save_session(sid, params)
         if params:
             async with db_helper.session_factory() as session:
-                repo = MarkRepository(session)
-                result = await repo.get_marks(params)
+                mark_repository = await get_pg_mark_repository(
+                    session, self.geo_service
+                )
+                result = await mark_repository.get_marks(params)
                 result = [
                     ReadMark.model_validate(mark).model_dump(mode="json")
                     for mark in result

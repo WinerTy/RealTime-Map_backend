@@ -44,7 +44,6 @@ class UserRead(schemas.BaseUser[int]):
     phone: Optional[str] = None
     username: str
     avatar: Optional[str] = None
-    level: int
     subscriptions: Optional[List["ReadUserSubscription"]] = []
     bans: Optional[List["ReadUsersBan"]] = []
     gamefication: Optional[UserGamefication] = None

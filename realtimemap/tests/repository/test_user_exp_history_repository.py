@@ -1,13 +1,17 @@
-from datetime import datetime, timedelta
 from decimal import Decimal
 
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from modules.gamefication.model import UserExpHistory
-from modules.gamefication.repository import NewUserExpHistoryRepository
+from modules.gamefication.repository import PgUserExpHistoryRepository
 from modules.gamefication.schemas import CreateUserExpHistory
-from .fixtures import test_user, test_exp_action, test_exp_actions, test_subscription_plan
+from .fixtures import (
+    test_user,
+    test_exp_action,
+    test_exp_actions,
+    test_subscription_plan,
+)
 
 
 class TestUserExpHistoryRepository:
@@ -18,7 +22,7 @@ class TestUserExpHistoryRepository:
         self, db_session: AsyncSession, test_user, test_exp_action
     ):
         """Тест создания записи истории опыта"""
-        repo = NewUserExpHistoryRepository(session=db_session)
+        repo = PgUserExpHistoryRepository(session=db_session)
 
         history_data = CreateUserExpHistory(
             user_id=test_user.id,
@@ -48,7 +52,7 @@ class TestUserExpHistoryRepository:
         self, db_session: AsyncSession, test_user, test_exp_action
     ):
         """Тест получения записи истории по ID"""
-        repo = NewUserExpHistoryRepository(session=db_session)
+        repo = PgUserExpHistoryRepository(session=db_session)
 
         # Создаем запись
         history_data = CreateUserExpHistory(
@@ -76,7 +80,7 @@ class TestUserExpHistoryRepository:
         self, db_session: AsyncSession, test_user, test_exp_action
     ):
         """Тест подсчета дневного лимита пользователя по действию"""
-        repo = NewUserExpHistoryRepository(session=db_session)
+        repo = PgUserExpHistoryRepository(session=db_session)
 
         # Создаем 3 записи за сегодня
         for _ in range(3):
@@ -105,7 +109,7 @@ class TestUserExpHistoryRepository:
         self, db_session: AsyncSession, test_user, test_exp_action
     ):
         """Тест подсчета дневного лимита когда записей нет"""
-        repo = NewUserExpHistoryRepository(session=db_session)
+        repo = PgUserExpHistoryRepository(session=db_session)
 
         count = await repo.get_user_daily_limit_by_action(
             user_id=test_user.id, action_id=test_exp_action.id
@@ -118,7 +122,7 @@ class TestUserExpHistoryRepository:
         self, db_session: AsyncSession, test_user, test_exp_actions
     ):
         """Тест что дневной лимит считается отдельно для разных действий"""
-        repo = NewUserExpHistoryRepository(session=db_session)
+        repo = PgUserExpHistoryRepository(session=db_session)
 
         # Создаем 2 записи для первого действия
         for _ in range(2):
@@ -166,7 +170,7 @@ class TestUserExpHistoryRepository:
         self, db_session: AsyncSession, test_user, test_exp_action
     ):
         """Тест проверки что пользователь еще не получал опыт"""
-        repo = NewUserExpHistoryRepository(session=db_session)
+        repo = PgUserExpHistoryRepository(session=db_session)
 
         is_granted = await repo.check_if_user_alredy_granted(
             user_id=test_user.id, action_id=test_exp_action.id
@@ -179,7 +183,7 @@ class TestUserExpHistoryRepository:
         self, db_session: AsyncSession, test_user, test_exp_action
     ):
         """Тест проверки что пользователь уже получал опыт"""
-        repo = NewUserExpHistoryRepository(session=db_session)
+        repo = PgUserExpHistoryRepository(session=db_session)
 
         # Создаем запись
         history_data = CreateUserExpHistory(
@@ -207,7 +211,7 @@ class TestUserExpHistoryRepository:
         self, db_session: AsyncSession, test_user, test_exp_action
     ):
         """Тест что отозванные записи не учитываются"""
-        repo = NewUserExpHistoryRepository(session=db_session)
+        repo = PgUserExpHistoryRepository(session=db_session)
 
         # Создаем отозванную запись
         history_data = CreateUserExpHistory(
@@ -235,7 +239,7 @@ class TestUserExpHistoryRepository:
         self, db_session: AsyncSession, test_exp_action
     ):
         """Тест что проверка работает независимо для разных пользователей"""
-        repo = NewUserExpHistoryRepository(session=db_session)
+        repo = PgUserExpHistoryRepository(session=db_session)
 
         # Создаем двух пользователей
         from modules.user.model import User
@@ -290,7 +294,7 @@ class TestUserExpHistoryRepository:
         self, db_session: AsyncSession, test_user, test_exp_action
     ):
         """Тест удаления записи истории опыта"""
-        repo = NewUserExpHistoryRepository(session=db_session)
+        repo = PgUserExpHistoryRepository(session=db_session)
 
         # Создаем запись
         history_data = CreateUserExpHistory(
@@ -317,10 +321,14 @@ class TestUserExpHistoryRepository:
 
     @pytest.mark.asyncio
     async def test_exp_history_with_multiplier(
-        self, db_session: AsyncSession, test_user, test_exp_action, test_subscription_plan
+        self,
+        db_session: AsyncSession,
+        test_user,
+        test_exp_action,
+        test_subscription_plan,
     ):
         """Тест записи истории с множителем от подписки"""
-        repo = NewUserExpHistoryRepository(session=db_session)
+        repo = PgUserExpHistoryRepository(session=db_session)
 
         history_data = CreateUserExpHistory(
             user_id=test_user.id,
@@ -347,7 +355,7 @@ class TestUserExpHistoryRepository:
         self, db_session: AsyncSession, test_user, test_exp_action
     ):
         """Тест записи истории с изменением уровня"""
-        repo = NewUserExpHistoryRepository(session=db_session)
+        repo = PgUserExpHistoryRepository(session=db_session)
 
         history_data = CreateUserExpHistory(
             user_id=test_user.id,
@@ -373,7 +381,7 @@ class TestUserExpHistoryRepository:
         self, db_session: AsyncSession, test_user, test_exp_action
     ):
         """Тест создания нескольких записей истории"""
-        repo = NewUserExpHistoryRepository(session=db_session)
+        repo = PgUserExpHistoryRepository(session=db_session)
 
         # Создаем несколько записей
         created_ids = []

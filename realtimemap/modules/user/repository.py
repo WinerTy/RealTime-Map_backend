@@ -1,27 +1,23 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Sequence, Optional
+from typing import TYPE_CHECKING, Sequence, Optional, List
 
 from sqlalchemy import select, and_, or_
 
-from core.common import BaseRepository
+from core.common.repository import UserRepository
+from database.adapter import PgAdapter
 from modules.gamefication.model import Level
 from modules.user.schemas import UserCreate, UserUpdate
 from modules.user_ban.model import UsersBan
 from .model import User
 
 if TYPE_CHECKING:
-    from sqlalchemy.ext.asyncio import AsyncSession
+    pass
 
 
-class UserRepository(BaseRepository[User, UserCreate, UserUpdate]):
-    def __init__(self, session: "AsyncSession"):
-        super().__init__(User, session)
-
-    async def update_user(self, user: User, update_data: UserUpdate) -> User:
-        return await self.update(user.id, update_data)
-
-    async def delete_user(self, user: User) -> User:
-        return await self.delete(user.id)
+class PgUserRepository(UserRepository):
+    def __init__(self, adapter: PgAdapter[User, UserCreate, UserUpdate]):
+        super().__init__(adapter)
+        self.adapter = adapter
 
     async def user_is_banned(self, user_id: int) -> bool:
         """
@@ -50,16 +46,14 @@ class UserRepository(BaseRepository[User, UserCreate, UserUpdate]):
             )
             .order_by(UsersBan.banned_at.desc())
         )
-        result = await self.session.execute(stmt)
-        active_ban = result.scalar_one_or_none()
+        active_ban = await self.adapter.execute_query_one(stmt)
 
         return active_ban is not None
 
-    async def level_up(self, user_id: int) -> int:
+    async def get_level_up(self, user_id: int) -> int:
         user = await self.get_by_id(user_id)
         level_stmt = select(Level).where(Level.is_active).order_by(Level.level.asc())
-        raw_levels = await self.session.execute(level_stmt)
-        levels: Sequence[Level] = raw_levels.scalars().all()
+        levels: List[Level] = await self.adapter.execute_query(level_stmt)
 
         if not levels:
             return user.level  # noqa
@@ -85,12 +79,6 @@ class UserRepository(BaseRepository[User, UserCreate, UserUpdate]):
         return new_level
 
     async def get_users_for_leaderboard(self) -> Optional[Sequence[User]]:
-        stmt = (
-            select(self.model)
-            .where(self.model.is_active)
-            .order_by(self.model.level.desc())
-            .limit(10)
-        )
-        raw_users = await self.session.execute(stmt)
-        users = raw_users.scalars().all()
+        stmt = select(User).where(User.is_active).order_by(User.level.desc()).limit(10)
+        users = await self.adapter.execute_query(stmt)
         return users

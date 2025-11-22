@@ -24,8 +24,8 @@ class BaseRepository(IBaseRepository[Model, CreateSchema, UpdateSchema]):
     async def create(self, data: CreateSchema, **kwargs: Any) -> Model:
         return await self.adapter.create(data, **kwargs)
 
-    async def update(self, data: UpdateSchema, **kwargs: Any) -> Model:
-        return await self.adapter.update(data, **kwargs)
+    async def update(self, record_id: int, data: UpdateSchema, **kwargs: Any) -> Model:
+        return await self.adapter.update(record_id, data)
 
     async def delete(self, record_id: int, **kwargs: Any) -> Model:
         return await self.adapter.delete(record_id)

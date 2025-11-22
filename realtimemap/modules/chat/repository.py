@@ -3,16 +3,18 @@ from typing import List, Tuple, Union
 from sqlalchemy import select, func, Select, and_
 from sqlalchemy.orm import aliased
 
-from core.common import BaseRepository
+from core.common.repository import ChatRepository
+from database.adapter import PgAdapter
 from modules.message.model import Message
 from modules.user.model import User
 from .model import Chat
 from .schemas import CreateChat, UpdateChat
 
 
-class ChatRepository(BaseRepository[Chat, CreateChat, UpdateChat]):
-    def __init__(self, session: "AsyncSession"):
-        super().__init__(session=session, model=Chat)
+class PgChatRepository(ChatRepository):
+    def __init__(self, adapter: PgAdapter[Chat, CreateChat, UpdateChat]):
+        super().__init__(adapter)
+        self.adapter = adapter
 
     async def get_user_chats_with_details(
         self, current_user_id: int
@@ -39,24 +41,20 @@ class ChatRepository(BaseRepository[Chat, CreateChat, UpdateChat]):
         return result.unique().all()
 
     async def get_user_chats_ids(self, user_id: int) -> List[int]:
-        stmt = (
-            select(self.model.id)
-            .join(self.model.participants)
-            .where(User.id == user_id)
-        )
+        stmt = select(Chat.id).join(Chat.participants).where(User.id == user_id)
         result = await self.session.execute(stmt)
         return result.scalars().all()
 
     async def check_user_in_chat(
         self, chat_id: int, user_id: int, get_stmt: bool = False
     ) -> Union[bool, "Select"]:
-        stmt = select(self.model.id).where(
-            self.model.id == chat_id,
-            self.model.participants.any(User.id == user_id),
+        stmt = select(Chat.id).where(
+            Chat.id == chat_id,
+            Chat.participants.any(User.id == user_id),
         )
         if get_stmt:
             return stmt
-        result = await self.session.scalar(stmt)
+        result = await self.adapter.execute_scalar(stmt)
         return result is not None
 
     async def find_or_create_private_chat(
@@ -66,9 +64,9 @@ class ChatRepository(BaseRepository[Chat, CreateChat, UpdateChat]):
             user1_id, user2_id = user2_id, user1_id
 
         stmt = (
-            select(self.model)
-            .join(self.model.participants)
-            .group_by(self.model.id)
+            select(Chat)
+            .join(Chat.participants)
+            .group_by(Chat.id)
             .having(
                 and_(
                     func.count(User.id) == 2,
@@ -78,15 +76,15 @@ class ChatRepository(BaseRepository[Chat, CreateChat, UpdateChat]):
             )
         )
 
-        result = await self.session.execute(stmt)
-        existing_chat = result.scalar_one_or_none()
+        existing_chat = await self.adapter.execute_query_one(stmt)
 
         if existing_chat:
             return False, existing_chat
+        user1_stmt = select(User).where(User.id == user1_id)
+        user2_stmt = select(User).where(User.id == user2_id)
+        user1 = await self.adapter.execute_query_one(user1_stmt)
+        user2 = await self.adapter.execute_query_one(user2_stmt)
 
-        user1 = await self.session.get(User, user1_id)
-        user2 = await self.session.get(User, user2_id)
-        print(user1, user2)
         if not user1 or not user2:
             raise ValueError("user1_id/user2_id is invalid")
 

@@ -4,7 +4,7 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from modules.subscription.model import SubscriptionPlan, SubPlanType
-from modules.subscription.repository import SubscriptionPlanRepository
+from modules.subscription.repository import PgSubscriptionPlanRepository
 from modules.subscription.schemas import CreateSubscriptionPlan, UpdateSubscriptionPlan
 from .fixtures import test_subscription_plan, test_subscription_plans
 
@@ -15,7 +15,7 @@ class TestSubscriptionPlanRepository:
     @pytest.mark.asyncio
     async def test_create_subscription_plan(self, db_session: AsyncSession):
         """Тест создания плана подписки"""
-        repo = SubscriptionPlanRepository(session=db_session)
+        repo = PgSubscriptionPlanRepository(session=db_session)
 
         plan_data = CreateSubscriptionPlan(
             name="Test Plan",
@@ -37,7 +37,7 @@ class TestSubscriptionPlanRepository:
     @pytest.mark.asyncio
     async def test_get_by_id(self, db_session: AsyncSession, test_subscription_plan):
         """Тест получения плана подписки по ID"""
-        repo = SubscriptionPlanRepository(session=db_session)
+        repo = PgSubscriptionPlanRepository(session=db_session)
 
         plan = await repo.get_by_id(test_subscription_plan.id)
 
@@ -48,7 +48,7 @@ class TestSubscriptionPlanRepository:
     @pytest.mark.asyncio
     async def test_get_by_id_not_found(self, db_session: AsyncSession):
         """Тест получения несуществующего плана подписки"""
-        repo = SubscriptionPlanRepository(session=db_session)
+        repo = PgSubscriptionPlanRepository(session=db_session)
 
         plan = await repo.get_by_id(99999)
 
@@ -59,7 +59,7 @@ class TestSubscriptionPlanRepository:
         self, db_session: AsyncSession, test_subscription_plans
     ):
         """Тест получения планов подписки (активные и неактивные)"""
-        repo = SubscriptionPlanRepository(session=db_session)
+        repo = PgSubscriptionPlanRepository(session=db_session)
 
         # Получаем только активные
         active_plans = await repo.get_subscription_plans()
@@ -70,7 +70,7 @@ class TestSubscriptionPlanRepository:
         self, db_session: AsyncSession, test_subscription_plans
     ):
         """Тест получения только активных планов подписки"""
-        repo = SubscriptionPlanRepository(session=db_session)
+        repo = PgSubscriptionPlanRepository(session=db_session)
 
         active_plans = await repo.get_subscription_plans()
 
@@ -83,7 +83,7 @@ class TestSubscriptionPlanRepository:
         self, db_session: AsyncSession, test_subscription_plan
     ):
         """Тест обновления плана подписки"""
-        repo = SubscriptionPlanRepository(session=db_session)
+        repo = PgSubscriptionPlanRepository(session=db_session)
 
         update_data = UpdateSubscriptionPlan(
             name="Updated Plan",
@@ -102,7 +102,7 @@ class TestSubscriptionPlanRepository:
         self, db_session: AsyncSession, test_subscription_plan
     ):
         """Тест удаления плана подписки"""
-        repo = SubscriptionPlanRepository(session=db_session)
+        repo = PgSubscriptionPlanRepository(session=db_session)
 
         result = await repo.delete(test_subscription_plan.id)
 
@@ -115,7 +115,7 @@ class TestSubscriptionPlanRepository:
     @pytest.mark.asyncio
     async def test_delete_non_existent_plan(self, db_session: AsyncSession):
         """Тест удаления несуществующего плана"""
-        repo = SubscriptionPlanRepository(session=db_session)
+        repo = PgSubscriptionPlanRepository(session=db_session)
 
         result = await repo.delete(99999)
 
@@ -124,7 +124,7 @@ class TestSubscriptionPlanRepository:
     @pytest.mark.asyncio
     async def test_get_subscription_plans_empty(self, db_session: AsyncSession):
         """Тест получения активных планов когда их нет"""
-        repo = SubscriptionPlanRepository(session=db_session)
+        repo = PgSubscriptionPlanRepository(session=db_session)
 
         plans = await repo.get_subscription_plans()
 
@@ -133,7 +133,7 @@ class TestSubscriptionPlanRepository:
     @pytest.mark.asyncio
     async def test_create_plan_with_different_types(self, db_session: AsyncSession):
         """Тест создания планов с разными типами"""
-        repo = SubscriptionPlanRepository(session=db_session)
+        repo = PgSubscriptionPlanRepository(session=db_session)
 
         # Premium
         premium_plan = await repo.create(

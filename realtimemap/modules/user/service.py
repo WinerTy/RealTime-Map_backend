@@ -2,7 +2,6 @@ import asyncio
 from typing import TYPE_CHECKING, Optional, List
 
 from errors.http2 import AuthenticationError
-from interfaces import IUserRepository, IUsersBanRepository, IUserSubscriptionRepository
 from modules.user_ban.schemas import ReadUsersBan
 from .schemas import (
     UserRead,
@@ -16,15 +15,20 @@ from ..gamefication.schemas.level.crud import LevelRead
 if TYPE_CHECKING:
     from modules import User
     from fastapi import Request
-    from modules.gamefication.repository import LevelRepository
+    from core.common.repository import (
+        UserRepository,
+        LevelRepository,
+        UsersBanRepository,
+        UserSubscriptionRepository,
+    )
 
 
 class UserService:
     def __init__(
         self,
-        user_repo: "IUserRepository",
-        user_ban_repo: "IUsersBanRepository",
-        user_subs_repo: "IUserSubscriptionRepository",
+        user_repo: "UserRepository",
+        user_ban_repo: "UsersBanRepository",
+        user_subs_repo: "UserSubscriptionRepository",
         level_repo: "LevelRepository",
     ):
         self.user_repo = user_repo

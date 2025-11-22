@@ -1,7 +1,7 @@
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from modules.gamefication.repository import NewLevelRepository
+from modules.gamefication.repository import PgLevelRepository
 from .fixtures import test_level, test_levels
 
 
@@ -11,7 +11,7 @@ class TestLevelRepository:
     @pytest.mark.asyncio
     async def test_get_by_id(self, db_session: AsyncSession, test_level):
         """Тест получения уровня по ID"""
-        repo = NewLevelRepository(session=db_session)
+        repo = PgLevelRepository(session=db_session)
 
         level = await repo.get_by_id(test_level.id)
 
@@ -23,7 +23,7 @@ class TestLevelRepository:
     @pytest.mark.asyncio
     async def test_get_by_id_not_found(self, db_session: AsyncSession):
         """Тест получения несуществующего уровня"""
-        repo = NewLevelRepository(session=db_session)
+        repo = PgLevelRepository(session=db_session)
 
         level = await repo.get_by_id(99999)
 
@@ -32,7 +32,7 @@ class TestLevelRepository:
     @pytest.mark.asyncio
     async def test_get_levels_count(self, db_session: AsyncSession, test_levels):
         """Тест проверки количества созданных уровней"""
-        repo = NewLevelRepository(session=db_session)
+        repo = PgLevelRepository(session=db_session)
 
         # Проверяем что все уровни созданы
         max_level = await repo.get_max_level()
@@ -42,7 +42,7 @@ class TestLevelRepository:
     @pytest.mark.asyncio
     async def test_get_next_level(self, db_session: AsyncSession, test_levels):
         """Тест получения следующего уровня"""
-        repo = NewLevelRepository(session=db_session)
+        repo = PgLevelRepository(session=db_session)
 
         next_level = await repo.get_next_level(current_level=1)
 
@@ -55,7 +55,7 @@ class TestLevelRepository:
         self, db_session: AsyncSession, test_levels
     ):
         """Тест получения следующего уровня из середины"""
-        repo = NewLevelRepository(session=db_session)
+        repo = PgLevelRepository(session=db_session)
 
         # Получаем уровень 4 (следующий после 3)
         next_level = await repo.get_next_level(current_level=3)
@@ -69,7 +69,7 @@ class TestLevelRepository:
         self, db_session: AsyncSession, test_levels
     ):
         """Тест что неактивный уровень не возвращается"""
-        repo = NewLevelRepository(session=db_session)
+        repo = PgLevelRepository(session=db_session)
 
         # Уровень 6 неактивен поэтому результат None
         next_level = await repo.get_next_level(current_level=5)
@@ -81,7 +81,7 @@ class TestLevelRepository:
         self, db_session: AsyncSession, test_levels
     ):
         """Тест получения следующего уровня когда достигнут максимум"""
-        repo = NewLevelRepository(session=db_session)
+        repo = PgLevelRepository(session=db_session)
 
         # Вариант для того что уровень был переведен в инактив а следуйщего нету
         next_level = await repo.get_next_level(current_level=6)
@@ -93,7 +93,7 @@ class TestLevelRepository:
         self, db_session: AsyncSession, test_levels
     ):
         """Тест получения следующего уровня для несуществующего текущего уровня"""
-        repo = NewLevelRepository(session=db_session)
+        repo = PgLevelRepository(session=db_session)
 
         next_level = await repo.get_next_level(current_level=99)
 
@@ -102,7 +102,7 @@ class TestLevelRepository:
     @pytest.mark.asyncio
     async def test_get_max_level(self, db_session: AsyncSession, test_levels):
         """Тест получения максимального уровня"""
-        repo = NewLevelRepository(session=db_session)
+        repo = PgLevelRepository(session=db_session)
 
         max_level = await repo.get_max_level()
 
@@ -113,7 +113,7 @@ class TestLevelRepository:
     @pytest.mark.asyncio
     async def test_get_max_level_empty(self, db_session: AsyncSession, test_levels):
         """Тест получения максимального уровня когда уровней нет"""
-        repo = NewLevelRepository(session=db_session)
+        repo = PgLevelRepository(session=db_session)
 
         max_level = await repo.get_max_level()
 
@@ -122,7 +122,7 @@ class TestLevelRepository:
     @pytest.mark.asyncio
     async def test_get_max_level_single(self, db_session: AsyncSession, test_level):
         """Тест получения максимального уровня когда есть только один уровень"""
-        repo = NewLevelRepository(session=db_session)
+        repo = PgLevelRepository(session=db_session)
 
         max_level = await repo.get_max_level()
 
@@ -133,7 +133,7 @@ class TestLevelRepository:
     @pytest.mark.asyncio
     async def test_delete_level(self, db_session: AsyncSession, test_level):
         """Тест удаления уровня"""
-        repo = NewLevelRepository(session=db_session)
+        repo = PgLevelRepository(session=db_session)
 
         result = await repo.delete(test_level.id)
 
@@ -148,7 +148,7 @@ class TestLevelRepository:
         self, db_session: AsyncSession, test_levels
     ):
         """Тест что уровни правильно упорядочены по возрастанию"""
-        repo = NewLevelRepository(session=db_session)
+        repo = PgLevelRepository(session=db_session)
 
         # Проверяем последовательно что уровни идут по возрастанию
         level_1 = await repo.get_by_id(test_levels[0].id)
@@ -160,7 +160,7 @@ class TestLevelRepository:
         self, db_session: AsyncSession, test_levels
     ):
         """Тест последовательного получения следующих уровней"""
-        repo = NewLevelRepository(session=db_session)
+        repo = PgLevelRepository(session=db_session)
 
         current_level = 1
         expected_levels = [2, 3, 4, 5]
