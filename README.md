@@ -20,80 +20,129 @@
 
 ## 1. About The Project (Для чего сделан)
 
-*[This is where you should write a detailed description of your project. Explain the problem it solves, its purpose, the target audience, and your motivation for creating it. For example: "The RealTime-map API serves as the central hub for a live location tracking system..."]*
+**RealTime-Map** — это backend для геосоциальной платформы, которая позволяет людям создавать временные метки на карте и взаимодействовать с происходящим вокруг них в режиме реального времени.
+
+### Зачем это нужно?
+
+Представьте, что вы можете оставить "цифровой след" в любом месте — отметить интересное событие, встречу, находку или предупреждение, которое будет видно другим людям поблизости. Это может быть:
+
+- Спонтанное мероприятие или встреча
+- Интересное место, о котором стоит узнать
+- Важное уведомление для района
+- Точка для общения с людьми рядом
+
+Каждая метка существует ограниченное время (от 12 часов до недели), что делает платформу живой и актуальной — здесь нет устаревшей информации.
+
+### Как это работает?
+
+**Для пользователей:**
+1. Откройте карту и посмотрите, что происходит вокруг вас прямо сейчас
+2. Создайте метку в нужном месте с фото, категорией и длительностью
+3. Общайтесь через комментарии и реакции
+4. Зарабатывайте опыт за активность и повышайте уровень
+5. Получайте уведомления о новых метках рядом с вами в реальном времени
+
+**Под капотом:**
+- Метки находятся мгновенно благодаря оптимизированным геопространственным запросам
+- Уведомления приходят в реальном времени через постоянное соединение с сервером
+- Система опыта и уровней мотивирует пользователей быть активными
+- Все работает быстро даже при большом количестве пользователей
+
+### Философия разработки
+
+Проект разрабатывается с фокусом на:
+
+- **Производительность**: Полностью асинхронная архитектура для обработки тысяч одновременных подключений
+- **Масштабируемость**: Модульная структура, кеширование, фоновые задачи
+- **Качество кода**: Строгая типизация, чистая архитектура, адаптер-паттерн для гибкости
+- **Современность**: Использование последних версий Python, FastAPI, SQLAlchemy 2.0, Pydantic v2
+- **Геопространственная эффективность**: Оптимизированные запросы через PostGIS и геохеширование
+
+### Текущий статус
+
+Проект находится в активной разработке. Недавно была проведена крупная рефакторинг-инициатива по переходу на Adapter Pattern для улучшения гибкости работы с данными. Основные модули реализованы и функционируют:
+
+- ✅ Создание и управление метками с геопозиционированием
+- ✅ Система аутентификации и профилей пользователей
+- ✅ Real-time уведомления через WebSocket
+- ✅ Комментарии и реакции
+- ✅ Gamification (опыт, уровни, награды за действия)
+- ✅ Подписки и монетизация через YooKassa
+- ✅ Модерация и система банов
+- ✅ Админ-панель для управления контентом
+
+Платформа готова к тестированию и дальнейшему развитию функционала.
 
 ---
 
 ## 2. Tech Stack (Стэк)
 
-This project is built with a modern, high-performance Python stack, ensuring scalability and reliability.
+Проект построен на современном высокопроизводительном Python-стеке, обеспечивающем масштабируемость и надежность.
 
-* **Language:** [Python 3.13](https://www.python.org/)
-* **API Framework:** [FastAPI](https://fastapi.tiangolo.com/) for high-performance, asynchronous API development.
-* **Database:** [PostgreSQL](https://www.postgresql.org/) for robust data storage.
-* **Geospatial Extension:** [PostGIS](https://postgis.net/) for efficient location-based queries.
-* **In-Memory Store:** [Redis](https://redis.io/) for caching and message brokering.
-* **Background Tasks:** [Celery](https://docs.celeryq.dev/) for handling asynchronous, long-running tasks.
-* **Real-time Communication:** [Socket.IO](https://socket.io/) for broadcasting live updates to clients.
-* **Data Validation:** [Pydantic](https://docs.pydantic.dev/) is used extensively for data validation, serialization,
-  and settings management.
-* **Package Management:** [uv](https://github.com/astral-sh/uv) for extremely fast dependency installation and
-  management.
+* **Язык:** [Python 3.13](https://www.python.org/)
+* **API Framework:** [FastAPI](https://fastapi.tiangolo.com/) — высокопроизводительная асинхронная разработка
+* **База данных:** [PostgreSQL](https://www.postgresql.org/) с расширением [PostGIS](https://postgis.net/) для геопространственных запросов
+* **Кеширование:** [Redis](https://redis.io/) для кеша и брокера сообщений
+* **Фоновые задачи:** [Celery](https://docs.celeryq.dev/) для асинхронной обработки длительных операций
+* **Real-time:** [Socket.IO](https://socket.io/) для мгновенной отправки обновлений клиентам
+* **Валидация:** [Pydantic](https://docs.pydantic.dev/) для валидации данных, сериализации и управления настройками
+* **Менеджер пакетов:** [uv](https://github.com/astral-sh/uv) для быстрой установки зависимостей
 
 ---
 
-## 3. Features (Особенности)
+## 3. Ключевые возможности
 
-* 🚀 **Asynchronous from the Ground Up:** Built on FastAPI (which uses Starlette and Uvicorn), the API is fully
-  asynchronous, making it highly efficient and capable of handling many concurrent connections.
-* ✅ **Modern & Type-Safe Code:** The entire codebase is strictly type-hinted using Python's `typing` module and enforced
-  by **Pydantic**. This leads to robust, self-documenting code with fewer bugs and excellent editor support.
-* ⚡ **Fast Development Cycle:** Utilizes `uv`, a next-generation Python package manager, for lightning-fast dependency
-  installation within the Docker build process.
-* 🌍 **Geospatial Capabilities:** Leverages the power of PostGIS to perform complex and efficient geographical queries.
-* ⚙️ **Background Task Processing:** Offloads heavy or long-running operations to Celery workers, ensuring the API
-  remains responsive.
-* 📡 **Real-time Broadcasting:** Uses Socket.IO to push data (like location updates) to connected clients instantly.
-* 📚 **Automatic Interactive Docs:** FastAPI automatically generates interactive API documentation (via Swagger UI and
-  ReDoc), which is always up-to-date with the code.
+**Функциональные возможности:**
+* Геолокационные метки с фотографиями и категориями
+* Автоматическое удаление устаревших меток (12-168 часов жизни)
+* Система комментариев с вложенными ответами и реакциями
+* Встроенный чат для общения между пользователями
+* Gamification: опыт, уровни, награды за активность
+* Подписки с расширенными возможностями
+* Модерация контента и система банов
+* Панель администратора для управления платформой
+
+**Технические особенности:**
+* Полностью асинхронная архитектура для высокой производительности
+* Строгая типизация всего кодабаза для надежности и удобства разработки
+* Эффективные геопространственные запросы через PostGIS
+* Фоновая обработка тяжелых операций для отзывчивости API
+* Real-time уведомления через WebSocket
+* Автоматическая интерактивная документация API (Swagger UI и ReDoc)
 
 ---
 
-## 4. Getting Started with Docker (Как запустить)
+## 4. Быстрый старт с Docker
 
-The easiest way to get the project running locally is by using Docker and Docker Compose. This will set up the API
-server, database, Redis instance, and Celery worker.
+Самый простой способ запустить проект локально — использовать Docker и Docker Compose. Это автоматически настроит API-сервер, базу данных, Redis и Celery worker.
 
-### Prerequisites
+### Требования
 
 * [Docker](https://www.docker.com/get-started)
-* [Docker Compose](https://docs.docker.com/compose/install/) (usually included with Docker Desktop)
+* [Docker Compose](https://docs.docker.com/compose/install/) (обычно включен в Docker Desktop)
 * [Git](https://git-scm.com/)
 
-### Setup and Configuration
+### Настройка и конфигурация
 
-1. **Clone the repository**
+1. **Клонируйте репозиторий**
    ```sh
    git clone https://github.com/your_username/RealTime-map.git
    cd RealTime-map
    ```
 
-2. **Create your environment configuration file**
-   In the root directory of the project, copy the example environment file. This file contains all the necessary
-   configuration variables for the application services.
+2. **Создайте файл конфигурации окружения**
+   В корневой директории проекта скопируйте пример файла окружения. Этот файл содержит все необходимые переменные конфигурации для сервисов приложения.
    ```sh
    cp .env.example .env
    ```
 
-3. **Configure your environment**
-   Open the newly created `.env` file with a text editor. You will need to adjust the hostnames for the database and
-   Redis to match the service names defined in your `docker-compose.yml` file.
+3. **Настройте окружение**
+   Откройте созданный файл `.env` в текстовом редакторе. Вам нужно настроить имена хостов для базы данных и Redis в соответствии с именами сервисов в вашем файле `docker-compose.yml`.
 
-   > **Important:** When running inside Docker Compose, services communicate using their service names, not `localhost`.
-   For example, if your PostgreSQL service is named `db` in `docker-compose.yml`, the host in the connection URL should
-   be `db`.
+   > **Важно:** При запуске в Docker Compose сервисы общаются используя имена сервисов, а не `localhost`.
+   Например, если ваш сервис PostgreSQL называется `db` в `docker-compose.yml`, то хост в URL подключения должен быть `db`.
 
-   Here is an example configuration assuming your services are named `db` and `redis`:
+   Пример конфигурации при условии, что сервисы называются `db` и `redis`:
 
    ```env
    # .env
@@ -129,23 +178,20 @@ server, database, Redis instance, and Celery worker.
    APP_CONFIG__PAYMENT__SHOP_ID=shop_id
    ```
 
-### Running the Application
+### Запуск приложения
 
-Once your `.env` file is configured, you can start all the services with a single command from the project's root
-directory:
+После настройки файла `.env` вы можете запустить все сервисы одной командой из корневой директории проекта:
 
 ```sh
 docker-compose up -d --build
 ```
 
-* --build: Rebuilds the images if the Dockerfile or source code has changed.
+* `--build`: Пересобирает образы, если Dockerfile или исходный код изменились
+* `-d`: Запускает контейнеры в фоновом режиме
 
-* -d: Runs the containers in detached mode (in the background).
+API будет доступен по адресу http://localhost:8001.
 
-The API will be running and accessible at http://localhost:8001.
+Для просмотра автоматически сгенерированной интерактивной документации перейдите по ссылкам:
 
-To view the automatically generated interactive documentation, navigate to:
-
-Swagger UI: http://localhost:8001/docs
-
-ReDoc: http://localhost:8001/redoc
+* **Swagger UI:** http://localhost:8001/docs
+* **ReDoc:** http://localhost:8001/redoc
