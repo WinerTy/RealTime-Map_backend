@@ -1,6 +1,6 @@
 import pytest
-from sqlalchemy.ext.asyncio import AsyncSession
 
+from database.adapter import PgAdapter
 from modules.gamefication.repository import PgExpActionRepository
 from .fixtures import test_exp_action, test_exp_actions
 
@@ -9,9 +9,9 @@ class TestExpActionRepository:
     """Тесты для NewExpActionRepository (ActionRepository)"""
 
     @pytest.mark.asyncio
-    async def test_get_by_id(self, db_session: AsyncSession, test_exp_action):
+    async def test_get_by_id(self, exp_action_adapter: PgAdapter, test_exp_action):
         """Тест получения действия по ID"""
-        repo = PgExpActionRepository(session=db_session)
+        repo = PgExpActionRepository(adapter=exp_action_adapter)
 
         action = await repo.get_by_id(test_exp_action.id)
 
@@ -21,9 +21,9 @@ class TestExpActionRepository:
         assert action.base_exp == test_exp_action.base_exp
 
     @pytest.mark.asyncio
-    async def test_get_by_id_not_found(self, db_session: AsyncSession):
+    async def test_get_by_id_not_found(self, exp_action_adapter: PgAdapter):
         """Тест получения несуществующего действия"""
-        repo = PgExpActionRepository(session=db_session)
+        repo = PgExpActionRepository(adapter=exp_action_adapter)
 
         action = await repo.get_by_id(99999)
 
@@ -31,10 +31,10 @@ class TestExpActionRepository:
 
     @pytest.mark.asyncio
     async def test_get_multiple_actions(
-        self, db_session: AsyncSession, test_exp_actions
+        self, exp_action_adapter: PgAdapter, test_exp_actions
     ):
         """Тест получения нескольких действий"""
-        repo = PgExpActionRepository(session=db_session)
+        repo = PgExpActionRepository(adapter=exp_action_adapter)
 
         # Получаем действия по типу и проверяем что они есть
         action1 = await repo.get_action_by_type("create_mark")
@@ -46,9 +46,11 @@ class TestExpActionRepository:
         assert action3 is not None
 
     @pytest.mark.asyncio
-    async def test_get_action_by_type(self, db_session: AsyncSession, test_exp_actions):
+    async def test_get_action_by_type(
+        self, exp_action_adapter: PgAdapter, test_exp_actions
+    ):
         """Тест получения действия по типу"""
-        repo = PgExpActionRepository(session=db_session)
+        repo = PgExpActionRepository(adapter=exp_action_adapter)
 
         action = await repo.get_action_by_type("create_mark")
 
@@ -59,10 +61,10 @@ class TestExpActionRepository:
 
     @pytest.mark.asyncio
     async def test_get_action_by_type_another(
-        self, db_session: AsyncSession, test_exp_actions
+        self, exp_action_adapter: PgAdapter, test_exp_actions
     ):
         """Тест получения другого действия по типу"""
-        repo = PgExpActionRepository(session=db_session)
+        repo = PgExpActionRepository(adapter=exp_action_adapter)
 
         action = await repo.get_action_by_type("create_comment")
 
@@ -73,10 +75,10 @@ class TestExpActionRepository:
 
     @pytest.mark.asyncio
     async def test_get_action_by_type_not_found(
-        self, db_session: AsyncSession, test_exp_actions
+        self, exp_action_adapter: PgAdapter, test_exp_actions
     ):
         """Тест получения несуществующего действия по типу"""
-        repo = PgExpActionRepository(session=db_session)
+        repo = PgExpActionRepository(adapter=exp_action_adapter)
 
         action = await repo.get_action_by_type("non_existent_action")
 
@@ -84,10 +86,10 @@ class TestExpActionRepository:
 
     @pytest.mark.asyncio
     async def test_get_action_by_type_inactive(
-        self, db_session: AsyncSession, test_exp_actions
+        self, exp_action_adapter: PgAdapter, test_exp_actions
     ):
         """Тест что неактивное действие не возвращается"""
-        repo = PgExpActionRepository(session=db_session)
+        repo = PgExpActionRepository(adapter=exp_action_adapter)
 
         # inactive_action имеет is_active=False
         action = await repo.get_action_by_type("inactive_action")
@@ -96,10 +98,10 @@ class TestExpActionRepository:
 
     @pytest.mark.asyncio
     async def test_get_action_by_type_only_active(
-        self, db_session: AsyncSession, test_exp_actions
+        self, exp_action_adapter: PgAdapter, test_exp_actions
     ):
         """Тест что возвращаются только активные действия"""
-        repo = PgExpActionRepository(session=db_session)
+        repo = PgExpActionRepository(adapter=exp_action_adapter)
 
         # Проверяем активное действие
         active_action = await repo.get_action_by_type("verify_email")
@@ -111,9 +113,9 @@ class TestExpActionRepository:
         assert inactive_action is None
 
     @pytest.mark.asyncio
-    async def test_delete_action(self, db_session: AsyncSession, test_exp_action):
+    async def test_delete_action(self, exp_action_adapter: PgAdapter, test_exp_action):
         """Тест удаления действия"""
-        repo = PgExpActionRepository(session=db_session)
+        repo = PgExpActionRepository(adapter=exp_action_adapter)
 
         result = await repo.delete(test_exp_action.id)
 
@@ -124,9 +126,11 @@ class TestExpActionRepository:
         assert deleted_action is None
 
     @pytest.mark.asyncio
-    async def test_action_properties(self, db_session: AsyncSession, test_exp_actions):
+    async def test_action_properties(
+        self, exp_action_adapter: PgAdapter, test_exp_actions
+    ):
         """Тест проверки различных свойств действий"""
-        repo = PgExpActionRepository(session=db_session)
+        repo = PgExpActionRepository(adapter=exp_action_adapter)
 
         # create_mark - повторяемое
         create_mark = await repo.get_action_by_type("create_mark")
@@ -141,10 +145,10 @@ class TestExpActionRepository:
 
     @pytest.mark.asyncio
     async def test_action_with_description(
-        self, db_session: AsyncSession, test_exp_actions
+        self, exp_action_adapter: PgAdapter, test_exp_actions
     ):
         """Тест действий с описанием"""
-        repo = PgExpActionRepository(session=db_session)
+        repo = PgExpActionRepository(adapter=exp_action_adapter)
 
         action = await repo.get_action_by_type("create_mark")
 
@@ -153,10 +157,10 @@ class TestExpActionRepository:
 
     @pytest.mark.asyncio
     async def test_get_action_by_type_case_sensitive(
-        self, db_session: AsyncSession, test_exp_actions
+        self, exp_action_adapter: PgAdapter, test_exp_actions
     ):
         """Тест что поиск по типу чувствителен к регистру"""
-        repo = PgExpActionRepository(session=db_session)
+        repo = PgExpActionRepository(adapter=exp_action_adapter)
 
         # Правильный регистр
         action_lower = await repo.get_action_by_type("create_mark")
@@ -168,10 +172,10 @@ class TestExpActionRepository:
 
     @pytest.mark.asyncio
     async def test_multiple_actions_different_exp(
-        self, db_session: AsyncSession, test_exp_actions
+        self, exp_action_adapter: PgAdapter, test_exp_actions
     ):
         """Тест что разные действия имеют разный опыт"""
-        repo = PgExpActionRepository(session=db_session)
+        repo = PgExpActionRepository(adapter=exp_action_adapter)
 
         create_mark = await repo.get_action_by_type("create_mark")
         create_comment = await repo.get_action_by_type("create_comment")

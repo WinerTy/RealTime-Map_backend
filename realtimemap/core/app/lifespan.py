@@ -10,6 +10,8 @@ from yookassa import Configuration
 from core.config import conf
 from database.helper import db_helper
 from integrations.payment.yookassa import YookassaClient
+from modules.events.bus import EventType, event_bus
+from modules.events.gamefication_handler import GameFicationEventHandler
 from utils.cache import OrJsonEncoder, custom_key_builder
 from .templating import TemplateManager
 
@@ -24,12 +26,17 @@ async def lifespan(app: FastAPI):
         RedisBackend(redis),
         prefix=conf.redis.prefix,
         coder=OrJsonEncoder,
-        key_builder=custom_key_builder,
+        key_builder=custom_key_builder,  # noqa
     )
     Configuration.secret_key = conf.payment.secret_key
     Configuration.account_id = conf.payment.shop_id
     yookassa_client = YookassaClient()
     app.state.yookassa_client = yookassa_client
+    gamefication_handler = GameFicationEventHandler()
+    for event_type in [
+        EventType.MARK_CREATE,
+    ]:
+        event_bus.subscribe(event_type, gamefication_handler.handle_exp_event)
     yield
     await FastAPILimiter.close()
     await db_helper.dispose()

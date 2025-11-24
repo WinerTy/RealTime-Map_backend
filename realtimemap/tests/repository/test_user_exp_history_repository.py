@@ -1,8 +1,8 @@
 from decimal import Decimal
 
 import pytest
-from sqlalchemy.ext.asyncio import AsyncSession
 
+from database.adapter import PgAdapter
 from modules.gamefication.model import UserExpHistory
 from modules.gamefication.repository import PgUserExpHistoryRepository
 from modules.gamefication.schemas import CreateUserExpHistory
@@ -19,10 +19,10 @@ class TestUserExpHistoryRepository:
 
     @pytest.mark.asyncio
     async def test_create_exp_history(
-        self, db_session: AsyncSession, test_user, test_exp_action
+        self, user_exp_history_adapter: PgAdapter, test_user, test_exp_action
     ):
         """Тест создания записи истории опыта"""
-        repo = PgUserExpHistoryRepository(session=db_session)
+        repo = PgUserExpHistoryRepository(adapter=user_exp_history_adapter)
 
         history_data = CreateUserExpHistory(
             user_id=test_user.id,
@@ -49,10 +49,10 @@ class TestUserExpHistoryRepository:
 
     @pytest.mark.asyncio
     async def test_get_by_id(
-        self, db_session: AsyncSession, test_user, test_exp_action
+        self, user_exp_history_adapter: PgAdapter, test_user, test_exp_action
     ):
         """Тест получения записи истории по ID"""
-        repo = PgUserExpHistoryRepository(session=db_session)
+        repo = PgUserExpHistoryRepository(adapter=user_exp_history_adapter)
 
         # Создаем запись
         history_data = CreateUserExpHistory(
@@ -77,10 +77,10 @@ class TestUserExpHistoryRepository:
 
     @pytest.mark.asyncio
     async def test_get_user_daily_limit_by_action(
-        self, db_session: AsyncSession, test_user, test_exp_action
+        self, user_exp_history_adapter: PgAdapter, test_user, test_exp_action
     ):
         """Тест подсчета дневного лимита пользователя по действию"""
-        repo = PgUserExpHistoryRepository(session=db_session)
+        repo = PgUserExpHistoryRepository(adapter=user_exp_history_adapter)
 
         # Создаем 3 записи за сегодня
         for _ in range(3):
@@ -106,10 +106,10 @@ class TestUserExpHistoryRepository:
 
     @pytest.mark.asyncio
     async def test_get_user_daily_limit_by_action_zero(
-        self, db_session: AsyncSession, test_user, test_exp_action
+        self, user_exp_history_adapter: PgAdapter, test_user, test_exp_action
     ):
         """Тест подсчета дневного лимита когда записей нет"""
-        repo = PgUserExpHistoryRepository(session=db_session)
+        repo = PgUserExpHistoryRepository(adapter=user_exp_history_adapter)
 
         count = await repo.get_user_daily_limit_by_action(
             user_id=test_user.id, action_id=test_exp_action.id
@@ -119,10 +119,10 @@ class TestUserExpHistoryRepository:
 
     @pytest.mark.asyncio
     async def test_get_user_daily_limit_different_actions(
-        self, db_session: AsyncSession, test_user, test_exp_actions
+        self, user_exp_history_adapter: PgAdapter, test_user, test_exp_actions
     ):
         """Тест что дневной лимит считается отдельно для разных действий"""
-        repo = PgUserExpHistoryRepository(session=db_session)
+        repo = PgUserExpHistoryRepository(adapter=user_exp_history_adapter)
 
         # Создаем 2 записи для первого действия
         for _ in range(2):
@@ -167,10 +167,10 @@ class TestUserExpHistoryRepository:
 
     @pytest.mark.asyncio
     async def test_check_if_user_already_granted_false(
-        self, db_session: AsyncSession, test_user, test_exp_action
+        self, user_exp_history_adapter: PgAdapter, test_user, test_exp_action
     ):
         """Тест проверки что пользователь еще не получал опыт"""
-        repo = PgUserExpHistoryRepository(session=db_session)
+        repo = PgUserExpHistoryRepository(adapter=user_exp_history_adapter)
 
         is_granted = await repo.check_if_user_alredy_granted(
             user_id=test_user.id, action_id=test_exp_action.id
@@ -180,10 +180,10 @@ class TestUserExpHistoryRepository:
 
     @pytest.mark.asyncio
     async def test_check_if_user_already_granted_true(
-        self, db_session: AsyncSession, test_user, test_exp_action
+        self, user_exp_history_adapter: PgAdapter, test_user, test_exp_action
     ):
         """Тест проверки что пользователь уже получал опыт"""
-        repo = PgUserExpHistoryRepository(session=db_session)
+        repo = PgUserExpHistoryRepository(adapter=user_exp_history_adapter)
 
         # Создаем запись
         history_data = CreateUserExpHistory(
@@ -208,10 +208,10 @@ class TestUserExpHistoryRepository:
 
     @pytest.mark.asyncio
     async def test_check_if_user_already_granted_revoked_ignored(
-        self, db_session: AsyncSession, test_user, test_exp_action
+        self, user_exp_history_adapter: PgAdapter, test_user, test_exp_action
     ):
         """Тест что отозванные записи не учитываются"""
-        repo = PgUserExpHistoryRepository(session=db_session)
+        repo = PgUserExpHistoryRepository(adapter=user_exp_history_adapter)
 
         # Создаем отозванную запись
         history_data = CreateUserExpHistory(
@@ -236,10 +236,10 @@ class TestUserExpHistoryRepository:
 
     @pytest.mark.asyncio
     async def test_check_if_user_already_granted_multiple_users(
-        self, db_session: AsyncSession, test_exp_action
+        self, user_exp_history_adapter: PgAdapter, test_exp_action
     ):
         """Тест что проверка работает независимо для разных пользователей"""
-        repo = PgUserExpHistoryRepository(session=db_session)
+        repo = PgUserExpHistoryRepository(adapter=user_exp_history_adapter)
 
         # Создаем двух пользователей
         from modules.user.model import User
@@ -260,9 +260,9 @@ class TestUserExpHistoryRepository:
             is_superuser=False,
             is_verified=False,
         )
-        db_session.add(user1)
-        db_session.add(user2)
-        await db_session.flush()
+        user_exp_history_adapter.session.add(user1)
+        user_exp_history_adapter.session.add(user2)
+        await user_exp_history_adapter.session.flush()
 
         # Создаем запись только для первого пользователя
         history_data = CreateUserExpHistory(
@@ -291,10 +291,10 @@ class TestUserExpHistoryRepository:
 
     @pytest.mark.asyncio
     async def test_delete_exp_history(
-        self, db_session: AsyncSession, test_user, test_exp_action
+        self, user_exp_history_adapter: PgAdapter, test_user, test_exp_action
     ):
         """Тест удаления записи истории опыта"""
-        repo = PgUserExpHistoryRepository(session=db_session)
+        repo = PgUserExpHistoryRepository(adapter=user_exp_history_adapter)
 
         # Создаем запись
         history_data = CreateUserExpHistory(
@@ -322,13 +322,13 @@ class TestUserExpHistoryRepository:
     @pytest.mark.asyncio
     async def test_exp_history_with_multiplier(
         self,
-        db_session: AsyncSession,
+        user_exp_history_adapter: PgAdapter,
         test_user,
         test_exp_action,
         test_subscription_plan,
     ):
         """Тест записи истории с множителем от подписки"""
-        repo = PgUserExpHistoryRepository(session=db_session)
+        repo = PgUserExpHistoryRepository(adapter=user_exp_history_adapter)
 
         history_data = CreateUserExpHistory(
             user_id=test_user.id,
@@ -352,10 +352,10 @@ class TestUserExpHistoryRepository:
 
     @pytest.mark.asyncio
     async def test_exp_history_with_level_change(
-        self, db_session: AsyncSession, test_user, test_exp_action
+        self, user_exp_history_adapter: PgAdapter, test_user, test_exp_action
     ):
         """Тест записи истории с изменением уровня"""
-        repo = PgUserExpHistoryRepository(session=db_session)
+        repo = PgUserExpHistoryRepository(adapter=user_exp_history_adapter)
 
         history_data = CreateUserExpHistory(
             user_id=test_user.id,
@@ -378,10 +378,10 @@ class TestUserExpHistoryRepository:
 
     @pytest.mark.asyncio
     async def test_multiple_exp_history_records(
-        self, db_session: AsyncSession, test_user, test_exp_action
+        self, user_exp_history_adapter: PgAdapter, test_user, test_exp_action
     ):
         """Тест создания нескольких записей истории"""
-        repo = PgUserExpHistoryRepository(session=db_session)
+        repo = PgUserExpHistoryRepository(adapter=user_exp_history_adapter)
 
         # Создаем несколько записей
         created_ids = []
