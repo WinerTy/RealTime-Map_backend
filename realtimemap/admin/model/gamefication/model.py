@@ -1,4 +1,3 @@
-from contextlib import asynccontextmanager
 from typing import Dict, Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,8 +9,6 @@ from starlette_admin.exceptions import FormValidationError
 from admin.fields import ActionTypeField
 from modules import Level, ExpAction, UserExpHistory
 from modules.gamefication.dependencies import get_pg_level_repository
-
-level_repository_context = asynccontextmanager(get_pg_level_repository)
 
 
 class AdminLevel(ModelView):
@@ -25,10 +22,10 @@ class AdminLevel(ModelView):
     async def validate(self, request: Request, data: Dict[str, Any]) -> None:
         errors: Dict[str, str] = dict()
         session: "AsyncSession" = request.state.session
-        async with level_repository_context(session) as level_repository:
-            max_level = await level_repository.get_max_level()
-            if max_level is not None and max_level.level + 1 != data["level"]:
-                errors["level"] = "Уровень не может превышать предыдущий больше чем +1"
+        level_repository = await get_pg_level_repository(session)
+        max_level = await level_repository.get_max_level()
+        if max_level is not None and max_level.level + 1 != data["level"]:
+            errors["level"] = "Уровень не может превышать предыдущий больше чем +1"
 
         if len(errors) > 0:
             raise FormValidationError(errors)

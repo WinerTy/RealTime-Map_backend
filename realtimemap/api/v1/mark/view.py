@@ -15,7 +15,7 @@ from api.v1.auth.fastapi_users import Annotated, get_current_user_without_ban
 from dependencies.notification import (
     get_mark_notification_service,
 )
-from modules.gamefication.dependencies import get_game_fication_service
+from modules.events.bus import event_bus, DomainEvent, EventType
 from modules.mark.dependencies import get_mark_service
 from modules.mark.schemas import (
     CreateMarkRequest,
@@ -31,8 +31,6 @@ from modules.notification import MarkNotificationService
 
 if TYPE_CHECKING:
     from modules import User
-    from modules.gamefication.service import GameFicationService
-
 
 router = APIRouter(prefix="/marks", tags=["Marks"])
 
@@ -118,9 +116,6 @@ async def create_mark_point(
     service: mark_service,
     request: Request,
     notification: mark_notification_service,
-    gamefication_serive: Annotated[
-        "GameFicationService", Depends(get_game_fication_service)
-    ],
 ):
     """
     Protected endpoint for create mark.
@@ -132,7 +127,15 @@ async def create_mark_point(
         event=ActionType.CREATE.value,
         request=request,
     )
-    await gamefication_serive.great_user_exp(user, "create_mark")
+    background.add_task(
+        event_bus.publish,
+        DomainEvent(
+            event_type=EventType.MARK_CREATE,
+            user=user,
+            source_id=instance.id,
+            source_type="marks",
+        ),
+    )
     return ReadMark.model_validate(instance, context={"request": request})
 
 
