@@ -1,14 +1,17 @@
 from typing import TYPE_CHECKING, List
 
 from fastapi import Request
-from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
+from fastapi_users_db_sqlalchemy import (
+    SQLAlchemyBaseUserTable,
+    SQLAlchemyBaseOAuthAccountTable,
+)
 from fastapi_users_db_sqlalchemy.access_token import (
     SQLAlchemyAccessTokenDatabase,
     SQLAlchemyBaseAccessTokenTable,
 )
 from jinja2 import Template
 from sqlalchemy import String, Integer, ForeignKey, event, Connection
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship, declared_attr
 from sqlalchemy_file import ImageField
 
 from auth.user_database import MySQLAlchemyUserDatabase
@@ -23,6 +26,15 @@ if TYPE_CHECKING:
     from modules.message.model import Chat
     from modules.user_subscription.model import UserSubscription
     from modules.gamefication.model import UserExpHistory
+
+
+class OAuthAccount(SQLAlchemyBaseOAuthAccountTable[int], BaseSqlModel, IntIdMixin):
+
+    @declared_attr
+    def user_id(cls):
+        return mapped_column(
+            Integer, ForeignKey("users.id", ondelete="cascade"), nullable=False
+        )
 
 
 class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
@@ -81,10 +93,13 @@ class User(BaseSqlModel, IntIdMixin, SQLAlchemyBaseUserTable[int]):
         lazy="noload",
         order_by="UserExpHistory.created_at.desc()",
     )
+    oauth_accounts: Mapped[List["OAuthAccount"]] = relationship(
+        "OAuthAccount", lazy="joined"
+    )
 
     @classmethod
     def get_db(cls, session: "AsyncSession"):
-        return MySQLAlchemyUserDatabase(session, cls)
+        return MySQLAlchemyUserDatabase(session, cls, OAuthAccount)
 
     def __str__(self):
         return self.username

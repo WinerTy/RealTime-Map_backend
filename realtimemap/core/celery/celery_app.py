@@ -13,6 +13,10 @@ app = Celery(
 app.conf.beat_schedule = {
     "end_check": {
         "task": "tasks.database.check_ended.check_mark_ended",  # Md Rename
-        "schedule": crontab(minute=15),
-    }
+        "schedule": crontab(),
+    },
+    "sync_metrics": {
+        "task": "tasks.database.sync_metrics.sync_user_metrics",  # Md Rename
+        "schedule": crontab(),
+    },
 }
