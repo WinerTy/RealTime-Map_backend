@@ -6,9 +6,10 @@ from typing import Optional, List, Dict
 from jinja2 import TemplateNotFound
 
 from core.app.templating import TemplateManager
+from core.celery import app
 from core.config import conf
 
-templates = TemplateManager(conf.template_dir / "email")
+templates = TemplateManager(conf.template_dir / "emails")
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +62,7 @@ def send_email(
         message.set_content(text_content, subtype="plain")
         message.add_alternative(html_content, subtype="html")
     else:
-        message.add_alternative(html_content, subtype="html")
+        message.set_content(html_content, subtype="html")
 
     try:
         with smtplib.SMTP_SSL(host=conf.smtp.host, port=conf.smtp.port) as smtp:
@@ -77,3 +78,20 @@ def send_email(
     except Exception as e:
         logger.error("Undefined error: %s", e)
         raise
+
+
+@app.task
+def welcome_email(
+    recipient: str,
+    username: str,
+):
+    base_url = "https://realtimemap.ru"
+
+    html = render_html(
+        "welcome.html", context={"base_url": base_url, "username": username}
+    )
+    send_email(
+        recipients=[recipient],
+        subject="Welcome Email",
+        html_content=html,
+    )

@@ -9,6 +9,7 @@ from .schemas import (
     UserRelationShip,
     ReadUserSubscription,
     UserGamefication,
+    UserUpdate,
 )
 from ..gamefication.schemas.level.crud import LevelRead
 
@@ -117,3 +118,10 @@ class UserService:
             for leader in leaders
         ]
         return users
+
+    async def update_user(self, user_id: int, update_data: UserUpdate) -> "User":
+        user = await self.user_repo.update(user_id, update_data)
+        return user
+
+    async def delete_user(self, user_id: int) -> None:
+        await self.user_repo.delete(user_id)

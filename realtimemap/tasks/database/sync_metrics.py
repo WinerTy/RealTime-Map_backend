@@ -81,7 +81,7 @@ def sync_user_metrics():
             )
 
             session.execute(stmt)
-            session.commit()
+            session.flush()
             logger.info(f"End updating metrics: {len(metrics_data)} users")
         else:
             logger.info("No such info")
@@ -168,7 +168,7 @@ def sync_active_user_metrics():
                     },
                 )
                 session.execute(stmt)
-                session.commit()
+                session.flush()
                 total_updated += len(metrics_data)
 
         logger.info("Sync metrics  ")

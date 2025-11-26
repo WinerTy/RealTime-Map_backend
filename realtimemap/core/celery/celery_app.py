@@ -11,12 +11,19 @@ app = Celery(
 )
 
 app.conf.beat_schedule = {
+    # Переодическая задача для проверки меток
     "end_check": {
-        "task": "tasks.database.check_ended.check_mark_ended",  # Md Rename
-        "schedule": crontab(),
+        "task": "tasks.database.check_ended.check_mark_ended",
+        "schedule": crontab(minute=30),
     },
-    "sync_metrics": {
-        "task": "tasks.database.sync_metrics.sync_user_metrics",  # Md Rename
-        "schedule": crontab(),
+    # Полная синхронизация пользователей и их статистики
+    "sync_all_metrics": {
+        "task": "tasks.database.sync_metrics.sync_user_metrics",
+        "schedule": crontab(hour=12),
+    },
+    # Синхронизация только активных пользователей за 24 часа
+    "sync_active_metrics": {
+        "task": "tasks.database.sync_metrics.sync_active_user_metrics",
+        "schedule": crontab(minute=15),
     },
 }

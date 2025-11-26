@@ -30,10 +30,13 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         user: User,
         request: Optional["Request"] = None,
     ):
+        from tasks import welcome_email
+
         log.warning(
             "User %r has registered.",
             user.id,
         )
+        welcome_email.delay(user.email, user.username)
 
     async def authenticate(
         self, credentials: OAuth2PasswordRequestForm
