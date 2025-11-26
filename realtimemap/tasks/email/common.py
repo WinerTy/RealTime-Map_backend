@@ -13,6 +13,8 @@ templates = TemplateManager(conf.template_dir / "emails")
 
 logger = logging.getLogger(__name__)
 
+BASE_URL = "https://realtimemap.ru"
+
 
 def render_html(template_name: str, context: Optional[Dict] = None) -> str:
     """
@@ -85,13 +87,26 @@ def welcome_email(
     recipient: str,
     username: str,
 ):
-    base_url = "https://realtimemap.ru"
 
     html = render_html(
-        "welcome.html", context={"base_url": base_url, "username": username}
+        "welcome.html", context={"base_url": BASE_URL, "username": username}
     )
     send_email(
         recipients=[recipient],
         subject="Welcome Email",
+        html_content=html,
+    )
+
+
+@app.task
+def verify_email(recipient: str, username: str, token: str):
+
+    html = render_html(
+        "verify_email.html",
+        context={"token": token, "username": username, "base_url": BASE_URL},
+    )
+    send_email(
+        recipients=[recipient],
+        subject="Verify Email",
         html_content=html,
     )

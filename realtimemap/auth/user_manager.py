@@ -77,11 +77,15 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         token: str,
         request: Optional["Request"] = None,
     ):
+        from tasks import verify_email
+
         log.warning(
             "Verification requested for user %r. Verification token: %r",
             user.id,
             token,
         )
+
+        verify_email.delay(user.email, user.username, token)
 
     async def on_after_forgot_password(
         self,
