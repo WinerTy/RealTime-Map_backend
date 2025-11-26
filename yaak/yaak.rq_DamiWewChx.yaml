@@ -2,9 +2,9 @@ type: http_request
 model: http_request
 id: rq_DamiWewChx
 createdAt: 2025-10-30T15:24:06.723977500
-updatedAt: 2025-10-30T16:01:06.546028700
+updatedAt: 2025-11-21T17:15:00.212130300
 workspaceId: wk_V99Hr7DmhP
-folderId: fl_UJQvbUtxEx
+folderId: fl_UxCbSZuLYD
 authentication:
   token: ${[ access_token ]}
 authenticationType: bearer
@@ -42,8 +42,16 @@ body:
     file: C:\Users\user\Pictures\Фоновые изображения рабочего стола\20. Карандаши.jpg
     id: jhYZdUfSWN
     name: photo
+  - enabled: false
+    id: wSHjpu7nZY
+    name: latitude
+    value: '61.200'
+  - enabled: false
+    id: MkPWrcycwp
+    name: longitude
+    value: '73.3904'
   - enabled: true
-    id: frU5jIGQ5n
+    id: rRnj2EPus8
     name: ''
     value: ''
 bodyType: multipart/form-data
@@ -55,6 +63,6 @@ headers:
   id: IGn5xAkPVb
 method: POST
 name: Create
-sortPriority: -1761836307706.0
+sortPriority: 3000.0
 url: ${[ api_url ]}/marks/
 urlParameters: []

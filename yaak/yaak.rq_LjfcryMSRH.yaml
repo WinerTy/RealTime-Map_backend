@@ -2,9 +2,9 @@ type: http_request
 model: http_request
 id: rq_LjfcryMSRH
 createdAt: 2025-10-30T15:34:25.722382300
-updatedAt: 2025-10-30T15:57:39.596415600
+updatedAt: 2025-11-22T11:02:02.255647100
 workspaceId: wk_V99Hr7DmhP
-folderId: fl_UJQvbUtxEx
+folderId: fl_UxCbSZuLYD
 authentication:
   token: ${[ access_token ]}
 authenticationType: bearer
@@ -30,7 +30,7 @@ body:
     id: HDZ2eiWZpY
     name: duration
     value: '48'
-  - enabled: true
+  - enabled: false
     id: qNa5QMYnIq
     name: category_id
     value: ${[ response.body.path(request='rq_XvSRvh2Htq', path=b64'JC5bMF0uaWQ', behavior='smart') ]}
@@ -43,7 +43,11 @@ body:
     id: jdcc3us6VY
     name: photo
   - enabled: true
-    id: uVryG7MW2w
+    id: xStxHYBDuz
+    name: category_id
+    value: '2'
+  - enabled: true
+    id: 45jyeSrqvN
     name: ''
     value: ''
 bodyType: multipart/form-data
@@ -55,7 +59,7 @@ headers:
   id: CBzSig5Jgw
 method: PATCH
 name: Update
-sortPriority: -1761836307706.0
+sortPriority: 0.0
 url: ${[ api_url ]}/marks/:id
 urlParameters:
 - enabled: true

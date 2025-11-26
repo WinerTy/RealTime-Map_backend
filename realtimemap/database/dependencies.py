@@ -1,3 +1,4 @@
+import logging
 from typing import AsyncGenerator, TYPE_CHECKING, Generator
 
 from .helper import db_helper
@@ -5,6 +6,8 @@ from .helper import db_helper
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
     from sqlalchemy.orm import Session
+
+logger = logging.getLogger(__name__)
 
 
 async def get_session() -> AsyncGenerator["AsyncSession", None]:
@@ -22,6 +25,7 @@ def get_sync_session() -> Generator["Session", None]:
         try:
             yield session
             session.commit()
-        except Exception:
+        except Exception as e:
             session.rollback()
+            logger.error("Error while getting session", e)
             raise

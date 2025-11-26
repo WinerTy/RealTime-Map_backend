@@ -2,9 +2,9 @@ type: http_request
 model: http_request
 id: rq_sGqajck6F5
 createdAt: 2025-10-30T15:02:55.714596600
-updatedAt: 2025-11-01T07:14:19.635491100
+updatedAt: 2025-11-22T20:25:24.795048800
 workspaceId: wk_V99Hr7DmhP
-folderId: fl_UJQvbUtxEx
+folderId: fl_UxCbSZuLYD
 authentication: {}
 authenticationType: null
 body: {}
@@ -13,14 +13,14 @@ description: ''
 headers: []
 method: GET
 name: Get
-sortPriority: -1761836307706.0
+sortPriority: 2000.0
 url: ${[ api_url ]}/marks/
 urlParameters:
-- enabled: true
+- enabled: false
   name: latitude
   value: ${[ faker.location.latitude() ]}
   id: EbTHZjTW9x
-- enabled: true
+- enabled: false
   name: longitude
   value: ${[ faker.location.longitude() ]}
   id: 6aNu7Xusip
@@ -28,7 +28,7 @@ urlParameters:
   name: category_id
   value: ${[ response.body.path(request='rq_XvSRvh2Htq', path=b64'JC5bMF0uaWQ', behavior='smart') ]}
   id: UK47FEXESb
-- enabled: true
+- enabled: false
   name: date
   value: 2025-10-30
   id: SppXVGe63v
@@ -45,6 +45,18 @@ urlParameters:
   value: '10000'
   id: ZnvJYvu9qB
 - enabled: true
+  name: latitude
+  value: '61.22'
+  id: 5j5JGRXfG6
+- enabled: true
+  name: longitude
+  value: '73.3904'
+  id: 4eywVQyZba
+- enabled: false
+  name: category_id
+  value: '12'
+  id: gWKh8asIbX
+- enabled: true
   name: ''
   value: ''
-  id: swkv850eT7
+  id: J0RkXT8eZn

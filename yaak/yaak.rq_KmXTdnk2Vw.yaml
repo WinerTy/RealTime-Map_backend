@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_KmXTdnk2Vw
 createdAt: 2025-10-30T14:34:57.004144700
-updatedAt: 2025-10-30T16:14:53.029281300
+updatedAt: 2025-11-22T11:18:35.440618800
 workspaceId: wk_V99Hr7DmhP
 folderId: fl_atqZ3pLazm
 authentication: {}
@@ -22,7 +22,15 @@ body:
     name: is_verified
     value: 'true'
   - enabled: true
-    id: qtbJDvbb6J
+    id: uefehM0I6s
+    name: email
+    value: admin1edited@mail.ru
+  - enabled: true
+    id: 8be3TttNKy
+    name: is_superuser
+    value: 'false'
+  - enabled: true
+    id: QGPqzXQ229
     name: ''
     value: ''
 bodyType: multipart/form-data
