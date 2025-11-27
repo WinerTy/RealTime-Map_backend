@@ -1,10 +1,13 @@
-from typing import Optional
+from typing import Optional, Any, TYPE_CHECKING
 
 from fastapi_users_db_sqlalchemy import (
     SQLAlchemyUserDatabase,
     SQLAlchemyBaseOAuthAccountTable,
 )
 from sqlalchemy import select
+
+if TYPE_CHECKING:
+    from modules.user.model import User
 
 
 class MySQLAlchemyUserDatabase(SQLAlchemyUserDatabase):
@@ -31,3 +34,7 @@ class MySQLAlchemyUserDatabase(SQLAlchemyUserDatabase):
             | (self.user_table.email == email),
         )
         return await self._get_user(stmt)
+
+    async def create(self, create_dict: dict[str, Any]) -> "User":
+        # TODO мб переписать генерацию тут
+        return await super().create(create_dict)

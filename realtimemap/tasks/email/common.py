@@ -6,14 +6,13 @@ from typing import Optional, List, Dict
 from jinja2 import TemplateNotFound
 
 from core.app.templating import TemplateManager
-from core.celery import app
 from core.config import conf
 
 templates = TemplateManager(conf.template_dir / "emails")
 
 logger = logging.getLogger(__name__)
 
-BASE_URL = "https://realtimemap.ru"
+BASE_URL = conf.frontend.url
 
 
 def render_html(template_name: str, context: Optional[Dict] = None) -> str:
@@ -80,33 +79,3 @@ def send_email(
     except Exception as e:
         logger.error("Undefined error: %s", e)
         raise
-
-
-@app.task
-def welcome_email(
-    recipient: str,
-    username: str,
-):
-
-    html = render_html(
-        "welcome.html", context={"base_url": BASE_URL, "username": username}
-    )
-    send_email(
-        recipients=[recipient],
-        subject="Welcome Email",
-        html_content=html,
-    )
-
-
-@app.task
-def verify_email(recipient: str, username: str, token: str):
-
-    html = render_html(
-        "verify_email.html",
-        context={"token": token, "username": username, "base_url": BASE_URL},
-    )
-    send_email(
-        recipients=[recipient],
-        subject="Verify Email",
-        html_content=html,
-    )
