@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_946TSfQRff
 createdAt: 2025-10-30T16:09:49.914152200
-updatedAt: 2025-10-30T16:11:18.552276
+updatedAt: 2025-11-22T11:17:50.758235600
 workspaceId: wk_V99Hr7DmhP
 folderId: fl_atqZ3pLazm
 authentication:
@@ -12,7 +12,7 @@ body: {}
 bodyType: null
 description: ''
 headers: []
-method: GET
+method: DELETE
 name: Random Delete
 sortPriority: -1761833592105.0
 url: ${[ api_url ]}/user/me

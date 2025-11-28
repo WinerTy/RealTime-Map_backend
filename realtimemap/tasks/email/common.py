@@ -8,9 +8,11 @@ from jinja2 import TemplateNotFound
 from core.app.templating import TemplateManager
 from core.config import conf
 
-templates = TemplateManager(conf.template_dir / "email")
+templates = TemplateManager(conf.template_dir / "emails")
 
 logger = logging.getLogger(__name__)
+
+BASE_URL = conf.frontend.url
 
 
 def render_html(template_name: str, context: Optional[Dict] = None) -> str:
@@ -61,7 +63,7 @@ def send_email(
         message.set_content(text_content, subtype="plain")
         message.add_alternative(html_content, subtype="html")
     else:
-        message.add_alternative(html_content, subtype="html")
+        message.set_content(html_content, subtype="html")
 
     try:
         with smtplib.SMTP_SSL(host=conf.smtp.host, port=conf.smtp.port) as smtp:
