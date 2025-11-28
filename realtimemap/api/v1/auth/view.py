@@ -34,10 +34,15 @@ if conf.api.v1.auth.activate_google_auth:
             conf.api.v1.auth.verification_token_secret,
         ),
         prefix="/google",
-        tags=["auth"],
+        tags=["Auth"],
     )
 
 router.include_router(
     fastapi_users.get_verify_router(UserRead),
-    tags=["auth"],
+    tags=["Auth"],
+)
+
+router.include_router(
+    fastapi_users.get_reset_password_router(),
+    tags=["Auth"],
 )

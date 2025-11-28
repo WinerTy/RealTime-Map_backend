@@ -33,6 +33,8 @@ class Level(BaseSqlModel, IntIdMixin, TimeMarkMixin):
 
     description: Mapped[str] = mapped_column(String(256), nullable=True)
 
+    color: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
     __table_args__ = (

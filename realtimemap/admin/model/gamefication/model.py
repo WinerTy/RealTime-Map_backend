@@ -2,7 +2,7 @@ from typing import Dict, Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
-from starlette_admin import TextAreaField, IntegerField
+from starlette_admin import TextAreaField, IntegerField, ColorField
 from starlette_admin.contrib.sqla import ModelView
 from starlette_admin.exceptions import FormValidationError
 
@@ -14,6 +14,7 @@ from modules.gamefication.dependencies import get_pg_level_repository
 class AdminLevel(ModelView):
     fields = [
         IntegerField("level", help_text="Level number"),
+        ColorField("color", required=False),
         Level.required_exp,
         TextAreaField("description", label="description"),
         Level.is_active,

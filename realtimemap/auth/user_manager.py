@@ -10,6 +10,7 @@ from fastapi_users import (
     exceptions,
 )
 from fastapi_users.models import ID, UP
+from starlette.responses import Response
 
 from auth.base import MyBaseUserDatabase
 from core.config import conf
@@ -80,12 +81,11 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         from tasks import verify_email
 
         log.warning(
-            "Verification requested for user %r. Verification token: %r",
+            "Verification requested for user %r.",
             user.id,
-            token,
         )
-
-        verify_email.delay(user.email, user.username, token)
+        verify_url = conf.frontend.get_verify_url(token)
+        verify_email.delay(user.email, user.username, verify_url)
 
     async def on_after_forgot_password(
         self,
@@ -93,10 +93,40 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         token: str,
         request: Optional["Request"] = None,
     ):
+        from tasks import forgot_password_email
+
         log.warning(
-            "User %r has forgot their password. Reset token: %r",
+            "User %r has forgot their password.",
             user.id,
-            token,
+        )
+        forgot_password_url = conf.frontend.get_password_reset_url(token)
+        forgot_password_email.delay(user.email, user.username, forgot_password_url)
+
+    async def on_after_reset_password(
+        self, user: User, request: Optional[Request] = None
+    ) -> None:
+        from tasks import change_password_email
+
+        ip_address = request.client.host if request else "Unknown"
+        change_password_email.delay(user.email, user.username, ip_address)
+
+    async def on_after_login(
+        self,
+        user: User,
+        request: Optional[Request] = None,
+        response: Optional[Response] = None,
+    ) -> None:
+        from tasks import login_email
+
+        log.info("User %r logged in", user.id)
+        user_agent = request.headers.get("User-Agent") if request else "Unknown"
+        ip_address = request.client.host if request else "Unknown"
+
+        login_email.delay(
+            user.email,
+            user.username,
+            ip_address,
+            user_agent,
         )
 
     async def create(

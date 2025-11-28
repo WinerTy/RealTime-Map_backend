@@ -9,6 +9,12 @@ def welcome_email(
     recipient: str,
     username: str,
 ):
+    """
+    Задача по отправке письма при регистрации нового пользователя
+    :param recipient: user email
+    :param username: username
+    :return:
+    """
     html = render_html(
         "welcome.html", context={"base_url": conf.frontend.url, "username": username}
     )

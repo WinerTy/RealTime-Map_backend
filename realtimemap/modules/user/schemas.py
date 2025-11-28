@@ -14,7 +14,9 @@ from utils.url_generator import generate_full_image_url
 class UserGamefication(BaseModel):
     current_level: Annotated[int, Field(..., description="Current user level")]
     current_exp: Annotated[int, Field(..., description="Current user exp level")]
-
+    current_level_color: Annotated[
+        Optional[str], Field(None, description="Current level color")
+    ]
     next_level: Annotated[
         Optional[LevelRead], Field(None, description="Next level for")
     ]
