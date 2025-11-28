@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, Sequence
+from typing import TYPE_CHECKING, Sequence, Optional
 
 from sqlalchemy import select, and_, or_, Select
 
@@ -59,3 +59,9 @@ class PgUsersBanRepository(UsersBanRepository):
         )
         active_bans = await self.adapter.execute_query(stmt)
         return active_bans
+
+    async def get_active_user_ban(self, user_id: int) -> Optional[UsersBan]:
+        stmt = self._base_query(user_id).limit(1)
+        active_ban = await self.adapter.execute_query_one(stmt)
+        return active_ban
+

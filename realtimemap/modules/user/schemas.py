@@ -28,7 +28,7 @@ class UserGamefication(BaseModel):
 
 class UserRelationShip(str, Enum):
     SUBSCRIPTION = "subscription"
-    BANS = "bans"
+    BAN = "ban"
     GAMEFICATION = "gamefication"
 
 
@@ -44,8 +44,8 @@ class UserRead(schemas.BaseUser[int]):
     phone: Optional[str] = None
     username: str
     avatar: Optional[str] = None
-    subscriptions: Optional[List["ReadUserSubscription"]] = []
-    bans: Optional[List["ReadUsersBan"]] = []
+    subscription: Optional["ReadUserSubscription"] = None
+    ban: Optional["ReadUsersBan"] = None
     gamefication: Optional[UserGamefication] = None
     _validate_avatar = field_validator("avatar", mode="before")(generate_full_image_url)
 

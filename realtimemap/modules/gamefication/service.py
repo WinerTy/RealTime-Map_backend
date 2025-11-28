@@ -95,7 +95,7 @@ class GameFicationService:
         base_exp = action.base_exp
         multiplier = Decimal("1.0")
         subscription_plan_id = None
-        user_sub = await self.user_subs_repo.get_active_subscriptions(user.id)
+        user_sub = await self.user_subs_repo.get_active_subscription(user.id)
         if user_sub:
             exp_multiplier = user_sub.plan.features.get("exp_multiplier")
             if exp_multiplier:
