@@ -107,7 +107,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     ) -> None:
         from tasks import change_password_email
 
-        ip_address = request.client.host if request else "Unknows"
+        ip_address = request.client.host if request else "Unknown"
         change_password_email.delay(user.email, user.username, ip_address)
 
     async def on_after_login(
@@ -119,12 +119,14 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         from tasks import login_email
 
         log.info("User %r logged in", user.id)
+        user_agent = request.headers.get("User-Agent") if request else "Unknown"
+        ip_address = request.client.host if request else "Unknown"
 
         login_email.delay(
             user.email,
             user.username,
-            request.client.host,
-            request.headers.get("User-Agent"),
+            ip_address,
+            user_agent,
         )
 
     async def create(
