@@ -13,6 +13,15 @@ def login_email(
     user_agent: Optional[str] = None,
     timestamp: Optional[datetime] = None,
 ):
+    """
+    Задача для отправки письма при логине
+    :param recipient:
+    :param username:
+    :param ip_address:
+    :param user_agent:
+    :param timestamp:
+    :return:
+    """
     if timestamp is None:
         timestamp = datetime.now()
 

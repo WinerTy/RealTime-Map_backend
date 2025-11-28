@@ -6,6 +6,13 @@ from .common import render_html, send_email
 
 @app.task
 def forgot_password_email(recipient: str, username: str, reset_url: str):
+    """
+    Задача по отправке письма при запросе на востановлении письма
+    :param recipient:
+    :param username:
+    :param reset_url:
+    :return:
+    """
     html = render_html(
         "password_reset.html",
         context={
@@ -24,6 +31,13 @@ def forgot_password_email(recipient: str, username: str, reset_url: str):
 def change_password_email(
     recipient: str, username: str, ip_address: Optional[str] = None
 ):
+    """
+    Задача по отправке письма при изменении пароля
+    :param recipient:
+    :param username:
+    :param ip_address:
+    :return:
+    """
     html = render_html(
         "password_changed.html",
         context={
