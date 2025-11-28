@@ -27,6 +27,6 @@ def login_email(
     )
     send_email(
         recipients=[recipient],
-        subject="Login notification",
+        subject="Login Notification",
         html_content=html,
     )
