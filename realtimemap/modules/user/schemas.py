@@ -53,7 +53,7 @@ class UserRead(schemas.BaseUser[int]):
 
 
 class UserCreate(schemas.BaseUserCreate):
-    username: Annotated[str, Field(..., description="Username", alias="name")]
+    username: Annotated[str, Field(..., description="Username")]
 
     @field_validator("password")
     def validate_password(cls, value: str):
