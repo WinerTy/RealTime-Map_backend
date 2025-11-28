@@ -10,6 +10,7 @@ from fastapi_users import (
     exceptions,
 )
 from fastapi_users.models import ID, UP
+from starlette.responses import Response
 
 from auth.base import MyBaseUserDatabase
 from core.config import conf
@@ -84,8 +85,8 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
             user.id,
             token,
         )
-
-        verify_email.delay(user.email, user.username, token)
+        verify_url = conf.frontend.get_verify_url(token)
+        verify_email.delay(user.email, user.username, verify_url)
 
     async def on_after_forgot_password(
         self,
@@ -93,10 +94,37 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         token: str,
         request: Optional["Request"] = None,
     ):
+        from tasks import forgot_password_email
+
         log.warning(
             "User %r has forgot their password. Reset token: %r",
             user.id,
             token,
+        )
+        forgot_password_url = conf.frontend.get_password_reset_url(token)
+        forgot_password_email.delay(user.email, user.username, forgot_password_url)
+
+    async def on_after_reset_password(
+        self, user: User, request: Optional[Request] = None
+    ) -> None:
+        from tasks import change_password_email
+
+        change_password_email.delay(user.email, user.username, request.client.host)
+
+    async def on_after_login(
+        self,
+        user: User,
+        request: Optional[Request] = None,
+        response: Optional[Response] = None,
+    ) -> None:
+
+        from tasks import login_email
+
+        login_email.delay(
+            user.email,
+            user.username,
+            request.client.host,
+            request.headers.get("User-Agent"),
         )
 
     async def create(
