@@ -1,3 +1,4 @@
+from functools import lru_cache
 from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -5,6 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from .api_prefix import ApiPrefix
 from .celery import CeleryConfig
 from .database import DatabaseConfig
+from .frontend import FrontendConfig
 from .logging import LoggingConfig
 from .payment import YooKassaPayment
 from .redis import RedisConfig
@@ -22,6 +24,7 @@ class AppConfig(BaseSettings):
     socket: SocketIOConfig
     api: ApiPrefix = ApiPrefix()
     smtp: SmtpConfig
+    frontend: FrontendConfig = FrontendConfig()
 
     static: Path = Path("static")
     root_dir: Path = ROOT_DIR
@@ -48,4 +51,8 @@ class AppConfig(BaseSettings):
         return self.root_dir / "static"
 
 
-conf = AppConfig()  # type: ignore
+@lru_cache
+def get_settings() -> AppConfig:
+    return AppConfig()
+
+conf = get_settings()  # type: ignore
