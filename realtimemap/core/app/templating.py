@@ -2,6 +2,8 @@ from pathlib import Path
 
 from starlette.templating import Jinja2Templates
 
+from core.config import conf
+
 
 class TemplateManager:
     def __init__(self, path: Path):
@@ -29,4 +31,4 @@ class TemplateManager:
         Метод для добавления глобальных значений
         :return:
         """
-        pass
+        self.engine.env.globals["base_url"] = conf.frontend.url

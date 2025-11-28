@@ -81,9 +81,8 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         from tasks import verify_email
 
         log.warning(
-            "Verification requested for user %r. Verification token: %r",
+            "Verification requested for user %r.",
             user.id,
-            token,
         )
         verify_url = conf.frontend.get_verify_url(token)
         verify_email.delay(user.email, user.username, verify_url)
@@ -97,9 +96,8 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         from tasks import forgot_password_email
 
         log.warning(
-            "User %r has forgot their password. Reset token: %r",
+            "User %r has forgot their password.",
             user.id,
-            token,
         )
         forgot_password_url = conf.frontend.get_password_reset_url(token)
         forgot_password_email.delay(user.email, user.username, forgot_password_url)
@@ -109,7 +107,8 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     ) -> None:
         from tasks import change_password_email
 
-        change_password_email.delay(user.email, user.username, request.client.host)
+        ip_address = request.client.host if request else "Unknows"
+        change_password_email.delay(user.email, user.username, ip_address)
 
     async def on_after_login(
         self,
@@ -117,8 +116,9 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         request: Optional[Request] = None,
         response: Optional[Response] = None,
     ) -> None:
-
         from tasks import login_email
+
+        log.info("User %r logged in", user.id)
 
         login_email.delay(
             user.email,

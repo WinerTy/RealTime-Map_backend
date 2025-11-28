@@ -11,8 +11,11 @@ def login_email(
     username: str,
     ip_address: Optional[str] = None,
     user_agent: Optional[str] = None,
-    timestamp: datetime = datetime.now(),
+    timestamp: Optional[datetime] = None,
 ):
+    if timestamp is None:
+        timestamp = datetime.now()
+
     html = render_html(
         "login_notification.html",
         context={
