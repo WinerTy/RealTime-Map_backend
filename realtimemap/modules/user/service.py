@@ -14,7 +14,7 @@ from .schemas import (
 from ..gamefication.schemas.level.crud import LevelRead
 
 if TYPE_CHECKING:
-    from modules import User
+    from modules import User, UserSubscription
     from fastapi import Request
     from core.common.repository import (
         UserRepository,
@@ -40,29 +40,15 @@ class UserService:
     async def is_ban(self, user_id: int) -> bool:
         return await self.user_repo.user_is_banned(user_id)
 
-    async def _load_subscriptions(
+    async def _load_subscription(
         self, user_id: int, request: "Request"
-    ) -> List[ReadUserSubscription]:
-        user_subs = await self.user_subs_repo.get_user_subscriptions(user_id)
-        return (
-            [
-                ReadUserSubscription.model_validate(sub, context={"request": request})
-                for sub in user_subs
-            ]
-            if user_subs
-            else []
-        )
+    ) -> Optional[ReadUserSubscription]:
+        user_sub = await self.user_subs_repo.get_active_subscription(user_id)
+        return ReadUserSubscription.model_validate(user_sub, context={"request": request}) if user_sub else None
 
-    async def _load_bans(self, user_id: int, request: "Request") -> List[ReadUsersBan]:
-        user_bans = await self.user_ban_repo.get_user_bans(user_id)
-        return (
-            [
-                ReadUsersBan.model_validate(ban, context={"request": request})
-                for ban in user_bans
-            ]
-            if user_bans
-            else []
-        )
+    async def _load_ban(self, user_id: int, request: "Request") -> Optional[ReadUsersBan]:
+        user_ban = await self.user_ban_repo.get_active_user_ban(user_id)
+        return ReadUsersBan.model_validate(user_ban, context={"request": request}) if user_ban else None
 
     async def _load_gamefication(self, user: "User") -> Optional[UserGamefication]:
         next_level = None
@@ -95,12 +81,12 @@ class UserService:
         include_mapping = {}
 
         if UserRelationShip.SUBSCRIPTION in params.include:
-            tasks.append(self._load_subscriptions(user.id, request))
-            include_mapping[len(tasks) - 1] = "subscriptions"
+            tasks.append(self._load_subscription(user.id, request))
+            include_mapping[len(tasks) - 1] = "subscription"
 
-        if UserRelationShip.BANS in params.include:
-            tasks.append(self._load_bans(user.id, request))
-            include_mapping[len(tasks) - 1] = "bans"
+        if UserRelationShip.BAN in params.include:
+            tasks.append(self._load_ban(user.id, request))
+            include_mapping[len(tasks) - 1] = "ban"
 
         if UserRelationShip.GAMEFICATION in params.include:
             tasks.append(self._load_gamefication(user))

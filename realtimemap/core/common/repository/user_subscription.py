@@ -37,7 +37,7 @@ class UserSubscriptionRepository(
         raise NotImplementedError
 
     @abstractmethod
-    async def get_active_subscriptions(
+    async def get_active_subscription(
         self, user_id: int
     ) -> Optional[UserSubscription]:
         """
@@ -46,3 +46,5 @@ class UserSubscriptionRepository(
         :return:
         """
         raise NotImplementedError
+
+

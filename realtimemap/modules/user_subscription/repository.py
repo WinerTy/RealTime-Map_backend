@@ -57,7 +57,7 @@ class PgUserSubscriptionRepository(UserSubscriptionRepository):
         result = await self.create(data=data)
         return result
 
-    async def get_active_subscriptions(
+    async def get_active_subscription(
         self, user_id: int
     ) -> Optional[UserSubscription]:
         now = datetime.now()
