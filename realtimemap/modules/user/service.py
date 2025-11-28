@@ -67,12 +67,16 @@ class UserService:
     async def _load_gamefication(self, user: "User") -> Optional[UserGamefication]:
         next_level = None
         raw_level = await self.level_repo.get_next_level(user.level)
+        current_level = await self.level_repo.get_level(
+            user.level
+        )  # Todo mb переделать надо будет
         if raw_level:
             next_level = LevelRead.model_validate(raw_level)
         return UserGamefication(
             current_level=user.level,
             current_exp=user.current_exp,
             next_level=next_level,
+            current_level_color=current_level.color if current_level else None,
         )
 
     async def get_included_user_info(

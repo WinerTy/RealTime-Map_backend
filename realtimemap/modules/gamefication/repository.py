@@ -34,6 +34,11 @@ class PgLevelRepository(LevelRepository):
     async def get_levels(self) -> Sequence[Level]:
         pass
 
+    async def get_level(self, level: int) -> Optional[Level]:
+        stmt = select(Level).where(Level.level == level, Level.is_active)
+        result = await self.adapter.execute_query_one(stmt)
+        return result
+
 
 class PgExpActionRepository(ExpActionRepository):
     def __init__(self, adapter: PgAdapter[ExpAction, None, None]):

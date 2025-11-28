@@ -31,3 +31,12 @@ class LevelRepository(BaseRepository[Level, None, None], ABC):
         :return:
         """
         raise NotImplementedError
+
+    @abstractmethod
+    async def get_level(self, level: int) -> Optional[Level]:
+        """
+        Получение уровня по его числовому значению
+        :param level:
+        :return:
+        """
+        raise NotImplementedError
