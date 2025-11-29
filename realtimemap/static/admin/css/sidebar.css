@@ -25,11 +25,11 @@
     align-items: center;
     padding: 12px 16px !important;
     border-radius: 10px !important;
-    /*color: var(--text-secondary) !important;*/
+    color: var(--text-secondary) !important;
     font-weight: 500;
     position: relative;
     overflow: hidden;
-    transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+    transition: all 0.2s ease-in-out;
 }
 
 .navbar-vertical .nav-link-icon {
@@ -39,9 +39,28 @@
     transition: color 0.2s ease-in-out;
 }
 
+.navbar-vertical .nav-link-title {
+    color: var(--text-secondary) !important;
+    transition: color 0.2s ease-in-out;
+}
+
+.navbar-vertical .nav-link:hover .nav-link-title {
+    color: var(--text-primary) !important;
+}
+
+.navbar-vertical .nav-item.active > .nav-link .nav-link-title,
+.navbar-vertical .nav-link.active .nav-link-title {
+    color: white !important;
+}
+
 .navbar-vertical .nav-link:hover {
     color: var(--text-primary) !important;
     background-color: color-mix(in srgb, var(--accent-primary) 10%, transparent) !important;
+    transform: translateX(4px);
+}
+
+.navbar-vertical .nav-link:hover .nav-link-icon {
+    color: var(--accent-primary) !important;
 }
 
 .navbar-vertical .nav-item.active > .nav-link,
@@ -49,16 +68,22 @@
     background-color: var(--accent-primary) !important;
     color: white !important;
     box-shadow: 0 4px 12px color-mix(in srgb, var(--accent-primary) 30%, transparent);
+    font-weight: 600;
+}
+
+.navbar-vertical .nav-item.active > .nav-link .nav-link-icon,
+.navbar-vertical .nav-link.active .nav-link-icon {
+    color: white !important;
 }
 
 .navbar-vertical .nav-item.active > .nav-link::before {
     content: '';
     position: absolute;
-    left: -10px;
+    left: 0;
     top: 15%;
     height: 70%;
     width: 4px;
-    background-color: var(--accent-primary-deep);
+    background-color: white;
     border-radius: 4px;
 }
 
@@ -76,6 +101,7 @@
     border-radius: 8px;
     position: relative;
     margin-bottom: 4px;
+    transition: all 0.2s ease;
 }
 
 
@@ -91,7 +117,8 @@
 
 .navbar-vertical .dropdown-item:hover {
     color: var(--accent-primary) !important;
-    background-color: transparent !important;
+    background-color: color-mix(in srgb, var(--accent-primary) 5%, transparent) !important;
+    transform: translateX(4px);
 }
 
 .navbar-vertical .dropdown-item:hover::before {
@@ -100,12 +127,14 @@
 }
 
 .navbar-vertical .dropdown-item.active {
-    color: var(--accent-primary-deep) !important;
+    color: var(--accent-primary) !important;
     font-weight: 600;
+    background-color: color-mix(in srgb, var(--accent-primary) 8%, transparent) !important;
 }
 
 .navbar-vertical .dropdown-item.active::before {
-    color: var(--accent-primary-deep) !important;
+    color: var(--accent-primary) !important;
+    font-weight: bold;
 }
 
 .navbar-vertical .dropdown-toggle::after {
@@ -115,4 +144,63 @@
 
 .navbar-vertical .nav-link.dropdown-toggle.show::after {
     transform: rotate(90deg) !important;
+}
+
+/*Scrollbar для sidebar */
+.navbar-vertical::-webkit-scrollbar {
+    width: 6px;
+}
+
+.navbar-vertical::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.navbar-vertical::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+.navbar-vertical::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-primary);
+}
+
+/* Анимация для dropdown */
+.navbar-vertical .dropdown-menu {
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Улучшенный разделитель для групп */
+.navbar-vertical .nav-item + .nav-item {
+    position: relative;
+}
+
+/* Стили для иконок в активном состоянии */
+.navbar-vertical .nav-item.active > .nav-link .nav-link-icon,
+.navbar-vertical .dropdown-toggle.active .nav-link-icon {
+    transform: scale(1.1);
+}
+
+/* Стили для бургер-меню */
+.navbar-toggler {
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.navbar-toggler:focus {
+    box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--accent-primary) 25%, transparent) !important;
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(var(--text-primary-rgb, 0, 0, 0), 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
 }

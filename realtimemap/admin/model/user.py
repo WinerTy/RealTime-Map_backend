@@ -20,7 +20,6 @@ from core.config import conf
 from modules import User
 from modules.user_ban.dependencies import get_user_ban_repository
 from modules.user_ban.model import BanReason
-from modules.user_ban.repository import PgUsersBanRepository
 from modules.user_ban.schemas import UsersBanCreate, ReasonTextException, UpdateUsersBan
 
 env = Environment(loader=FileSystemLoader(conf.template_dir))
@@ -149,7 +148,7 @@ class AdminUser(BaseModelAdmin):
         moderator = self.get_current_user(request)
         session: AsyncSession = request.state.session
         current_time = datetime.now()
-        user_ban_repo = PgUsersBanRepository(session)
+        user_ban_repo = await get_user_ban_repository(session)
 
         is_banned = await user_ban_repo.check_active_user_ban(user_id)
 

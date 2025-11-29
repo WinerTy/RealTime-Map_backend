@@ -2,17 +2,17 @@ from datetime import datetime
 from typing import Dict, Any, TYPE_CHECKING
 
 from starlette.requests import Request
-from starlette_admin import HasOne, IntegerField, DateTimeField
+from starlette_admin import HasOne, IntegerField, DateTimeField, TextAreaField
 from starlette_admin.contrib.sqla import ModelView
 from starlette_admin.exceptions import FormValidationError
 
 from admin.fields import GeomField
 from admin.fields.geohash_field import GeoHashField
-from core.app.socket import sio
+from dependencies.notification import get_mark_notification_service
 from modules import Mark
-from modules.mark.repository import PgMarkRepository
+from modules.geo_service import get_geo_service
+from modules.mark.dependencies import get_pg_mark_repository
 from modules.mark.schemas import ActionType
-from modules.notification import MarkNotificationService
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -34,7 +34,7 @@ class AdminMark(ModelView):
         ),
         Mark.mark_name,
         HasOne("owner", identity="user", required=True),
-        Mark.additional_info,
+        TextAreaField("additional_info", required=False),
         HasOne("category", identity="category", required=True),
         IntegerField("duration", min=12, max=48, step=12, required=True),
         DateTimeField("start_at", label="Start at", required=True),
@@ -79,8 +79,9 @@ class AdminMark(ModelView):
         request: Request, mark: Mark, action_type: str
     ) -> None:
         session: "AsyncSession" = request.state.session
-        mark_repo = PgMarkRepository(session)
-        notify_service = MarkNotificationService(mark_repo, sio)
+        geo_service = get_geo_service()
+        mark_repo = await get_pg_mark_repository(session, geo_service)
+        notify_service = get_mark_notification_service(mark_repo, geo_service)
         await notify_service.notify_mark_action(mark, action_type, request)
 
     async def after_create(self, request: Request, obj: Mark) -> None:
