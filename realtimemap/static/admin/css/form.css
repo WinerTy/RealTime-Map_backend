@@ -18,3 +18,80 @@
 .form-select {
     background-color: var(--bg-page) !important;
 }
+
+.field-textarea {
+    max-height: 300px;
+}
+
+
+.select2-selection {
+    background-color: var(--bg-page) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+    border-radius: 6px;
+}
+
+.select2-results__option, .select2-search {
+    background-color: var(--bg-page) !important;
+    color: var(--text-primary) !important;
+}
+
+input[type="search"] {
+    color: var(--text-primary) !important;
+    background-color: var(--bg-page) !important;
+}
+
+.select2-results__option--selectable {
+    background-color: var(--bg-page) !important;
+    color: var(--text-primary) !important;
+}
+
+.select2-results__option--selectable:hover {
+    background-color: var(--bg-card) !important;
+}
+
+.select2-results__option--highlighted {
+    background-color: var(--bg-card) !important;
+    color: #ffffff !important;
+}
+
+.select2-container--open .select2-dropdown {
+    background-color: var(--bg-page) !important;
+    border-color: var(--border-color) !important;
+}
+
+.select2-results__option--selected {
+    background-color: var(--bg-card) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Стили для input file */
+input[type="file"] {
+    background-color: var(--bg-page) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+input[type="file"]:hover {
+    border-color: var(--accent-primary) !important;
+    background-color: var(--bg-card) !important;
+}
+
+
+/* Стили для кнопки выбора файла */
+input[type="file"]::file-selector-button {
+    background-color: var(--accent-primary) !important;
+    color: #ffffff !important;
+    border: none !important;
+    padding: 6px 18px !important;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+input[type="file"]::file-selector-button:hover {
+    opacity: 0.9;
+    border: hidden !important;
+}

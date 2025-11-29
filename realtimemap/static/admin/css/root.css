@@ -3,9 +3,11 @@
     --bg-page: #f8f9fa;
     --bg-card: #ffffff;
     --text-primary: #343a40;
+    --text-primary-rgb: 52, 58, 64;
     --text-secondary: #6c757d;
     --border-color: #e9ecef;
     --accent-primary: #7aafeb;
+    --accent-primary-rgb: 122, 175, 235;
     --accent-primary-deep: #4a8ad4;
     --accent-danger: #ff3b30;
     --accent-succses: #82f00d;
@@ -16,9 +18,11 @@
     --bg-page: #1a1d21;
     --bg-card: #2c3035;
     --text-primary: #e9ecef;
+    --text-primary-rgb: 233, 236, 239;
     --text-secondary: #adb5bd;
     --border-color: #495057;
     --accent-primary: #7aafeb;
+    --accent-primary-rgb: 122, 175, 235;
     --accent-primary-deep: #8bc0f7;
     --accent-danger: #ff4d4f;
     --accent-succses: #82f00d;

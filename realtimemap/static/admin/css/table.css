@@ -96,3 +96,7 @@
 td {
     color: var(--text-secondary) !important;
 }
+
+.dataTables_info {
+    color: var(--text-primary) !important;
+}
